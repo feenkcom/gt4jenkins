@@ -1,4 +1,4 @@
-## A Gt style Jenkins client.
+# Gt style Jenkins client.
 ```
 EpMonitor current disable.
 [ 

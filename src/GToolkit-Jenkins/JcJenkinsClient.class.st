@@ -10,6 +10,14 @@ Class {
 	#category : #'GToolkit-Jenkins'
 }
 
+{ #category : #constants }
+JcJenkinsClient class >> backgroundColorForStatus: aString [
+	aString = 'SUCCESS' ifTrue: [^ BrGlamorousColors successBackgroundColor].
+	aString = 'FAILURE' ifTrue: [^ BrGlamorousColors errorBackgroundColor].
+	aString = 'UNSTABLE' ifTrue: [^ BrGlamorousColors failureBackgroundColor ].
+	^ BrGlamorousColors lightBorderColor.
+]
+
 { #category : #accessing }
 JcJenkinsClient >> blueOcean [
 	|json modelBuilder model|

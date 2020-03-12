@@ -28,6 +28,12 @@ JcBlueJUnitTestResult >> gtDisplayOn: stream [
 	stream nextPutAll: self name
 ]
 
+{ #category : #accessing }
+JcBlueJUnitTestResult >> gtTestFor: aView [
+	<gtView>
+	^ self testMethod gtSourceFor: aView
+]
+
 { #category : #testing }
 JcBlueJUnitTestResult >> isFailed [
 	^ self status = 'FAILED'

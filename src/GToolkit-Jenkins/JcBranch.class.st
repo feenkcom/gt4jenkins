@@ -6,12 +6,12 @@ Class {
 
 { #category : #accessing }
 JcBranch >> duration [
-	^ (( json at: 'latestRun') at: 'durationInMillis') asNumber milliSeconds
+	^ (( rawData at: 'latestRun') at: 'durationInMillis') asNumber milliSeconds
 ]
 
 { #category : #accessing }
 JcBranch >> gtDisplayOn: stream [
-	stream nextPutAll: (json at: 'name')
+	stream nextPutAll: (rawData at: 'name')
 ]
 
 { #category : #accessing }
@@ -34,7 +34,7 @@ JcBranch >> gtRunsFor: aView [
 
 { #category : #accessing }
 JcBranch >> result [
-	^ ( json at: 'latestRun') at: 'result'
+	^ ( rawData at: 'latestRun') at: 'result'
 ]
 
 { #category : #accessing }
@@ -49,5 +49,5 @@ JcBranch >> runs [
 
 { #category : #accessing }
 JcBranch >> startTime [
-	^ DateAndTime fromString: (( json at: 'latestRun') at: 'startTime')
+	^ DateAndTime fromString: (( rawData at: 'latestRun') at: 'startTime')
 ]

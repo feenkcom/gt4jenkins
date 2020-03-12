@@ -1,6 +1,9 @@
 Class {
 	#name : #JcPipelineNode,
 	#superclass : #JcModelElement,
+	#instVars : [
+		'parentRun'
+	],
 	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
 }
 
@@ -11,5 +14,25 @@ JcPipelineNode >> gtDisplayOn: stream [
 
 { #category : #accessing }
 JcPipelineNode >> name [
-	^ json at: 'displayName'
+	^ rawData at: 'displayName'
+]
+
+{ #category : #accessing }
+JcPipelineNode >> parentRun [
+	^ parentRun
+]
+
+{ #category : #accessing }
+JcPipelineNode >> parentRun: aParentRun [
+	parentRun := aParentRun
+]
+
+{ #category : #accessing }
+JcPipelineNode >> result [
+	^ rawData at: 'result'
+]
+
+{ #category : #accessing }
+JcPipelineNode >> resultBackgroundColor [
+	^ JcJenkinsClient backgroundColorForStatus: self result
 ]

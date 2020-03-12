@@ -13,7 +13,7 @@ JcGithubOrganizationFolder >> gtPipelinesFor: aView [
 		items: [ self pipelines ];
 		column: 'Name' translated do: [ :aColumn | 
 			aColumn 
-				item: [ :p | p json at: 'name' ]; 
+				item: [ :p | p rawData at: 'name' ]; 
 				matchParent ]
 ]
 

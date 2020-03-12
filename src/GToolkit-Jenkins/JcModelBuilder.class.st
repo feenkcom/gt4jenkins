@@ -56,7 +56,7 @@ JcModelBuilder >> modelFrom: aDictionary [
 		theClass := (self ensureClass: fullClassName).
 		theObject := theClass new.
 		theObject modelBuilder: self.
-		theObject json: aDictionary.
+		theObject rawData: aDictionary.
 		^ theObject].
 	^ nil
 	

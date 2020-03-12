@@ -6,7 +6,7 @@ Class {
 
 { #category : #accessing }
 JcOrganization >> gtDisplayOn: stream [
-	stream nextPutAll: (json at:'name')
+	stream nextPutAll: (rawData at:'name')
 ]
 
 { #category : #accessing }
@@ -18,7 +18,7 @@ JcOrganization >> gtPipelinesFor: aView [
 		items: [ self pipelines ];
 		column: 'Name' translated do: [ :aColumn | 
 			aColumn 
-				item: [ :p | p json at: 'name' ]; 
+				item: [ :p | p rawData at: 'name' ]; 
 				matchParent ]
 ]
 

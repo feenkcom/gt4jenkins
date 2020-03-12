@@ -18,6 +18,13 @@ JcJenkinsClient class >> backgroundColorForStatus: aString [
 	^ BrGlamorousColors lightBorderColor.
 ]
 
+{ #category : #constants }
+JcJenkinsClient class >> backgroundColorForTestStatus: aString [
+	aString = 'PASSED' ifTrue: [^ BrGlamorousColors successBackgroundColor].
+	aString = 'FAILED' ifTrue: [^ BrGlamorousColors failureBackgroundColor].
+	^ BrGlamorousColors lightBorderColor.
+]
+
 { #category : #accessing }
 JcJenkinsClient >> blueOcean [
 	|json modelBuilder model|

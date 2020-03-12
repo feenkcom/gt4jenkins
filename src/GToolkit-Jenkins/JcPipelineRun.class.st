@@ -6,22 +6,158 @@ Class {
 
 { #category : #accessing }
 JcPipelineRun >> duration [
-	^ (json at: 'durationInMillis')  asNumber milliSeconds
+	^ (rawData at: 'durationInMillis')  asNumber milliSeconds
 ]
 
 { #category : #accessing }
 JcPipelineRun >> gtDisplayOn: stream [
-	stream nextPutAll: (json at: 'id')
+	stream nextPutAll: (rawData at: 'id')
+]
+
+{ #category : #accessing }
+JcPipelineRun >> gtNodesFor: aView [
+	<gtView>
+	| aList |
+
+	aList := aView columnedList
+		title: 'Nodes' translated;
+		priority: 60;
+		items: [ self nodes].
+
+	aList column
+		title: 'Index' translated;
+		width: 30;
+		item: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray].
+	
+	aList column
+		title: 'Item' translated;
+		item: [ :eachItem :eachIndex | eachItem ];
+		itemFormat: [ :eachItem | eachItem gtDisplayText ].
+	
+	^ aList
+]
+
+{ #category : #accessing }
+JcPipelineRun >> gtStagesMapFor: aView [
+	<gtView> 
+	^ aView mondrian 
+	  title: 'Stages Map' translated;
+	  priority: 55; 
+	  painting: [ :mondrian | 
+	  	  |allNodes|
+	  	  allNodes := self nodes.
+			mondrian nodes 
+				shape: [ :aStage | 
+				|container editor statusColor aDropdown|
+					statusColor := aStage resultBackgroundColor.
+					container := BlElement new
+						layout: BlLinearLayout horizontal;
+						look:BrShadowLook;
+						clipChildren: false;
+						margin:(BlInsets all:10);
+						background: Color white;
+						zIndex: 1;
+						when: BlClickEvent do:[:e | e target phlow spawnObject: aStage];
+						constraintsDo: [ :c |
+							c horizontal exact:200.
+							c vertical fitContent].
+					editor := BrLabel new 
+						text: aStage name asRopedText;
+						look: BrGlamorousLabelLook;
+						constraintsDo: [ :c | 
+							c margin: (BlInsets all: 5).
+							c vertical fitContent.
+							c horizontal matchParent.
+							 ].
+					aDropdown := BrBadge new
+							label: (aStage failedTests size);
+							exact: 20 @ 20;
+							visibility:
+					(aStage failedTests size isZero
+						ifTrue: [ BlVisibility gone ]
+						ifFalse: [ BlVisibility visible ]);
+					constraintsDo: [ :c | 
+						c horizontal fitContent.
+						c vertical fitContent.
+						c ignoreByLayout.
+						c ignored horizontal alignRight.
+						c ignored vertical alignTop.
+						c margin: (BlInsets top: -10 right: -10) ];
+					look: BrGlamorousBadgeWithLabelLook +
+						(BrGlamorousWithDropdownLook
+							handle: [ BrBadge new
+										label: (aStage failedTests size);
+										exact: 20 @ 20;
+										look: BrGlamorousBadgeWithLabelLook;
+										yourself ]
+							content: [ | aPhlowView aPopupElement |
+								aPhlowView := aStage gtFailedTestsFor: GtPhlowEmptyView new.
+								aPopupElement := BlElement new
+											border: (BlBorder paint: Color orange width: 2);
+											background: Color white;
+											layout: BlLinearLayout vertical;
+											constraintsDo: [ :c | 
+												c horizontal fitContent.
+												c vertical fitContent ].
+								aPhlowView asElementDo: [ :anElement | 
+												anElement layout: BlLinearLayout vertical.
+												aPopupElement addChild: anElement.
+												anElement 
+													when: GtPhlowObjectToSpawn do: [:e | 
+													container fireEvent: (GtPhlowObjectToSpawn new object: e object; sourceElement: e target)] ].
+										aPopupElement ]).
+					container
+						addChild: (BrVerticalPane new vMatchParent; hExact: 15; background: statusColor );
+						addChild: aDropdown;
+						addChild: (editor).
+				];
+				
+			with: allNodes.
+			mondrian edges
+				shape: [
+					BlSigmoidElement new 
+						zIndex: 0;
+						beVertical;
+						bendingPoint:0.3;
+						sharpness: 0.1;
+						border: (BlBorder paint: (Color gray alpha: 0.2) width: 2)];
+				fromCenterBottom;
+				toCenterTop;
+				connectFrom: #yourself 
+				toAll: [:each | | pN |
+					pN := each nextStagesIds.
+					allNodes select: [ :node | pN anySatisfy: [ :stageID | stageID = node id ] ] ].
+			mondrian layout custom: ((GtGradNorthHierarchicalLayout new interRanksSpacing: 30)).
+			]
+
+]
+
+{ #category : #accessing }
+JcPipelineRun >> gtTestsFor: aView [
+	<gtView>
+	((rawData at: 'state') = 'RUNNING') ifTrue: [^ aView empty].
+	^ aView columnedList
+		title: (rawData at: 'runSummary') translated;
+		priority: 50;
+		items: [ self tests];
+		column: 'Status' translated do: [ :column | 
+			column
+				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each statusBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
+				noResize ];
+		column: 'Status' translated format: [ :eachTest | eachTest status ] width: 70;
+		column: 'Class' translated format: [ :eachTest | eachTest testClassName ] width: 250;
+		column: 'Method' translated format: [ :eachTest | eachTest testMethodName ];
+		column: 'Stage' translated format: [:eachTest | eachTest fullStageName ]
 ]
 
 { #category : #accessing }
 JcPipelineRun >> nodes [
-	^ (super linksClientFor: 'nodes') execute
+	^ ((super linksClientFor: 'nodes') execute) collect: [:each | each parentRun: self]
 ]
 
 { #category : #accessing }
 JcPipelineRun >> result [
-	^ json at: 'result'
+	^ rawData at: 'result'
 ]
 
 { #category : #accessing }
@@ -31,5 +167,10 @@ JcPipelineRun >> resultBackgroundColor [
 
 { #category : #accessing }
 JcPipelineRun >> startTime [
-	^ DateAndTime fromString: (json at: 'startTime')
+	^ DateAndTime fromString: (rawData at: 'startTime')
+]
+
+{ #category : #accessing }
+JcPipelineRun >> tests [
+	^ ((super linksClientFor: 'tests') execute)
 ]

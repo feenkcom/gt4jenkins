@@ -19,6 +19,26 @@ JcBlueJUnitTestResult class >> testStatusParser [
 ]
 
 { #category : #accessing }
+JcBlueJUnitTestResult >> fullStageName [
+	^ '/ ' join: self testNameParsed allButLast 
+]
+
+{ #category : #accessing }
+JcBlueJUnitTestResult >> gtDisplayOn: stream [
+	stream nextPutAll: self name
+]
+
+{ #category : #testing }
+JcBlueJUnitTestResult >> isFailed [
+	^ self status = 'FAILED'
+]
+
+{ #category : #testing }
+JcBlueJUnitTestResult >> isPassed [
+	^ self status = 'PASSED'
+]
+
+{ #category : #accessing }
 JcBlueJUnitTestResult >> name [ 
 	^ rawData at: 'name'
 ]

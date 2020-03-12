@@ -1,6 +1,9 @@
 Class {
 	#name : #JcPipelineRun,
 	#superclass : #JcModelElement,
+	#instVars : [
+		'tests'
+	],
 	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
 }
 
@@ -172,5 +175,6 @@ JcPipelineRun >> startTime [
 
 { #category : #accessing }
 JcPipelineRun >> tests [
-	^ ((super linksClientFor: 'tests') execute)
+	tests ifNil: [ tests := ((super linksClientFor: 'tests') execute)].
+	^ tests
 ]

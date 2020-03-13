@@ -24,6 +24,7 @@ JcQueuedBlueRun >> allTestsURL [
 
 { #category : #accessing }
 JcQueuedBlueRun >> duration [
+	((rawData at: 'result') = 'UNKNOWN') ifTrue: [^ (rawData at: 'state')].
 	^ (rawData at: 'durationInMillis')  asNumber milliSeconds
 ]
 
@@ -190,7 +191,7 @@ JcQueuedBlueRun >> resultBackgroundColor [
 
 { #category : #accessing }
 JcQueuedBlueRun >> startTime [
-	^ DateAndTime fromString: (rawData at: 'startTime')
+	^ (rawData at: 'state')
 ]
 
 { #category : #accessing }

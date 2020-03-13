@@ -2,10 +2,27 @@ Class {
 	#name : #JcPipelineNode,
 	#superclass : #JcModelElement,
 	#instVars : [
-		'parentRun'
+		'parentRun',
+		'allRawTests'
 	],
 	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
 }
+
+{ #category : #accessing }
+JcPipelineNode >> addRawTest: aDictionary [
+	allRawTests add: aDictionary
+]
+
+{ #category : #accessing }
+JcPipelineNode >> allRawTests [
+	^ allRawTests
+]
+
+{ #category : #accessing }
+JcPipelineNode >> ensureAllTestsRaw [
+	allRawTests ifNil: [allRawTests := OrderedCollection new].
+	^ allRawTests
+]
 
 { #category : #accessing }
 JcPipelineNode >> failedTests [

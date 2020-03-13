@@ -4,18 +4,25 @@ Class {
 	#instVars : [
 		'tests',
 		'parentBranchName',
-		'allTests'
+		'allTests',
+		'nodesDictionary'
 	],
 	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
 }
 
 { #category : #accessing }
 JcPipelineRun >> allTests [
-	|client|
+	|client stageId|
 	allTests ifNil: 
 	[client := (super urlClientFor: self allTestsURL).
 	client modelBuilder jenkinsClient setBasicAuth.
 	allTests := client execute].
+	allTests rawSuites collect: [ :suite | 
+		|enclosingBlocksArray|
+		enclosingBlocksArray := (suite at: 'enclosingBlocks').
+		enclosingBlocksArray ifNotEmpty: [
+			stageId := enclosingBlocksArray first.
+			((nodesDictionary at: stageId) ensureAllTestsRaw) add: suite]].
 	^ allTests
 ]
 
@@ -26,7 +33,7 @@ JcPipelineRun >> allTestsURL [
 
 { #category : #accessing }
 JcPipelineRun >> duration [
-	^ (rawData at: 'durationInMillis')  asNumber milliSeconds
+	^ ((rawData at: 'durationInMillis')  asNumber milliSeconds roundTo: 1 second) humanReadablePrintString
 ]
 
 { #category : #accessing }
@@ -172,7 +179,15 @@ JcPipelineRun >> gtTestsFor: aView [
 
 { #category : #accessing }
 JcPipelineRun >> nodes [
-	^ ((super linksClientFor: 'nodes') execute) collect: [:each | each parentRun: self]
+	nodesDictionary ifNil: [nodesDictionary := Dictionary new.
+	((super linksClientFor: 'nodes') execute) collect: [:each | nodesDictionary at:( each id) put: (each parentRun: self)]].
+	^ nodesDictionary values
+	
+]
+
+{ #category : #accessing }
+JcPipelineRun >> nodesDictionary [
+	^ nodesDictionary
 ]
 
 { #category : #accessing }
@@ -192,7 +207,10 @@ JcPipelineRun >> resultBackgroundColor [
 
 { #category : #accessing }
 JcPipelineRun >> startTime [
-	^ DateAndTime fromString: (rawData at: 'startTime')
+	|st|
+	st := DateAndTime fromString: (rawData at: 'startTime').
+	^ String streamContents: [:s | st printSeparateDateAndTimeOn: s]
+	
 ]
 
 { #category : #accessing }

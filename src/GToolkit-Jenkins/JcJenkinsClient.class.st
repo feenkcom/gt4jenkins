@@ -42,6 +42,12 @@ JcJenkinsClient >> password [
 ]
 
 { #category : #accessing }
+JcJenkinsClient >> setBasicAuth [
+	znclient := ZnClient new
+	username: username password: password.
+]
+
+{ #category : #accessing }
 JcJenkinsClient >> setupJwtToken [
 	| jwt |
 	znclient get: ('' join: { url .'/jwt-auth/token?maxExpiryTimeInMins=120'}).

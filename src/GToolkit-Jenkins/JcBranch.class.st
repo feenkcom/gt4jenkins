@@ -1,6 +1,9 @@
 Class {
 	#name : #JcBranch,
 	#superclass : #JcModelElement,
+	#instVars : [
+		'runs'
+	],
 	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
 }
 
@@ -44,7 +47,10 @@ JcBranch >> resultBackgroundColor [
 
 { #category : #accessing }
 JcBranch >> runs [
-	^ (super linksClientFor: 'runs') execute
+	
+	runs ifNil: [runs := (super linksClientFor: 'runs') execute. runs := runs collect: [:r | r parentBranchName: (rawData at: 'fullName')]].
+	^ runs
+	
 ]
 
 { #category : #accessing }

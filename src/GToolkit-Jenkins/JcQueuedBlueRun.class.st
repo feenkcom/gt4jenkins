@@ -1,41 +1,39 @@
 Class {
-	#name : #JcPipelineRun,
+	#name : #JcQueuedBlueRun,
 	#superclass : #JcModelElement,
 	#instVars : [
-		'tests',
 		'parentBranchName',
-		'allTests'
+		'tests'
 	],
-	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
+	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanServiceEmbeddedRest'
 }
 
 { #category : #accessing }
-JcPipelineRun >> allTests [
+JcQueuedBlueRun >> allTests [
 	|client|
-	allTests ifNil: 
-	[client := (super urlClientFor: self allTestsURL).
+	client := (super urlClientFor: self allTestsURL).
 	client modelBuilder jenkinsClient setBasicAuth.
-	allTests := client execute].
-	^ allTests
+	^ client execute
+ 
 ]
 
 { #category : #accessing }
-JcPipelineRun >> allTestsURL [
+JcQueuedBlueRun >> allTestsURL [
 		^ '/job/', (parentBranchName copyReplaceAll: '/' with: '/job/'), '/' , (rawData at: 'id'), '/testReport/api/json'
 ]
 
 { #category : #accessing }
-JcPipelineRun >> duration [
+JcQueuedBlueRun >> duration [
 	^ (rawData at: 'durationInMillis')  asNumber milliSeconds
 ]
 
 { #category : #accessing }
-JcPipelineRun >> gtDisplayOn: stream [
+JcQueuedBlueRun >> gtDisplayOn: stream [
 	stream nextPutAll: (rawData at: 'id')
 ]
 
 { #category : #accessing }
-JcPipelineRun >> gtNodesFor: aView [
+JcQueuedBlueRun >> gtNodesFor: aView [
 	<gtView>
 	| aList |
 
@@ -58,7 +56,7 @@ JcPipelineRun >> gtNodesFor: aView [
 ]
 
 { #category : #accessing }
-JcPipelineRun >> gtStagesMapFor: aView [
+JcQueuedBlueRun >> gtStagesMapFor: aView [
 	<gtView> 
 	^ aView mondrian 
 	  title: 'Stages Map' translated;
@@ -153,7 +151,7 @@ JcPipelineRun >> gtStagesMapFor: aView [
 ]
 
 { #category : #accessing }
-JcPipelineRun >> gtTestsFor: aView [
+JcQueuedBlueRun >> gtTestsFor: aView [
 	<gtView>
 	((rawData at: 'state') = 'RUNNING') ifTrue: [^ aView empty].
 	^ aView columnedList
@@ -171,32 +169,31 @@ JcPipelineRun >> gtTestsFor: aView [
 ]
 
 { #category : #accessing }
-JcPipelineRun >> nodes [
+JcQueuedBlueRun >> nodes [
 	^ ((super linksClientFor: 'nodes') execute) collect: [:each | each parentRun: self]
 ]
 
 { #category : #accessing }
-JcPipelineRun >> parentBranchName: aBranchName [
-	parentBranchName := aBranchName
+JcQueuedBlueRun >> parentBranchName: aName [
+	parentBranchName := aName
 ]
 
 { #category : #accessing }
-JcPipelineRun >> result [
+JcQueuedBlueRun >> result [
 	^ rawData at: 'result'
 ]
 
 { #category : #accessing }
-JcPipelineRun >> resultBackgroundColor [
+JcQueuedBlueRun >> resultBackgroundColor [
 	^ JcJenkinsClient backgroundColorForStatus: self result
 ]
 
 { #category : #accessing }
-JcPipelineRun >> startTime [
+JcQueuedBlueRun >> startTime [
 	^ DateAndTime fromString: (rawData at: 'startTime')
 ]
 
 { #category : #accessing }
-JcPipelineRun >> tests [
-	tests ifNil: [ tests := ((super linksClientFor: 'tests') execute)].
-	^ tests
+JcQueuedBlueRun >> tests [
+	^ ((super linksClientFor: 'tests') execute).
 ]

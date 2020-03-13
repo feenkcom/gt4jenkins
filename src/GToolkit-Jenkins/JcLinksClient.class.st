@@ -31,6 +31,11 @@ JcLinksClient >> getRawData [
 ]
 
 { #category : #accessing }
+JcLinksClient >> modelBuilder [
+	^ modelBuilder
+]
+
+{ #category : #accessing }
 JcLinksClient >> modelBuilder: aModelBuilder [
 	modelBuilder := aModelBuilder
 ]

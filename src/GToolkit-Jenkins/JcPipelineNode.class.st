@@ -19,6 +19,11 @@ JcPipelineNode >> allRawTests [
 ]
 
 { #category : #accessing }
+JcPipelineNode >> allTests [
+	^ theModelBuilder modelFrom: allRawTests className: 'IoJenkinsBlueoceanServiceEmbeddedRestJunit.JcBlueJUnitStageTestResult'
+]
+
+{ #category : #accessing }
 JcPipelineNode >> ensureAllTestsRaw [
 	allRawTests ifNil: [allRawTests := OrderedCollection new].
 	^ allRawTests

@@ -48,7 +48,7 @@ JcModelBuilder >> jenkinsClient: aJenkinsClient [
 { #category : #accessing }
 JcModelBuilder >> modelFrom: aDictionary [
 	| theClass theObject theArray|
-	aDictionary isArray ifTrue: [
+	(aDictionary isDictionary) ifFalse: [
 	theArray := OrderedCollection new.
 	aDictionary collect: [:each | theArray add: (self modelFrom: each)].
 	^ theArray].
@@ -59,5 +59,20 @@ JcModelBuilder >> modelFrom: aDictionary [
 		theObject rawData: aDictionary.
 		^ theObject].
 	^ nil
+	
+]
+
+{ #category : #accessing }
+JcModelBuilder >> modelFrom: aDictionary className: aClasName [
+	| theClass theObject theArray|
+	(aDictionary isDictionary) ifFalse: [
+	theArray := OrderedCollection new.
+	aDictionary collect: [:each | theArray add: (self modelFrom: each className: aClasName)].
+	^ theArray].
+	theClass := (self ensureClass: aClasName).
+	theObject := theClass new.
+	theObject modelBuilder: self.
+	theObject rawData: aDictionary.
+	^ theObject
 	
 ]

@@ -37,3 +37,13 @@ JcModelElement >> rawData [
 JcModelElement >> rawData: aDictionary [
 	rawData := aDictionary
 ]
+
+{ #category : #accessing }
+JcModelElement >> urlClientFor: aUrl [
+	|client|
+	client := JcLinksClient new.
+	client for: aUrl.
+	client modelBuilder: theModelBuilder.
+	client url: aUrl.
+	^ client.
+]

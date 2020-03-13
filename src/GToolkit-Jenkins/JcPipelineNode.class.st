@@ -40,6 +40,20 @@ JcPipelineNode >> gtFailedTestsFor: aView [
 ]
 
 { #category : #accessing }
+JcPipelineNode >> gtStepsFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'Steps' translated;
+		priority: 50;
+		items: [ self steps];
+		column: 'Status' translated do: [ :column | 
+			column
+				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each resultBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
+				noResize ];
+		column: 'Item' translated format: [ :eachItem | eachItem gtDisplayText ]
+]
+
+{ #category : #accessing }
 JcPipelineNode >> id [ 
 	^ rawData at:'id'
 ]
@@ -72,4 +86,9 @@ JcPipelineNode >> result [
 { #category : #accessing }
 JcPipelineNode >> resultBackgroundColor [
 	^ JcJenkinsClient backgroundColorForStatus: self result
+]
+
+{ #category : #accessing }
+JcPipelineNode >> steps [
+	^ (super linksClientFor: 'steps') execute
 ]

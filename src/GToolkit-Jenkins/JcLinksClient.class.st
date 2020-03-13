@@ -11,16 +11,23 @@ Class {
 
 { #category : #accessing }
 JcLinksClient >> execute [
-	|json model jc|
-	jc := modelBuilder jenkinsClient.
-	json := jc znclient get: ('' join:{jc url . url}).
-	model := modelBuilder modelFrom: (NeoJSONReader fromString: json).
+	|rawData model|
+	rawData:=self getRawData.
+	model := modelBuilder modelFrom: (NeoJSONReader fromString: rawData).
 	^ model.
 ]
 
 { #category : #accessing }
 JcLinksClient >> for: aLinksKey [
 	linksKey := aLinksKey
+]
+
+{ #category : #accessing }
+JcLinksClient >> getRawData [
+	|model jc|
+	jc := modelBuilder jenkinsClient.
+	^ jc znclient get: ('' join:{jc url . url}).
+	
 ]
 
 { #category : #accessing }

@@ -14,19 +14,20 @@ JcPipelineNode >> addRawTest: aDictionary [
 ]
 
 { #category : #accessing }
+JcPipelineNode >> allCasesSize [
+	^ (self allTests flatCollect: [:c | c allCases]) size
+]
+
+{ #category : #accessing }
 JcPipelineNode >> allRawTests [
 	^ allRawTests
 ]
 
 { #category : #accessing }
 JcPipelineNode >> allTests [
-	^ theModelBuilder modelFrom: allRawTests className: 'IoJenkinsBlueoceanServiceEmbeddedRestJunit.JcBlueJUnitStageTestResult'
-]
-
-{ #category : #accessing }
-JcPipelineNode >> ensureAllTestsRaw [
-	allRawTests ifNil: [allRawTests := OrderedCollection new].
-	^ allRawTests
+	allRawTests := parentRun allTests at: self id ifAbsent:[nil]. "this will trigger a get in the parent to cache all test results"
+	allRawTests ifNil: [^ OrderedCollection new].
+	^ theModelBuilder modelFrom: allRawTests className: 'IoJenkinsBlueoceanServiceEmbeddedRestJunit.BlueJUnitStageTestResult'
 ]
 
 { #category : #accessing }
@@ -35,6 +36,25 @@ JcPipelineNode >> failedTests [
 	allFailed := parentRun tests select: [:each | each isFailed].
 	allFailed := allFailed select: [:t | t testNameParsed size = 4 and: [(t testNameParsed at: 3) trimmed asSymbol = self name asSymbol]].
 	^ allFailed
+]
+
+{ #category : #accessing }
+JcPipelineNode >> gtAllTestsFor: aView [
+	<gtView>
+	| at|
+	at := self allTests.
+	at isEmpty ifTrue:[ ^ aView empty].
+	^ aView columnedList
+		title: 'All Examples' translated;
+		priority: 60;
+		items: [ at];
+		column: 'Index' translated item: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray] width: 20;
+		column: 'Status' translated do: [ :column | 
+			column
+				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each statusBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
+				noResize ];
+		column: 'Package' translated format: [ :eachItem | eachItem testClassName] width: 250;
+		column: 'Examples' translated format: [ :eachItem | eachItem allCases size] width: 50
 ]
 
 { #category : #accessing }
@@ -49,7 +69,7 @@ JcPipelineNode >> gtFailedTestsFor: aView [
 	ft := self failedTests.
 	ft isEmpty ifTrue:[ ^ aView empty].
 	^ aView columnedList
-		title: 'FailedTests' translated;
+		title: 'Failed Examples' translated;
 		priority: 60;
 		items: [ self failedTests];
 		column: 'Index' translated item: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray] width: 20;

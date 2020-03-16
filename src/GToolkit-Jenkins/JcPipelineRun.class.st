@@ -12,18 +12,22 @@ Class {
 
 { #category : #accessing }
 JcPipelineRun >> allTests [
-	|client stageId|
-	allTests ifNil: 
-	[client := (super urlClientFor: self allTestsURL).
-	client modelBuilder jenkinsClient setBasicAuth.
-	allTests := client execute].
-	allTests rawSuites collect: [ :suite | 
-		|enclosingBlocksArray|
-		enclosingBlocksArray := (suite at: 'enclosingBlocks').
-		enclosingBlocksArray ifNotEmpty: [
-			stageId := enclosingBlocksArray first.
-			((nodesDictionary at: stageId) ensureAllTestsRaw) add: suite]].
-	^ allTests
+	|client stageId allTestsResult|
+	allTests ifNil: [
+		client := (super urlClientFor: self allTestsURL).
+		client modelBuilder jenkinsClient setBasicAuth.
+		allTestsResult := client execute].
+		
+		allTestsResult ifNotNil: [
+			allTests := Dictionary new.
+			allTestsResult rawSuites collect: [ :suite | 
+				|enclosingBlocksArray|
+				enclosingBlocksArray := (suite at: 'enclosingBlocks').
+				enclosingBlocksArray ifNotEmpty: [
+					stageId := enclosingBlocksArray first.
+					allTests at: stageId ifAbsentPut: OrderedCollection new.
+						(allTests at: stageId) add: suite]]].
+	^ allTests.
 ]
 
 { #category : #accessing }
@@ -75,7 +79,7 @@ JcPipelineRun >> gtStagesMapFor: aView [
 	  	  allNodes := self nodes.
 			mondrian nodes 
 				shape: [ :aStage | 
-				|container editor statusColor aDropdown|
+				|container editor statusColor aDropdown allTestsDropdown|
 					statusColor := aStage resultBackgroundColor.
 					container := BlElement new
 						layout: BlLinearLayout horizontal;
@@ -125,7 +129,8 @@ JcPipelineRun >> gtStagesMapFor: aView [
 											layout: BlLinearLayout vertical;
 											constraintsDo: [ :c | 
 												c horizontal fitContent.
-												c vertical fitContent ].
+												c vertical fitContent.
+												].
 								aPhlowView asElementDo: [ :anElement | 
 												anElement layout: BlLinearLayout vertical.
 												aPopupElement addChild: anElement.
@@ -133,9 +138,52 @@ JcPipelineRun >> gtStagesMapFor: aView [
 													when: GtPhlowObjectToSpawn do: [:e | 
 													container fireEvent: (GtPhlowObjectToSpawn new object: e object; sourceElement: e target)] ].
 										aPopupElement ]).
+					allTestsDropdown := BrBadge new
+							label: (aStage allCasesSize);
+							exact: 20 @ 20;
+							visibility:
+					(aStage allTests size isZero
+						ifTrue: [ BlVisibility gone ]
+						ifFalse: [ BlVisibility visible ]);
+					constraintsDo: [ :c | 
+						c horizontal fitContent.
+						c vertical fitContent.
+						c ignoreByLayout.
+						c ignored horizontal alignLeft.
+						c ignored vertical alignTop.
+						c margin: (BlInsets top: -10 left: -10 bottom:0 right:0 ) ];
+					look: BrGlamorousBadgeWithLabelLook +
+						(BrGlamorousWithDropdownLook
+							handle: [ BrBadge new
+										label: aStage allCasesSize;
+										exact: 20 @ 20;
+										look: BrGlamorousBadgeWithLabelLook;
+										yourself ]
+							content: [ | aPhlowView aPopupElement |
+								aPhlowView := aStage gtAllTestsFor: GtPhlowEmptyView new.
+								aPopupElement := BlElement new
+											border: (BlBorder paint: Color orange width: 2);
+											background: Color white;
+											layout: BlLinearLayout vertical;
+											constraintsDo: [ :c | 
+												c horizontal fitContent.
+												c vertical fitContent].
+								aPhlowView asElementDo: [ :anElement | 
+												anElement layout: BlFrameLayout new.
+												anElement constraintsDo: [ :c | 
+													c horizontal fitContent.
+													c vertical fitContent.
+													c maxHeight: 200  ].
+												aPopupElement addChild: anElement.
+												anElement 
+													when: GtPhlowObjectToSpawn do: [:e | 
+													container fireEvent: (GtPhlowObjectToSpawn new object: e object; sourceElement: e target)] ].
+										aPopupElement ]).
+					
 					container
 						addChild: (BrVerticalPane new vMatchParent; hExact: 15; background: statusColor );
 						addChild: aDropdown;
+						addChild: allTestsDropdown;
 						addChild: (editor).
 				];
 				

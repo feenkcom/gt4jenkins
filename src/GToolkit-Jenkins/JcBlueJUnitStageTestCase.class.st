@@ -18,7 +18,7 @@ JcBlueJUnitStageTestCase >> methodName [
 JcBlueJUnitStageTestCase >> status [
 	|result|
 	result := 'SUCCESS'.
-	((rawData at: 'status') = 'FAILED' ) ifTrue: [ 
+	((rawData at: 'status') ~= 'PASSED' ) ifTrue: [ 
 		result := 'UNSTABLE'].
 	^ result
 ]

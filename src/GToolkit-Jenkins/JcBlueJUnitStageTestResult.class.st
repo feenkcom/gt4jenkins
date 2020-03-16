@@ -32,10 +32,7 @@ JcBlueJUnitStageTestResult >> gtAllCasesFor: aView [
 JcBlueJUnitStageTestResult >> status [
 	|result|
 	result := 'SUCCESS'.
-	(rawData at: 'cases') collect: [:c | 
-		(((c at:'status') = 'FAILED') and:[result = 'PASSED']) ifTrue: [ 
-		result := 'UNSTABLE'].
-	].
+	(rawData at: 'cases') detect: [:d | (d at: 'status') ~= 'PASSED'] ifFound: [result := 'UNSTABLE'] ifNone: [result := 'SUCCESS'.].
 	^ result
 ]
 

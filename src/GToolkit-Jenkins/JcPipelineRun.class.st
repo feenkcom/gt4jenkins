@@ -169,7 +169,7 @@ JcPipelineRun >> gtStagesMapFor: aView [
 												c horizontal fitContent.
 												c vertical fitContent].
 								aPhlowView asElementDo: [ :anElement | 
-												anElement layout: BlFrameLayout new.
+												anElement layout: BlLinearLayout vertical.
 												anElement constraintsDo: [ :c | 
 													c horizontal fitContent.
 													c vertical fitContent.

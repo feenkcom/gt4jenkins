@@ -3,7 +3,7 @@
 EpMonitor current disable.
 [ 
   Metacello new
-    baseline: 'JenkinsClient';
+    baseline: 'GToolkit4Jenkins';
     repository: 'github://feenkcom/gt4jenkins/src';
     load
 ] ensure: [ EpMonitor current enable ].

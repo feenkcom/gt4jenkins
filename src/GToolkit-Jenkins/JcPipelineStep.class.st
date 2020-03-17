@@ -18,6 +18,7 @@ JcPipelineStep >> gtLogFor: aView [
 	|text logURL|
 	logURL := ((((rawData at:'actions') detect: ([:a | (a at:'urlName') = 'log'])) at: '_links') at: 'self') at: 'href'.
 	text := (super urlClientFor: logURL) getRawData.
+	text := text copyReplaceAll: (Character value:27) asString with:  ''''.
 	text ifNil: [^aView empty].
 	^ aView textEditor
 		look: BrGlamorousCodeEditorLook;

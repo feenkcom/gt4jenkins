@@ -10,6 +10,7 @@ JcPipelineStep >> getLogText [
 	|text logURL|
 	logURL := ((((rawData at:'actions') detect: ([:a | (a at:'urlName') = 'log'])) at: '_links') at: 'self') at: 'href'.
 	text := (super urlClientFor: logURL) getRawData.
+	text ifNil: [^nil].
 	text := text copyReplaceAll: (Character value:27) asString with:  ''''.
 	^ text
 ]
@@ -30,6 +31,7 @@ JcPipelineStep >> gtLogFor: aView [
 	text ifNil: [^aView empty].
 	^ aView textEditor
 		look: BrGlamorousCodeEditorLook;
+		styler: JcConsoleStyler new;
 		title: 'Console Log';
 		text: [text]
 ]

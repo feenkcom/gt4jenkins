@@ -5,6 +5,16 @@ Class {
 }
 
 { #category : #accessing }
+JcPipelineStep >> getLogText [
+	
+	|text logURL|
+	logURL := ((((rawData at:'actions') detect: ([:a | (a at:'urlName') = 'log'])) at: '_links') at: 'self') at: 'href'.
+	text := (super urlClientFor: logURL) getRawData.
+	text := text copyReplaceAll: (Character value:27) asString with:  ''''.
+	^ text
+]
+
+{ #category : #accessing }
 JcPipelineStep >> gtDisplayOn: stream [
 	|displayDescription|
 	displayDescription := (rawData at: 'displayDescription').
@@ -16,9 +26,7 @@ JcPipelineStep >> gtDisplayOn: stream [
 JcPipelineStep >> gtLogFor: aView [
 	<gtView>
 	|text logURL|
-	logURL := ((((rawData at:'actions') detect: ([:a | (a at:'urlName') = 'log'])) at: '_links') at: 'self') at: 'href'.
-	text := (super urlClientFor: logURL) getRawData.
-	text := text copyReplaceAll: (Character value:27) asString with:  ''''.
+	text := self getLogText.
 	text ifNil: [^aView empty].
 	^ aView textEditor
 		look: BrGlamorousCodeEditorLook;

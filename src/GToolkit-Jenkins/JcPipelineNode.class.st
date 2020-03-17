@@ -31,6 +31,15 @@ JcPipelineNode >> allTests [
 ]
 
 { #category : #accessing }
+JcPipelineNode >> duration [
+	|duration|
+	duration := ((rawData at: 'durationInMillis')  asNumber milliSeconds roundTo: 1 second).
+	duration minutes = 0 ifTrue:[
+	^ '' join: {duration seconds asString, ' s'}].
+	^ '' join: {duration minutes asString, ' m ', duration seconds asString, ' s'}
+]
+
+{ #category : #accessing }
 JcPipelineNode >> failedTests [
 	|allFailed|
 	allFailed := parentRun tests select: [:each | each isFailed].

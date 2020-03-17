@@ -79,7 +79,7 @@ JcPipelineRun >> gtStagesMapFor: aView [
 	  	  allNodes := self nodes.
 			mondrian nodes 
 				shape: [ :aStage | 
-				|container editor statusColor aDropdown allTestsDropdown|
+				|container editor statusColor aDropdown allTestsDropdown examplesSize labelText runTimeLabel labelContainer|
 					statusColor := aStage resultBackgroundColor.
 					container := BlElement new
 						layout: BlLinearLayout horizontal;
@@ -92,8 +92,32 @@ JcPipelineRun >> gtStagesMapFor: aView [
 						constraintsDo: [ :c |
 							c horizontal exact:200.
 							c vertical fitContent].
+					labelContainer := BlElement new
+						layout: BlLinearLayout vertical;
+						
+						clipChildren: false;
+					
+						background: Color white;
+						zIndex: 1;
+						when: BlClickEvent do:[:e | e target phlow spawnObject: aStage];
+						constraintsDo: [ :c |
+							c horizontal matchParent.
+							c vertical fitContent].
 					editor := BrLabel new 
 						text: aStage name asRopedText;
+						look: BrGlamorousLabelLook;
+						constraintsDo: [ :c | 
+							c margin: (BlInsets all: 5).
+							c vertical fitContent.
+							c horizontal matchParent.
+							 ].
+					examplesSize := aStage allCasesSize.
+					labelText := aStage duration. 
+					(examplesSize > 0) ifTrue: 
+						[labelText:= 'Run ', examplesSize asString,' examples in ', labelText].
+					
+					runTimeLabel := BrLabel new 
+						text: labelText asRopedText;
 						look: BrGlamorousLabelLook;
 						constraintsDo: [ :c | 
 							c margin: (BlInsets all: 5).
@@ -138,53 +162,16 @@ JcPipelineRun >> gtStagesMapFor: aView [
 													when: GtPhlowObjectToSpawn do: [:e | 
 													container fireEvent: (GtPhlowObjectToSpawn new object: e object; sourceElement: e target)] ].
 										aPopupElement ]).
-					allTestsDropdown := BrBadge new
-							label: (aStage allCasesSize);
-							exact: 20 @ 20;
-							visibility:
-					(aStage allTests size isZero
-						ifTrue: [ BlVisibility gone ]
-						ifFalse: [ BlVisibility visible ]);
-					constraintsDo: [ :c | 
-						c horizontal fitContent.
-						c vertical fitContent.
-						c ignoreByLayout.
-						c ignored horizontal alignLeft.
-						c ignored vertical alignTop.
-						c margin: (BlInsets top: -10 left: -10 bottom:0 right:0 ) ];
-					look: BrGlamorousBadgeWithLabelLook +
-						(BrGlamorousWithDropdownLook
-							handle: [ BrBadge new
-										label: aStage allCasesSize;
-										exact: 20 @ 20;
-										look: BrGlamorousBadgeWithLabelLook;
-										yourself ]
-							content: [ | aPhlowView aPopupElement |
-								aPhlowView := aStage gtAllTestsFor: GtPhlowEmptyView new.
-								aPopupElement := BlElement new
-											border: (BlBorder paint: Color orange width: 2);
-											background: Color white;
-											layout: BlLinearLayout vertical;
-											constraintsDo: [ :c | 
-												c horizontal fitContent.
-												c vertical fitContent].
-								aPhlowView asElementDo: [ :anElement | 
-												anElement layout: BlLinearLayout vertical.
-												anElement constraintsDo: [ :c | 
-													c horizontal fitContent.
-													c vertical fitContent.
-													c maxHeight: 200  ].
-												aPopupElement addChild: anElement.
-												anElement 
-													when: GtPhlowObjectToSpawn do: [:e | 
-													container fireEvent: (GtPhlowObjectToSpawn new object: e object; sourceElement: e target)] ].
-										aPopupElement ]).
 					
+					
+					labelContainer 
+						addChild: editor;
+						addChild: runTimeLabel.
+					labelContainer addChild: aDropdown.
 					container
 						addChild: (BrVerticalPane new vMatchParent; hExact: 15; background: statusColor );
-						addChild: aDropdown;
-						addChild: allTestsDropdown;
-						addChild: (editor).
+						addChild: labelContainer.
+						
 				];
 				
 			with: allNodes.

@@ -102,9 +102,9 @@ JcWorkflowRun >> gtStagesFor: aView [
 		column: 'Index' translated item: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray] width: 20;
 		column: 'Status' translated do: [ :column | 
 			column
-				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each statusBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
+				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each resultBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
 				noResize ];
-		column: 'Name' translated format: [ :eachItem | eachItem gtDisplayString] width: 250
+		column: 'Name' translated format: [ :eachItem | eachItem gtDisplayText] width: 250
 		
 ]
 

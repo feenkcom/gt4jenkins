@@ -6,5 +6,15 @@ Class {
 
 { #category : #accessing }
 JcWfWorkflowRunStage >> gtDisplayOn: stream [
-	stream nextPut: (rawData at: 'name')
+	stream nextPutAll: (rawData at: 'name')
+]
+
+{ #category : #accessing }
+JcWfWorkflowRunStage >> result [
+	^ rawData at: 'status'
+]
+
+{ #category : #accessing }
+JcWfWorkflowRunStage >> resultBackgroundColor [
+	^ JcJenkinsClient backgroundColorForStatus: self result
 ]

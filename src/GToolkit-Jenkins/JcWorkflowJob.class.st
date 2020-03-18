@@ -9,7 +9,11 @@ Class {
 
 { #category : #accessing }
 JcWorkflowJob >> builds [
-	builds ifNil: [ builds := super modelBuilder modelFrom: (rawData at: 'builds')].
+	builds ifNil: [ 
+	rawData at: 'builds' ifPresent: [:data | 
+		builds := super modelBuilder modelFrom: data ] 
+		ifAbsent: [builds := OrderedCollection new]].
+	
 	^ builds
 ]
 
@@ -34,7 +38,9 @@ JcWorkflowJob >> gtDisplayOn: stream [
 
 { #category : #accessing }
 JcWorkflowJob >> resultBackgroundColor [
-	^ self builds last resultBackgroundColor
+	self builds size > 0 ifTrue:[^ self builds last resultBackgroundColor ].
+	^ Color gray
+	
 ]
 
 { #category : #accessing }

@@ -18,7 +18,7 @@ GtJenkinsClientSnippet class >> typeName [
 
 { #category : #converting }
 GtJenkinsClientSnippet >> asElement [
-	| snippetContainer formElement urlInputElement tokenInputElement toolbar playInspectButton userInputElement anExpanderElement |
+	| snippetContainer formElement urlInputElement tokenInputElement toolbar playInspectButton playBlueInspectButton userInputElement anExpanderElement |
 	formElement := BlElement new.
 	formElement constraintsDo: [ :c |  
 		c vertical fitContent.
@@ -42,13 +42,17 @@ GtJenkinsClientSnippet >> asElement [
 		label: 'Inspect connection';
 		icon: BrGlamorousIcons playinspect asElement;
 		action: [ 
-			| client  |
+			| client |
 			client := JcJenkinsClient new
 				username: userInputElement editor text asString
 				token: tokenInputElement editor text asString
 				url: urlInputElement editor text asString.
-			playInspectButton phlow spawnObject: client blueOcean ].
+			[playInspectButton phlow spawnObject: client blueOcean] on: KeyNotFound do:[playInspectButton phlow spawnObject: client plainJenkinsApi]
+			
+			 ].
+			
 	toolbar addItem: playInspectButton.
+	
 	
 	snippetContainer := BrVerticalPane new
 		vFitContent;

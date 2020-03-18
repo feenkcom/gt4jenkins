@@ -7,11 +7,8 @@ This offers a client that based on Glamorous Toolkit's abilities to allow you to
 In a Glamorous Toolkit image, load the code via this snippet:
 
 ```
-EpMonitor current disable.
-[ 
-  Metacello new
+Metacello new
     baseline: 'GToolkit4Jenkins';
     repository: 'github://feenkcom/gt4jenkins/src';
     load
-] ensure: [ EpMonitor current enable ].
 ```

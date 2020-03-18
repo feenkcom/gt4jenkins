@@ -11,7 +11,7 @@ JcPipelineStep >> getLogText [
 	logURL := ((((rawData at:'actions') detect: ([:a | (a at:'urlName') = 'log'])) at: '_links') at: 'self') at: 'href'.
 	text := (super urlClientFor: logURL) getRawData.
 	text ifNil: [^nil].
-	text := text copyReplaceAll: (Character value:27) asString with:  ''''.
+	text := text copyReplaceAll: (Character value:27) asString with:  String cr.
 	^ text
 ]
 

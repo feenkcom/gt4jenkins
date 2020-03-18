@@ -9,6 +9,23 @@ Class {
 }
 
 { #category : #accessing }
+JcModelElement >> fullUrlClientFor: aUrl [
+	|client newModelBuilder jc|
+	client := JcFullURLClient new.
+	
+	jc := JcJenkinsClient new.
+	jc username: (theModelBuilder jenkinsClient username)
+	    token: (theModelBuilder jenkinsClient password)
+		url: (theModelBuilder jenkinsClient url).
+	newModelBuilder := JcModelBuilder new.
+	(newModelBuilder jenkinsClient: jc).
+	jc setupJwtToken.
+	client modelBuilder: newModelBuilder.
+	client url: aUrl.
+	^ client.
+]
+
+{ #category : #accessing }
 JcModelElement >> links [
 	^ nil
 ]
@@ -46,8 +63,8 @@ JcModelElement >> rawData: aDictionary [
 { #category : #accessing }
 JcModelElement >> urlClientFor: aUrl [
 	|client newModelBuilder jc|
-	client := JcLinksClient new.
-	client for: aUrl.
+	client := JcUrlClient new.
+	
 	jc := JcJenkinsClient new.
 	jc username: (theModelBuilder jenkinsClient username)
 	    token: (theModelBuilder jenkinsClient password)

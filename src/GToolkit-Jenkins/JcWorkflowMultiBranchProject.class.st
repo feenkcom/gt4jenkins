@@ -1,6 +1,9 @@
 Class {
 	#name : #JcWorkflowMultiBranchProject,
 	#superclass : #JcModelElement,
+	#instVars : [
+		'jobs'
+	],
 	#category : #'GToolkit-Jenkins-Generated-OrgJenkinsciPluginsWorkflowMultibranch'
 }
 
@@ -16,10 +19,15 @@ JcWorkflowMultiBranchProject >> gtJobsFor: aView [
 		title: 'Jobs' translated;
 		priority: 50;
 		items: [ self jobs];
-		column: 'Item' translated format: [ :each | each gtDisplayText ] width: 200.
+		column: 'Status' translated do: [ :column | 
+			column
+				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each resultBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
+				noResize ];
+		column: 'Branch' translated format: [ :each | each gtDisplayText ] width: 200
 ]
 
 { #category : #accessing }
 JcWorkflowMultiBranchProject >> jobs [
-	^ super modelBuilder modelFrom: (rawData at: 'jobs')
+	jobs ifNil:[jobs:=  super modelBuilder modelFrom: (rawData at: 'jobs')].
+	^ jobs
 ]

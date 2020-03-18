@@ -1,12 +1,16 @@
 Class {
 	#name : #JcWorkflowJob,
 	#superclass : #JcModelElement,
+	#instVars : [
+		'builds'
+	],
 	#category : #'GToolkit-Jenkins-Generated-OrgJenkinsciPluginsWorkflowJob'
 }
 
 { #category : #accessing }
 JcWorkflowJob >> builds [
-	^ super modelBuilder modelFrom: (rawData at: 'builds')
+	builds ifNil: [ builds := super modelBuilder modelFrom: (rawData at: 'builds')].
+	^ builds
 ]
 
 { #category : #accessing }
@@ -16,10 +20,24 @@ JcWorkflowJob >> gtBuildsFor: aView [
 		title: 'Builds' translated;
 		priority: 50;
 		items: [ self builds];
-		column: 'Item' translated format: [ :each | each gtDisplayText ] width: 200.
+		column: 'Status' translated do: [ :column | 
+			column
+				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each resultBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
+				noResize ];
+		column: 'Item' translated format: [ :each | each gtDisplayText ] width: 200
 ]
 
 { #category : #accessing }
 JcWorkflowJob >> gtDisplayOn: stream [
 	stream nextPutAll: (rawData at: 'name')
+]
+
+{ #category : #accessing }
+JcWorkflowJob >> resultBackgroundColor [
+	^ self builds last resultBackgroundColor
+]
+
+{ #category : #accessing }
+JcWorkflowJob >> startTime [
+	^ self builds last startTime
 ]

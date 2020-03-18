@@ -32,11 +32,7 @@ JcPipelineNode >> allTests [
 
 { #category : #accessing }
 JcPipelineNode >> duration [
-	|duration|
-	duration := ((rawData at: 'durationInMillis')  asNumber milliSeconds roundTo: 1 second).
-	duration minutes = 0 ifTrue:[
-	^ '' join: {duration seconds asString, ' s'}].
-	^ '' join: {duration minutes asString, ' m ', duration seconds asString, ' s'}
+	^ Duration milliSeconds: (rawData at: 'durationInMillis' )
 ]
 
 { #category : #accessing }
@@ -54,7 +50,7 @@ JcPipelineNode >> gtAllTestsFor: aView [
 	at := self allTests.
 	at isEmpty ifTrue:[ ^ aView empty].
 	^ aView columnedList
-		title: 'All Examples' translated;
+		title: 'Tests' translated;
 		priority: 60;
 		items: [ at];
 		column: 'Index' translated item: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray] width: 20;

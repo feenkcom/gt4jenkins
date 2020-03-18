@@ -79,73 +79,40 @@ JcPipelineRun >> gtStagesMapFor: aView [
 	  	  allNodes := self nodes.
 			mondrian nodes 
 				shape: [ :aStage | 
-				|container editor statusColor aDropdown allTestsDropdown examplesSize labelText runTimeLabel labelContainer|
+				|container editor statusColor aDropdown allTestsDropdown examplesSize labelText runTimeLabel labelContainer duration|
 					statusColor := aStage resultBackgroundColor.
-					container := BlElement new
-						layout: BlLinearLayout horizontal;
-						look:BrShadowLook;
+					container := BrHorizontalPane new
+						hExact: 200;
+						vFitContent;
+						look: BrShadowLook;
 						clipChildren: false;
-						margin:(BlInsets all:10);
+						margin: (BlInsets all: 10);
 						background: Color white;
 						zIndex: 1;
-						when: BlClickEvent do:[:e | e target phlow spawnObject: aStage];
-						constraintsDo: [ :c |
-							c horizontal exact:200.
-							c vertical fitContent].
-					labelContainer := BlElement new
-						layout: BlLinearLayout vertical;
-						
-						clipChildren: false;
-					
-						background: Color white;
-						zIndex: 1;
-						when: BlClickEvent do:[:e | e target phlow spawnObject: aStage];
-						constraintsDo: [ :c |
-							c horizontal matchParent.
-							c vertical fitContent].
-					editor := BrLabel new 
-						text: aStage name asRopedText;
-						look: BrGlamorousLabelLook;
-						constraintsDo: [ :c | 
-							c margin: (BlInsets all: 5).
-							c vertical fitContent.
-							c horizontal matchParent.
-							 ].
-					examplesSize := aStage allCasesSize.
-					labelText := aStage duration. 
-					(examplesSize > 0) ifTrue: 
-						[labelText:= 'Run ', examplesSize asString,' examples in ', labelText].
-					
-					runTimeLabel := BrLabel new 
-						text: labelText asRopedText;
-						look: BrGlamorousLabelLook;
-						constraintsDo: [ :c | 
-							c margin: (BlInsets all: 5).
-							c vertical fitContent.
-							c horizontal matchParent.
-							 ].
+						when: BlClickEvent do: [:e | e target phlow spawnObject: aStage].
+					labelContainer := BrVerticalPane new hMatchParent; vFitContent;
+						padding: (BlInsets all: 5).
 					aDropdown := BrBadge new
 							label: (aStage failedTests size);
 							exact: 20 @ 20;
-							visibility:
-					(aStage failedTests size isZero
+							visibility: (aStage failedTests size isZero
 						ifTrue: [ BlVisibility gone ]
 						ifFalse: [ BlVisibility visible ]);
-					constraintsDo: [ :c | 
-						c horizontal fitContent.
-						c vertical fitContent.
-						c ignoreByLayout.
-						c ignored horizontal alignRight.
-						c ignored vertical alignTop.
-						c margin: (BlInsets top: -10 right: -10) ];
-					look: BrGlamorousBadgeWithLabelLook +
-						(BrGlamorousWithDropdownLook
-							handle: [ BrBadge new
+							constraintsDo: [ :c | 
+								c horizontal fitContent.
+								c vertical fitContent.
+								c ignoreByLayout.
+								c ignored horizontal alignRight.
+								c ignored vertical alignTop.
+								c margin: (BlInsets top: -10 right: -10) ];
+							look: BrGlamorousBadgeWithLabelLook +
+								(BrGlamorousWithDropdownLook
+								handle: [ BrBadge new
 										label: (aStage failedTests size);
 										exact: 20 @ 20;
 										look: BrGlamorousBadgeWithLabelLook;
 										yourself ]
-							content: [ | aPhlowView aPopupElement |
+								content: [ | aPhlowView aPopupElement |
 								aPhlowView := aStage gtFailedTestsFor: GtPhlowEmptyView new.
 								aPopupElement := BlElement new
 											border: (BlBorder paint: Color orange width: 2);
@@ -162,18 +129,21 @@ JcPipelineRun >> gtStagesMapFor: aView [
 													when: GtPhlowObjectToSpawn do: [:e | 
 													container fireEvent: (GtPhlowObjectToSpawn new object: e object; sourceElement: e target)] ].
 										aPopupElement ]).
-					
-					
-					labelContainer 
-						addChild: editor;
-						addChild: runTimeLabel.
+					labelContainer addChild: (BrLabel new text: aStage name asRopedText; look: BrGlamorousLabelLook).
+					duration := aStage duration.
+					duration < 1 second ifFalse: [
+						labelContainer addChild: (BrLabel new 
+						text: duration gtHumanReadableString asRopedText;
+						look: (BrGlamorousLabelLook new foreground: Color gray)) ].
+					examplesSize := aStage allCasesSize.
+					(examplesSize > 0) ifTrue: [
+						labelContainer addChild: (
+							BrLabel new text: aStage allCasesSize asString,' tests'; look: (BrGlamorousLabelLook new foreground: Color gray))].
 					labelContainer addChild: aDropdown.
 					container
 						addChild: (BrVerticalPane new vMatchParent; hExact: 15; background: statusColor );
-						addChild: labelContainer.
-						
+						addChild: labelContainer.	
 				];
-				
 			with: allNodes.
 			mondrian edges
 				shape: [

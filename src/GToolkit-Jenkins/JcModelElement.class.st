@@ -24,6 +24,11 @@ JcModelElement >> linksClientFor: aLinkKey [
 ]
 
 { #category : #accessing }
+JcModelElement >> modelBuilder [
+	^ theModelBuilder
+]
+
+{ #category : #accessing }
 JcModelElement >> modelBuilder: aModelBuilder [.
 	theModelBuilder := aModelBuilder
 ]

@@ -42,6 +42,16 @@ JcJenkinsClient >> password [
 ]
 
 { #category : #accessing }
+JcJenkinsClient >> plainJenkinsApi [
+	| modelBuilder model jobs|
+	modelBuilder := JcModelBuilder new.
+	jobs := znclient get: ('' join: { url . '/api/json?tree=jobs[name,jobs[name,jobs[name,builds[id,result,timestamp,url]]]]&pretty=true'}).
+	modelBuilder jenkinsClient: self.
+	model := modelBuilder modelFrom: (NeoJSONReader fromString: jobs).
+	^ model.
+]
+
+{ #category : #accessing }
 JcJenkinsClient >> setBasicAuth [
 	znclient := ZnClient new
 	username: username password: password.

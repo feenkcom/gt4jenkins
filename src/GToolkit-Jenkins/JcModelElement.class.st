@@ -19,7 +19,7 @@ JcModelElement >> fullUrlClientFor: aUrl [
 		url: (theModelBuilder jenkinsClient url).
 	newModelBuilder := JcModelBuilder new.
 	(newModelBuilder jenkinsClient: jc).
-	jc setupJwtToken.
+	
 	client modelBuilder: newModelBuilder.
 	client url: aUrl.
 	^ client.

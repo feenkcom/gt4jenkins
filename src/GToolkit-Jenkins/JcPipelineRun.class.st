@@ -91,7 +91,8 @@ JcPipelineRun >> gtStagesMapFor: aView [
 						zIndex: 1;
 						when: BlClickEvent do: [:e | e target phlow spawnObject: aStage].
 					labelContainer := BrVerticalPane new hMatchParent; vFitContent;
-						padding: (BlInsets all: 5).
+						padding: (BlInsets all: 5);
+						clipChildren: false.
 					aDropdown := BrBadge new
 							label: (aStage failedTests size);
 							exact: 20 @ 20;

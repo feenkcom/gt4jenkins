@@ -8,14 +8,13 @@ Class {
 JcConsoleStyler >> privateStyle: aText [
 	|parseResult parser|
 	parser := (('AssertionFailure' asPParser token ==> [ :token | 
-			aText attributes: { BlTextForegroundAttribute new paint: Color red } 
+			(aText 
 				from: token start 
-				to: token stop ]) / 
+				to: token stop) highlight: BrGlamorousColors errorBackgroundColor ]) / 
 		((#startOfLine asPParser, '+' asPParser, #endOfLine asPParser negate star token , #endOfLine asPParser) ==> [ :tokens | 
-			aText attributes: {
-					BlTextForegroundAttribute new paint: Color blue } 
+			(aText  
 				from: tokens third start - 1
-				to: tokens third stop ])) sea star.
+				to: tokens third stop) highlight: BrGlamorousColors textHighlightColor ])) sea star.
 	parseResult := parser parse: aText asString.
 	^ aText
 	 

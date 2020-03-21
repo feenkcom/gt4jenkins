@@ -6,11 +6,26 @@ Class {
 
 { #category : #accessing }
 JcConsoleStyler >> privateStyle: aText [
-	|parseResult parser executeActionParser exitOne|
+	|parseResult parser executeActionParser exitOne segmentationFault newUndeclared deprecation |
 	exitOne := #startOfLine asPParser, 'script returned exit code 1' asPParser token ==> [ :tokens | 
 			(aText  
 				from: tokens second start - 1
 				to: tokens second stop) highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5)].
+	segmentationFault := #startOfLine asPParser, 'Segmentation fault' asPParser token, #endOfLine asPParser negate star token, #endOfLine asPParser ==> [ :tokens | 
+			(aText  
+				from: tokens second start - 1
+				to: tokens third stop) highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5)].
+	newUndeclared :=  #startOfLine asPParser, 'NewUndeclaredWarning:'asPParser token, #endOfLine asPParser negate star token, #endOfLine asPParser ==> [ :tokens | 
+			(aText  
+				from: tokens second start - 1
+				to: tokens third stop) highlight: (BrGlamorousColors failureBackgroundColor alpha: 0.5)].
+	
+	deprecation :=  #startOfLine asPParser, 'DeprecationPerformedNotification:' asPParser token, #endOfLine asPParser negate star token, #endOfLine asPParser ==> [ :tokens | 
+			(aText  
+				from: tokens second start - 1
+				to: tokens third stop) highlight: (BrGlamorousColors failureBackgroundColor alpha: 0.5)].
+	
+	
 	executeActionParser := (#startOfLine asPParser, 
 		('GtRlExecuteActionSignal' asPParser / #endOfLine asPParser) negate plus token,
 		('GtRlExecuteActionSignal' asPParser),
@@ -23,11 +38,11 @@ JcConsoleStyler >> privateStyle: aText [
 		(aText 
 				from: tokens second start 
 				to: tokens fourth stop) highlight: color ].
-	parser := (exitOne / executeActionParser /
+	parser := (exitOne / executeActionParser / segmentationFault / newUndeclared / deprecation /
 		((#startOfLine asPParser, '+' asPParser, #endOfLine asPParser negate star token , #endOfLine asPParser) ==> [ :tokens | 
 			(aText  
 				from: tokens third start - 1
 				to: tokens third stop) highlight: BrGlamorousColors neutralBackgroundColor ])) sea star.
-	parseResult := parser parse: aText asString.
+	parseResult := parser optimize parse: aText asString.
 	^ aText
 ]

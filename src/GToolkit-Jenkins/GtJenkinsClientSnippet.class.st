@@ -28,6 +28,7 @@ GtJenkinsClientSnippet >> asElement [
 	urlInputElement := self inputElementNamed: 'Url' in: formElement.
 	userInputElement := self inputElementNamed: 'User' in: formElement.
 	tokenInputElement := self inputElementNamed: 'Token' in: formElement.
+	tokenInputElement editor text replacingText: $*.
 	
 	toolbar := BrToolbar new
 		look: BrToolbarLook new;
@@ -101,10 +102,7 @@ GtJenkinsClientSnippet >> inputElementNamed: aString in: formElement [
 		c vertical fitContent.
 		c horizontal matchParent.
 		c grid vertical alignCenter ].
-	text := '' asRopedText 
-		weight: 400;
-		fontName: 'Source Sans Pro';
-		fontSize: 14.
+	text := '' asRopedText glamorousRegularFont.
 	inputElement editor: (BrTextEditor new text: text).
 	formElement addChild: labelElement.
 	formElement addChild: inputElement.

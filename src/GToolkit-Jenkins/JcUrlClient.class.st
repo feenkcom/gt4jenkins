@@ -13,7 +13,7 @@ Class {
 JcUrlClient >> execute [
 	|rawData model|
 	rawData:=self getRawData.
-	model := modelBuilder modelFrom: (NeoJSONReader fromString: rawData).
+	[model := modelBuilder modelFrom: (NeoJSONReader fromString: rawData).] on: NeoJSONParseError do: [ ^ nil].
 	^ model.
 ]
 

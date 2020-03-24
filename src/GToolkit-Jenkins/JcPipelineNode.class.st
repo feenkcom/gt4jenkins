@@ -38,8 +38,10 @@ JcPipelineNode >> duration [
 { #category : #accessing }
 JcPipelineNode >> failedTests [
 	|allFailed|
-	allFailed := parentRun tests select: [:each | each isFailed].
-	allFailed := allFailed select: [:t | t testNameParsed size = 4 and: [(t testNameParsed at: 3) trimmed asSymbol = self name asSymbol]].
+	allFailed := OrderedCollection new.
+	parentRun tests ifNotNil: [
+		allFailed := parentRun tests select: [:each | each isFailed].
+		allFailed := allFailed select: [:t | t testNameParsed size = 4 and: [(t testNameParsed at: 3) trimmed asSymbol = self name asSymbol]]].
 	^ allFailed
 ]
 

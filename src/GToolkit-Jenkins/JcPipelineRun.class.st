@@ -27,6 +27,7 @@ JcPipelineRun >> allTests [
 					stageId := enclosingBlocksArray first.
 					allTests at: stageId ifAbsentPut: OrderedCollection new.
 						(allTests at: stageId) add: suite]]].
+	allTests ifNil: [ ^ Dictionary new].
 	^ allTests.
 ]
 
@@ -222,5 +223,6 @@ JcPipelineRun >> startTime [
 { #category : #accessing }
 JcPipelineRun >> tests [
 	tests ifNil: [ tests := ((super linksClientFor: 'tests') execute)].
+	tests ifNil: [ ^ OrderedCollection new].
 	^ tests
 ]

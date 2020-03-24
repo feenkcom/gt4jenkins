@@ -6,7 +6,7 @@ Class {
 
 { #category : #accessing }
 JcJcBlueJUnitStageTestResult >> resultBackgroundColor [
-	^ JenkinsClient backgroundColorForStatus: self result
+	^ JcJenkinsClient backgroundColorForStatus: self result
 ]
 
 { #category : #accessing }

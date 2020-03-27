@@ -61,7 +61,11 @@ JcBlueJUnitTestResult >> statusBackgroundColor [
 
 { #category : #accessing }
 JcBlueJUnitTestResult >> testClassName [
-	^ self testNameParsed last key
+	| aClassName |
+	aClassName := self testNameParsed last.
+	^ aClassName isString 
+		ifTrue: [ aClassName ] 
+		ifFalse: [ aClassName key ]
 ]
 
 { #category : #accessing }

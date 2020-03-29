@@ -20,7 +20,7 @@ JcMultiBranchPipeline >> gtBranchesFor: aView [
 			column
 				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each resultBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
 				noResize ];
-		column: 'Branch' translated format: [ :each | each gtDisplayText ] width: 200;
-		column: 'Last duration' translated format: [ :each | (each duration roundTo: 1 second) humanReadablePrintString ] width: 200;
-		column: 'Last run start time' translated format: [ :each | String streamContents: [:s | each startTime printSeparateDateAndTimeOn: s]]
+		column: 'Branch' translated format: [ :each | each gtDisplayText ] width: 110;
+		column: 'Last duration' translated format: [ :each | (each duration roundTo: 1 second) humanReadablePrintString ] width: 150;
+		column: 'Last run start time' translated format: [ :each | String streamContents: [:s | each startTime asDateAndTime asLocal printSeparateDateAndTimeOn: s ]]
 ]

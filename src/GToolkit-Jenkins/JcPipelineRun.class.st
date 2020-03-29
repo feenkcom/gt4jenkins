@@ -216,6 +216,7 @@ JcPipelineRun >> resultBackgroundColor [
 JcPipelineRun >> startTime [
 	|st|
 	st := DateAndTime fromString: (rawData at: 'startTime').
+	st := st asLocal.
 	^ String streamContents: [:s | st printSeparateDateAndTimeOn: s]
 	
 ]

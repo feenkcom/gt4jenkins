@@ -28,11 +28,12 @@ JcBranch >> gtRunsFor: aView [
 			column
 				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each resultBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
 				noResize ];
-		column: 'Result' translated format: [ :each | each result ] width: 70;
+		column: 'Result' translated item: [ :each | each result ] width: 70;
 		column: 'Item' translated format: [ :each | each gtDisplayText ] width: 50;
 		"column: 'Tests' translated format: [:each | (each tests select: [:test | test isFailed]) size asString] width: 200;"
-		column: 'Duration' translated format: [ :each | (each duration) ] width: 200;
-		column: 'Start time' translated format: [ :each | each startTime]
+		column: 'Duration' translated item: [ :each | (each duration) ] width: 200;
+		column: 'Start time' translated item: [ :each | 
+			String streamContents: [:s | each startTime asDateAndTime asLocal printSeparateDateAndTimeOn: s ] ]
 ]
 
 { #category : #accessing }
@@ -55,5 +56,5 @@ JcBranch >> runs [
 
 { #category : #accessing }
 JcBranch >> startTime [
-	^ DateAndTime fromString: (( rawData at: 'latestRun') at: 'startTime')
+	^ (DateAndTime fromString: (( rawData at: 'latestRun') at: 'startTime')) asLocal
 ]

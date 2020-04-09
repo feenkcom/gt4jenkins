@@ -16,6 +16,11 @@ GtJenkinsClientSnippet class >> typeName [
 	^ 'jenkins'
 ]
 
+{ #category : #'json mapping' }
+GtJenkinsClientSnippet class >> xdocSnippetMappingFor: aNeoJSONMapper [
+	"ignore"
+]
+
 { #category : #converting }
 GtJenkinsClientSnippet >> asElement [
 	| snippetContainer formElement urlInputElement tokenInputElement toolbar playInspectButton playBlueInspectButton userInputElement anExpanderElement |

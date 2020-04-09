@@ -41,7 +41,7 @@ GtJenkinsClientSnippet >> asElement [
 		beSmall;
 		look: BrGlamorousButtonWithIconLook;
 		label: 'Inspect connection';
-		icon: BrGlamorousIcons playinspect asElement;
+		icon: BrGlamorousVectorIcons playinspect;
 		action: [ 
 			| client |
 			client := JcJenkinsClient new

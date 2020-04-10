@@ -16,6 +16,11 @@ GtJenkinsClientSnippet class >> typeName [
 	^ 'jenkins'
 ]
 
+{ #category : #'json mapping' }
+GtJenkinsClientSnippet class >> xdocSnippetMappingFor: aNeoJSONMapper [
+	"ignore"
+]
+
 { #category : #converting }
 GtJenkinsClientSnippet >> asElement [
 	| snippetContainer formElement urlInputElement tokenInputElement toolbar playInspectButton playBlueInspectButton userInputElement anExpanderElement |
@@ -41,7 +46,7 @@ GtJenkinsClientSnippet >> asElement [
 		beSmall;
 		look: BrGlamorousButtonWithIconLook;
 		label: 'Inspect connection';
-		icon: BrGlamorousIcons playinspect asElement;
+		icon: BrGlamorousVectorIcons playinspect;
 		action: [ 
 			| client |
 			client := JcJenkinsClient new

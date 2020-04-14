@@ -49,24 +49,17 @@ JcPipelineRun >> gtDisplayOn: stream [
 { #category : #accessing }
 JcPipelineRun >> gtNodesFor: aView [
 	<gtView>
-	| aList |
-
-	aList := aView columnedList
+	^ aView columnedList
 		title: 'Nodes' translated;
-		priority: 60;
-		items: [ self nodes].
-
-	aList column
-		title: 'Index' translated;
-		width: 30;
-		item: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray].
-	
-	aList column
-		title: 'Item' translated;
-		item: [ :eachItem :eachIndex | eachItem ];
-		itemFormat: [ :eachItem | eachItem gtDisplayText ].
-	
-	^ aList
+		priority: 50;
+		items: [ self nodes];
+		column: 'Status' translated do: [ :column | 
+			column
+				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each resultBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
+				noResize ];
+		column: 'Result' translated item: [ :each | each result ] width: 70;
+		column: 'Item' translated format: [ :each | each gtDisplayText ];
+		column: 'Duration' translated item: [ :each | (each duration) ] width: 200
 ]
 
 { #category : #accessing }

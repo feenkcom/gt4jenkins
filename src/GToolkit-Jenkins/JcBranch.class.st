@@ -33,7 +33,10 @@ JcBranch >> gtRunsFor: aView [
 		"column: 'Tests' translated format: [:each | (each tests select: [:test | test isFailed]) size asString] width: 200;"
 		column: 'Duration' translated item: [ :each | (each duration) ] width: 200;
 		column: 'Start time' translated item: [ :each | 
-			String streamContents: [:s | each startTime asDateAndTime asLocal printSeparateDateAndTimeOn: s ] ]
+			each startTime = 'QUEUED'
+				ifTrue: [ each startTime ]
+				ifFalse:
+					[ String streamContents: [:s | each startTime asDateAndTime asLocal printSeparateDateAndTimeOn: s ] ] ]
 ]
 
 { #category : #accessing }

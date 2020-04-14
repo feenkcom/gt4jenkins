@@ -52,13 +52,13 @@ JcPipelineRun >> gtNodesFor: aView [
 	^ aView columnedList
 		title: 'Nodes' translated;
 		priority: 50;
-		items: [ self nodes];
+		items: [ self nodes sort:[:a :b | a id asInteger < b id asInteger]];
 		column: 'Status' translated do: [ :column | 
 			column
 				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each resultBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
 				noResize ];
 		column: 'Result' translated item: [ :each | each result ] width: 70;
-		column: 'Item' translated format: [ :each | each gtDisplayText ];
+		column: 'Item' translated format: [ :each | each gtDisplayText ] width: 200;
 		column: 'Duration' translated item: [ :each | (each duration) ] width: 200
 ]
 
@@ -154,7 +154,7 @@ JcPipelineRun >> gtStagesMapFor: aView [
 				toAll: [:each | | pN |
 					pN := each nextStagesIds.
 					allNodes select: [ :node | pN anySatisfy: [ :stageID | stageID = node id ] ] ].
-			mondrian layout custom: ((GtGradNorthHierarchicalLayout new interRanksSpacing: 30)).
+			mondrian layout custom: ((GtGraphDominanceTreeLayout new)).
 			]
 
 ]

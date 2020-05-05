@@ -5,50 +5,119 @@ Class {
 }
 
 { #category : #accessing }
+JcConsoleStyler >> classDependecesOn: aText [
+	^ (#startOfLine asPParser
+		, 'MetacelloNotification: Warning: This package depends on the following classes:' asPParser token 
+		, #endOfLine asPParser negate star token 
+		, #endOfLine asPParser) ==> [ :tokens | 
+			(aText from: tokens second start to: tokens third stop)
+				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> deprecationOn: aText [
+	^ (#startOfLine asPParser
+		, 'DeprecationPerformedNotification:' asPParser token
+		, #endOfLine asPParser negate star token , #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens second start to: tokens third stop)
+				highlight: (BrGlamorousColors failureBackgroundColor alpha: 0.5) ]
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> executeActionFailureOn: aText [
+	^ (#startOfLine asPParser
+		,
+			('GtRlExecuteActionSignal' asPParser / #endOfLine asPParser) negate
+				plus token , 'GtRlExecuteActionSignal' asPParser
+		, #endOfLine asPParser negate star token , #endOfLine asPParser)
+		==> [ :tokens | 
+			| color |
+			color := (tokens fourth value includesSubstring: '[')
+				ifTrue: [ BrGlamorousColors errorBackgroundColor alpha: 0.5 ]
+				ifFalse: [ BrGlamorousColors successBackgroundColor alpha: 0.5 ].
+			(aText from: tokens second start to: tokens fourth stop)
+				highlight: color ]
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> exitOneParserOn: aText [
+	^ (#startOfLine asPParser
+		, 'script returned exit code 1' asPParser token)
+		==> [ :tokens | 
+			(aText from: tokens second start to: tokens second stop)
+				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> metacelloNotificationFetched: aText [
+	^ (#startOfLine asPParser
+		, 'MetacelloNotification: Fetched' asPParser token
+		, #endOfLine asPParser negate star token 
+		, #endOfLine asPParser) ==> [ :tokens | 
+			(aText from: tokens second start to: tokens third stop)
+				foreground: (BrGlamorousColors defaultButtonTextColor alpha: 0.5) ]
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> metacelloNotificationLoaded: aText [
+	^ (#startOfLine asPParser
+		, 'MetacelloNotification: Loaded' asPParser token
+		, #endOfLine asPParser negate star token 
+		, #endOfLine asPParser) ==> [ :tokens | 
+			(aText from: tokens second start to: tokens third stop)
+				foreground: (BrGlamorousColors defaultButtonTextColor alpha: 0.5) ]
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> newUndeclaredOn: aText [
+	^ (#startOfLine asPParser , 'NewUndeclaredWarning:' asPParser token
+		, #endOfLine asPParser negate star token , #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens second start to: tokens third stop)
+				highlight: (BrGlamorousColors failureBackgroundColor alpha: 0.5) ]
+]
+
+{ #category : #accessing }
 JcConsoleStyler >> privateStyle: aText [
-	|parseResult parser executeActionParser exitOne segmentationFault newUndeclared deprecation squareBracketError |
-	exitOne := #startOfLine asPParser, 'script returned exit code 1' asPParser token ==> [ :tokens | 
-			(aText  
-				from: tokens second start - 1
-				to: tokens second stop) highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5)].
-	segmentationFault := #startOfLine asPParser, 'Segmentation fault' asPParser token, #endOfLine asPParser negate star token, #endOfLine asPParser ==> [ :tokens | 
-			(aText  
-				from: tokens second start - 1
-				to: tokens third stop) highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5)].
-				
-	squareBracketError := #startOfLine asPParser, '[' asPParser token, #digit asPParser plus, 'm'
- asPParser, #endOfLine asPParser negate star token, #endOfLine asPParser ==> [ :tokens | 
-			(aText  
-				from: tokens second start - 1
-				to: tokens fifth stop) highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5)].
-	newUndeclared :=  #startOfLine asPParser, 'NewUndeclaredWarning:'asPParser token, #endOfLine asPParser negate star token, #endOfLine asPParser ==> [ :tokens | 
-			(aText  
-				from: tokens second start - 1
-				to: tokens third stop) highlight: (BrGlamorousColors failureBackgroundColor alpha: 0.5)].
-	
-	deprecation :=  #startOfLine asPParser, 'DeprecationPerformedNotification:' asPParser token, #endOfLine asPParser negate star token, #endOfLine asPParser ==> [ :tokens | 
-			(aText  
-				from: tokens second start - 1
-				to: tokens third stop) highlight: (BrGlamorousColors failureBackgroundColor alpha: 0.5)].
-	
-	
-	executeActionParser := (#startOfLine asPParser, 
-		('GtRlExecuteActionSignal' asPParser / #endOfLine asPParser) negate plus token,
-		('GtRlExecuteActionSignal' asPParser),
-		#endOfLine asPParser negate star token,
-		#endOfLine asPParser) ==> [ :tokens | 
-		| color |
-		color := (tokens fourth value includesSubstring: '[') 
-			ifTrue: [BrGlamorousColors errorBackgroundColor alpha: 0.5]
-			ifFalse: [BrGlamorousColors successBackgroundColor alpha: 0.5].
-		(aText 
-				from: tokens second start 
-				to: tokens fourth stop) highlight: color ].
-	parser := (exitOne / executeActionParser / segmentationFault / newUndeclared / deprecation / squareBracketError /
-		((#startOfLine asPParser, '+' asPParser, #endOfLine asPParser negate star token , #endOfLine asPParser) ==> [ :tokens | 
-			(aText  
-				from: tokens third start - 1
-				to: tokens third stop) highlight: BrGlamorousColors neutralBackgroundColor ])) sea star.
-	parseResult := parser optimize parse: aText asString.
+	| parser executeActionParser exitOne segmentationFault newUndeclared deprecation squareBracketError |
+	exitOne := self exitOneParserOn: aText.
+	segmentationFault := self segmentationFaultParserOn: aText.
+	squareBracketError := self squareBracketErrorOn: aText.
+	newUndeclared := self newUndeclaredOn: aText.
+	deprecation := self deprecationOn: aText.
+	executeActionParser := self executeActionFailureOn: aText.
+	parser := (
+		(self metacelloNotificationFetched: aText)
+		/ (self metacelloNotificationLoaded: aText)
+		/ exitOne / executeActionParser / segmentationFault
+		/ newUndeclared / deprecation / squareBracketError 
+		/ (self classDependecesOn: aText)
+		/
+			((#startOfLine asPParser , '+' asPParser
+				, #endOfLine asPParser negate star token , #endOfLine asPParser)
+				==> [ :tokens | 
+					(aText from: tokens third start - 1 to: tokens third stop)
+						highlight: BrGlamorousColors neutralBackgroundColor ])) sea star.
+	parser optimize parse: aText asString.
 	^ aText
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> segmentationFaultParserOn: aText [
+	^ (#startOfLine asPParser , 'Segmentation fault' asPParser token
+		, #endOfLine asPParser negate star token , #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens second start to: tokens third stop)
+				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> squareBracketErrorOn: aText [
+	^ (#startOfLine asPParser , '[' asPParser token
+		, #digit asPParser plus , 'm' asPParser
+		, #endOfLine asPParser negate star token , #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens second start to: tokens fifth stop)
+				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]

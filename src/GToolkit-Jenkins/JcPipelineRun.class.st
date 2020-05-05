@@ -154,7 +154,7 @@ JcPipelineRun >> gtStagesMapFor: aView [
 				toAll: [:each | | pN |
 					pN := each nextStagesIds.
 					allNodes select: [ :node | pN anySatisfy: [ :stageID | stageID = node id ] ] ].
-			mondrian layout custom: ((GtGraphDominanceTreeLayout new)).
+			mondrian layout custom: ((GtGraphDominanceTreeLayout new verticalGap: 20; horizontalGap: 20)).
 			]
 
 ]

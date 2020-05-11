@@ -43,9 +43,20 @@ JcConsoleStyler >> executeActionFailureOn: aText [
 { #category : #accessing }
 JcConsoleStyler >> exitOneParserOn: aText [
 	^ (#startOfLine asPParser
-		, 'script returned exit code 1' asPParser token)
+		, 'script returned exit code 1' asPParser token
+		, #endOfLine asPParser negate star token , #endOfLine asPParser)
 		==> [ :tokens | 
-			(aText from: tokens second start to: tokens second stop)
+			(aText from: tokens second start to: tokens third stop)
+				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> illegalInstructionOn: aText [
+	^ (#startOfLine asPParser
+		, 'Illegal instruction' asPParser token
+		, #endOfLine asPParser negate star token , #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens second start to: tokens third stop)
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
@@ -90,6 +101,7 @@ JcConsoleStyler >> privateStyle: aText [
 	parser := (
 		(self metacelloNotificationFetched: aText)
 		/ (self metacelloNotificationLoaded: aText)
+		/ (self illegalInstructionOn: aText)
 		/ exitOne / executeActionParser / segmentationFault
 		/ newUndeclared / deprecation / squareBracketError 
 		/ (self classDependecesOn: aText)

@@ -15,6 +15,16 @@ JcConsoleStyler >> classDependecesOn: aText [
 ]
 
 { #category : #accessing }
+JcConsoleStyler >> coreDumpedOn: aText [
+	^ (#startOfLine asPParser
+		, 'Aborted (core dumped)' asPParser token
+		, #endOfLine asPParser negate star token , #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens second start to: tokens third stop)
+				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
+]
+
+{ #category : #accessing }
 JcConsoleStyler >> deprecationOn: aText [
 	^ (#startOfLine asPParser
 		, 'DeprecationPerformedNotification:' asPParser token
@@ -43,9 +53,20 @@ JcConsoleStyler >> executeActionFailureOn: aText [
 { #category : #accessing }
 JcConsoleStyler >> exitOneParserOn: aText [
 	^ (#startOfLine asPParser
-		, 'script returned exit code 1' asPParser token)
+		, 'script returned exit code 1' asPParser token
+		, #endOfLine asPParser negate star token , #endOfLine asPParser)
 		==> [ :tokens | 
-			(aText from: tokens second start to: tokens second stop)
+			(aText from: tokens second start to: tokens third stop)
+				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> illegalInstructionOn: aText [
+	^ (#startOfLine asPParser
+		, 'Illegal instruction' asPParser token
+		, #endOfLine asPParser negate star token , #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens second start to: tokens third stop)
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
@@ -70,6 +91,15 @@ JcConsoleStyler >> metacelloNotificationLoaded: aText [
 ]
 
 { #category : #accessing }
+JcConsoleStyler >> neutralOn: aText [
+	^ (#startOfLine asPParser , '+' asPParser
+		, #endOfLine asPParser negate star token , #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens third start - 1 to: tokens third stop)
+				highlight: BrGlamorousColors neutralBackgroundColor ]
+]
+
+{ #category : #accessing }
 JcConsoleStyler >> newUndeclaredOn: aText [
 	^ (#startOfLine asPParser , 'NewUndeclaredWarning:' asPParser token
 		, #endOfLine asPParser negate star token , #endOfLine asPParser)
@@ -80,26 +110,20 @@ JcConsoleStyler >> newUndeclaredOn: aText [
 
 { #category : #accessing }
 JcConsoleStyler >> privateStyle: aText [
-	| parser executeActionParser exitOne segmentationFault newUndeclared deprecation squareBracketError |
-	exitOne := self exitOneParserOn: aText.
-	segmentationFault := self segmentationFaultParserOn: aText.
-	squareBracketError := self squareBracketErrorOn: aText.
-	newUndeclared := self newUndeclaredOn: aText.
-	deprecation := self deprecationOn: aText.
-	executeActionParser := self executeActionFailureOn: aText.
-	parser := (
-		(self metacelloNotificationFetched: aText)
+	| parser |
+	parser := (self metacelloNotificationFetched: aText)
 		/ (self metacelloNotificationLoaded: aText)
-		/ exitOne / executeActionParser / segmentationFault
-		/ newUndeclared / deprecation / squareBracketError 
+		/ (self illegalInstructionOn: aText) 
+		/ (self coreDumpedOn: aText)
+		/ (self exitOneParserOn: aText)
+		/ (self executeActionFailureOn: aText)
+		/ (self segmentationFaultParserOn: aText)
+		/ (self newUndeclaredOn: aText) 
+		/ (self deprecationOn: aText)
+		/ (self squareBracketErrorOn: aText)
 		/ (self classDependecesOn: aText)
-		/
-			((#startOfLine asPParser , '+' asPParser
-				, #endOfLine asPParser negate star token , #endOfLine asPParser)
-				==> [ :tokens | 
-					(aText from: tokens third start - 1 to: tokens third stop)
-						highlight: BrGlamorousColors neutralBackgroundColor ])) sea star.
-	parser optimize parse: aText asString.
+		/ (self neutralOn: aText).
+	parser sea star optimize parse: aText asString.
 	^ aText
 ]
 

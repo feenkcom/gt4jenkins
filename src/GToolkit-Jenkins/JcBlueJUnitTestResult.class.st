@@ -31,7 +31,16 @@ JcBlueJUnitTestResult >> gtDisplayOn: stream [
 { #category : #accessing }
 JcBlueJUnitTestResult >> gtTestFor: aView [
 	<gtView>
-	^ self testMethod gtSourceFor: aView
+	self testMethod 
+		ifNotNil: [ :aMethod | ^ aMethod gtSourceFor: aView ].
+	^ aView textEditor 
+		title: 'Not Found';
+		glamorousRegularFontAndSize;
+		text: [ String streamContents: [ :aStream | 
+			aStream 
+				nextPutAll: 'Source code not found:'; cr;
+				nextPutAll: ' - class: '; print: self testClassName; cr;
+				nextPutAll: ' - method: '; print: self testMethodName; cr ] ]
 ]
 
 { #category : #testing }
@@ -70,9 +79,9 @@ JcBlueJUnitTestResult >> testClassName [
 
 { #category : #accessing }
 JcBlueJUnitTestResult >> testMethod [
-	<return: #CompiledMethod>
+	<return: #CompiledMethod or: nil>
 	| aClass aSelector aMethod |
-	aClass := self testClassName asClass.
+	aClass := self testClassName asClassIfAbsent: [ ^ nil ].
 	aSelector := self testMethodName asSymbol.
 	aMethod := aClass instanceSide lookupSelector: aSelector.
 	^ aMethod ifNil: [

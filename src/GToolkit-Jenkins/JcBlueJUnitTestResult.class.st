@@ -70,7 +70,13 @@ JcBlueJUnitTestResult >> testClassName [
 
 { #category : #accessing }
 JcBlueJUnitTestResult >> testMethod [
-	^ self testClassName asClass >> self testMethodName asSymbol 
+	<return: #CompiledMethod>
+	| aClass aSelector aMethod |
+	aClass := self testClassName asClass.
+	aSelector := self testMethodName asSymbol.
+	aMethod := aClass instanceSide lookupSelector: aSelector.
+	^ aMethod ifNil: [
+		aClass classSide lookupSelector: aSelector ]
 ]
 
 { #category : #accessing }

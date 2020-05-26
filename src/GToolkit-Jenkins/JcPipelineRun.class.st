@@ -122,7 +122,7 @@ JcPipelineRun >> gtStagesMapFor: aView [
 												aPopupElement addChild: anElement.
 												anElement 
 													when: GtPhlowObjectToSpawn do: [:e | 
-													container fireEvent: (GtPhlowObjectToSpawn new object: e object; sourceElement: e target)] ].
+													container phlow spawnTool: e tool] ].
 										aPopupElement ]).
 					labelContainer addChild: (BrLabel new text: aStage name asRopedText; look: BrGlamorousLabelLook).
 					duration := aStage duration.

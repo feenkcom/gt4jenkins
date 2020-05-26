@@ -14,6 +14,14 @@ JcConsoleStyler >> classDependecesOn: aText [
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
+{ #category : #system }
+JcConsoleStyler >> compiledMethodFrom: aString [
+	| aMethodDefinition |
+	aMethodDefinition := GtSystemUtility methodDefinitionFromString: aString.
+	aMethodDefinition isDefined ifFalse: [ ^ nil ].
+	^ aMethodDefinition compiledMethod
+]
+
 { #category : #accessing }
 JcConsoleStyler >> coreDumpedOn: aText [
 	^ (#startOfLine asPParser
@@ -27,11 +35,25 @@ JcConsoleStyler >> coreDumpedOn: aText [
 { #category : #accessing }
 JcConsoleStyler >> deprecationOn: aText [
 	^ (#startOfLine asPParser
-		, 'DeprecationPerformedNotification:' asPParser token
-		, #endOfLine asPParser negate star token , #endOfLine asPParser)
+		, 'DeprecationPerformedNotification: Automatic deprecation code rewrite: The method ' asPParser token
+		, ' called from ' asPParser negate plus token
+		, ' called from ' asPParser token
+		, ' has been deprecated' asPParser negate plus token
+		, ' has been deprecated' asPParser token
+		, #endOfLine asPParser negate plus token
+		, #endOfLine asPParser)
 		==> [ :tokens | 
-			(aText from: tokens second start to: tokens third stop)
-				highlight: (BrGlamorousColors failureBackgroundColor alpha: 0.5) ]
+			(aText from: tokens second start to: tokens second stop)
+				highlight: self failureBackgroundColor.
+			(aText from: tokens seventh start to: tokens seventh stop)
+				highlight: self failureBackgroundColor.
+			(aText from: tokens fourth start to: tokens fourth stop)
+				highlight: self failureBackgroundColor.
+			(aText from: tokens sixth start to: tokens sixth stop)
+				highlight: self failureBackgroundColor.
+			self includeMethodCoderIn: aText from: tokens third start to: tokens third stop underline: self failureBackgroundColor.
+			self includeMethodCoderIn: aText from: tokens fifth start to: tokens fifth stop underline: self failureBackgroundColor.
+			]
 ]
 
 { #category : #accessing }
@@ -70,6 +92,11 @@ JcConsoleStyler >> exitOneParserOn: aText [
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
+{ #category : #colors }
+JcConsoleStyler >> failureBackgroundColor [
+	^ BrGlamorousColors failureBackgroundColor alpha: 0.5
+]
+
 { #category : #accessing }
 JcConsoleStyler >> illegalInstructionOn: aText [
 	^ (#startOfLine asPParser
@@ -78,6 +105,45 @@ JcConsoleStyler >> illegalInstructionOn: aText [
 		==> [ :tokens | 
 			(aText from: tokens second start to: tokens third stop)
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
+]
+
+{ #category : #'text attributes' }
+JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop [
+	| aSubText aCompiledMethod |
+	aSubText := aText from: aStart to: aStop.
+	aCompiledMethod := self compiledMethodFrom: aSubText asString.
+	aCompiledMethod ifNil: [ ^ self ].
+	aSubText attribute:
+		(BrTextExpandButtonAttribute new
+				attributesCreatingBlock: [ BrTextAdornmentDynamicAttribute new
+						beAppend;
+						stencil: [ | editorElement coder |
+							coder := GtMethodCoder forMethod: aCompiledMethod.
+							coder subscribeToSystem.
+							coder expanded: true.
+							editorElement := coder asElement.
+							editorElement
+								border: (BlBorder paint: Color veryLightGray width: 1).
+							editorElement
+								margin:
+									(BlInsets
+										top: 3
+										right: 10
+										bottom: 10
+										left: 10) ] ])
+]
+
+{ #category : #'text attributes' }
+JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop underline: aColor [	
+	| aSubText aCompiledMethod |
+	self includeMethodCoderIn: aText from: aStart to: aStop.
+	aSubText := aText from: aStart to: aStop.
+	aCompiledMethod := self compiledMethodFrom: aSubText asString.
+	aCompiledMethod
+		ifNotNil: [ aSubText
+			underlineDo: [ :anAttribute | anAttribute paint: aColor ] ]
+		ifNil: [ aSubText
+			highlight: aColor ]
 ]
 
 { #category : #accessing }
@@ -111,11 +177,16 @@ JcConsoleStyler >> neutralOn: aText [
 
 { #category : #accessing }
 JcConsoleStyler >> newUndeclaredOn: aText [
-	^ (#startOfLine asPParser , 'NewUndeclaredWarning:' asPParser token
+	^ (#startOfLine asPParser 
+		, 'NewUndeclaredWarning: ' asPParser token
+		, ' ' asPParser negate plus token
 		, #endOfLine asPParser negate star token , #endOfLine asPParser)
 		==> [ :tokens | 
-			(aText from: tokens second start to: tokens third stop)
-				highlight: (BrGlamorousColors failureBackgroundColor alpha: 0.5) ]
+			(aText from: tokens second start to: tokens second stop)
+				highlight: self failureBackgroundColor.
+			(aText from: tokens fourth start to: tokens fourth stop)
+				highlight: self failureBackgroundColor.
+			self includeMethodCoderIn: aText from: tokens third start to: tokens third stop underline: self failureBackgroundColor ]
 ]
 
 { #category : #accessing }

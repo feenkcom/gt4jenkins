@@ -14,6 +14,14 @@ JcConsoleStyler >> classDependecesOn: aText [
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
+{ #category : #system }
+JcConsoleStyler >> compiledMethodFrom: aString [
+	| aMethodDefinition |
+	aMethodDefinition := GtSystemUtility methodDefinitionFromString: aString.
+	aMethodDefinition isDefined ifFalse: [ ^ nil ].
+	^ aMethodDefinition compiledMethod
+]
+
 { #category : #accessing }
 JcConsoleStyler >> coreDumpedOn: aText [
 	^ (#startOfLine asPParser
@@ -101,11 +109,9 @@ JcConsoleStyler >> illegalInstructionOn: aText [
 
 { #category : #'text attributes' }
 JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop [
-	| aSubText aMethodDefinition aCompiledMethod |
+	| aSubText aCompiledMethod |
 	aSubText := aText from: aStart to: aStop.
-	aMethodDefinition := GtSystemUtility methodDefinitionFromString: aSubText asString.
-	aMethodDefinition isDefined ifFalse: [ ^ self ].
-	aCompiledMethod := aMethodDefinition compiledMethod.
+	aCompiledMethod := self compiledMethodFrom: aSubText asString.
 	aCompiledMethod ifNil: [ ^ self ].
 	aSubText attribute:
 		(BrTextExpandButtonAttribute new
@@ -128,10 +134,16 @@ JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop [
 ]
 
 { #category : #'text attributes' }
-JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop underline: aColor [
+JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop underline: aColor [	
+	| aSubText aCompiledMethod |
 	self includeMethodCoderIn: aText from: aStart to: aStop.
-	(aText from: aStart to: aStop)
-		underlineDo: [ :anAttribute | anAttribute paint: aColor ].
+	aSubText := aText from: aStart to: aStop.
+	aCompiledMethod := self compiledMethodFrom: aSubText asString.
+	aCompiledMethod
+		ifNotNil: [ aSubText
+			underlineDo: [ :anAttribute | anAttribute paint: aColor ] ]
+		ifNil: [ aSubText
+			highlight: aColor ]
 ]
 
 { #category : #accessing }
@@ -165,11 +177,16 @@ JcConsoleStyler >> neutralOn: aText [
 
 { #category : #accessing }
 JcConsoleStyler >> newUndeclaredOn: aText [
-	^ (#startOfLine asPParser , 'NewUndeclaredWarning:' asPParser token
+	^ (#startOfLine asPParser 
+		, 'NewUndeclaredWarning: ' asPParser token
+		, ' ' asPParser negate plus token
 		, #endOfLine asPParser negate star token , #endOfLine asPParser)
 		==> [ :tokens | 
-			(aText from: tokens second start to: tokens third stop)
-				highlight: (BrGlamorousColors failureBackgroundColor alpha: 0.5) ]
+			(aText from: tokens second start to: tokens second stop)
+				highlight: self failureBackgroundColor.
+			(aText from: tokens fourth start to: tokens fourth stop)
+				highlight: self failureBackgroundColor.
+			self includeMethodCoderIn: aText from: tokens third start to: tokens third stop underline: self failureBackgroundColor ]
 ]
 
 { #category : #accessing }

@@ -5,6 +5,16 @@ Class {
 }
 
 { #category : #accessing }
+JcConsoleStyler >> archiveCreatingInflatingExtractingOn: aText [
+	^ (#startOfLine asPParser
+		, ('   creating: ' asPParser / '  inflating: ' asPParser / ' extracting: ' asPParser) token
+		, #endOfLine asPParser negate star token 
+		, #endOfLine asPParser) ==> [ :tokens | 
+			(aText from: tokens second start to: tokens third stop)
+				foreground: (BrGlamorousColors defaultButtonTextColor alpha: 0.5) ]
+]
+
+{ #category : #accessing }
 JcConsoleStyler >> classDependecesOn: aText [
 	^ (#startOfLine asPParser
 		, 'MetacelloNotification: Warning: This package depends on the following classes:' asPParser token 
@@ -56,6 +66,11 @@ JcConsoleStyler >> deprecationOn: aText [
 			]
 ]
 
+{ #category : #colors }
+JcConsoleStyler >> errorBackgroundColor [
+	^ BrGlamorousColors errorBackgroundColor alpha: 0.5
+]
+
 { #category : #accessing }
 JcConsoleStyler >> exceptionAccessViolationOn: aText [
 	^ (#startOfLine asPParser
@@ -95,6 +110,15 @@ JcConsoleStyler >> exitOneParserOn: aText [
 { #category : #colors }
 JcConsoleStyler >> failureBackgroundColor [
 	^ BrGlamorousColors failureBackgroundColor alpha: 0.5
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> hardSpaceOn: aText [
+	"ASCII value 160"
+	^ ' ' asPParser plus token
+		==> [ :token | 
+				(aText from: token start to: token stop)
+					highlight: (self failureBackgroundColor alpha: 0.75) ]
 ]
 
 { #category : #accessing }
@@ -147,6 +171,31 @@ JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop underline:
 ]
 
 { #category : #accessing }
+JcConsoleStyler >> makeErrorOn: aText [
+	^ (#startOfLine asPParser
+		, 'make: ***' asPParser token
+		, ' Error ' asPParser negate star 
+		, ' Error ' asPParser
+		, #digit asPParser plus token
+		, #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens second start to: tokens fifth stop)
+				highlight: self errorBackgroundColor ]
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> makefileFailedOn: aText [
+	^ (#startOfLine asPParser
+		, 'Makefile:' asPParser token
+		, ' failed' asPParser negate plus
+		, ' failed' asPParser token
+		, #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens second start to: tokens fourth stop)
+				highlight: self errorBackgroundColor ]
+]
+
+{ #category : #accessing }
 JcConsoleStyler >> metacelloNotificationFetched: aText [
 	^ (#startOfLine asPParser
 		, 'MetacelloNotification: Fetched' asPParser token
@@ -191,7 +240,8 @@ JcConsoleStyler >> newUndeclaredOn: aText [
 
 { #category : #accessing }
 JcConsoleStyler >> privateStyle: aText [
-	| parser |
+	| parser aString |
+	aString := aText asString.
 	parser := (self metacelloNotificationFetched: aText)
 		/ (self metacelloNotificationLoaded: aText)
 		/ (self illegalInstructionOn: aText) 
@@ -204,8 +254,13 @@ JcConsoleStyler >> privateStyle: aText [
 		/ (self deprecationOn: aText)
 		/ (self squareBracketErrorOn: aText)
 		/ (self classDependecesOn: aText)
+		/ (self archiveCreatingInflatingExtractingOn: aText)
+		/ (self makeErrorOn: aText)
+		/ (self makefileFailedOn: aText)
+		/ (self shellError: aText)
 		/ (self neutralOn: aText).
-	parser sea star optimize parse: aText asString.
+	parser sea star optimize parse: aString.
+	(self hardSpaceOn: aText) sea star optimize parse: aString.
 	^ aText
 ]
 
@@ -216,6 +271,19 @@ JcConsoleStyler >> segmentationFaultParserOn: aText [
 		==> [ :tokens | 
 			(aText from: tokens second start to: tokens third stop)
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> shellError: aText [
+	^ (#startOfLine asPParser
+		, '/bin/sh: ' asPParser token
+		, #digit asPParser plus
+		, ': ' asPParser
+		, #endOfLine asPParser negate plus token
+		, #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens second start to: tokens fifth stop)
+				highlight: self errorBackgroundColor ]
 ]
 
 { #category : #accessing }

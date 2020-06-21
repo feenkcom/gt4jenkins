@@ -12,10 +12,11 @@ JcOrganization >> gtDisplayOn: stream [
 { #category : #accessing }
 JcOrganization >> gtPipelinesFor: aView [
 	<gtView>
-	^ aView columnedList
+	^ aView columnedTree
 		title: 'Jobs' translated;
 		priority: 10;
 		items: [ self pipelines ];
+		children: [:each | (each class canUnderstand: #pipelines) ifTrue: [ each pipelines ] ifFalse: [{}]];
 		column: 'Name' translated do: [ :aColumn | 
 			aColumn 
 				item: [ :p | p rawData at: 'name' ]; 

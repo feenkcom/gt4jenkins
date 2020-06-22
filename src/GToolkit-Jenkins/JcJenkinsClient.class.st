@@ -34,7 +34,7 @@ JcJenkinsClient >> blueOcean [
 	modelBuilder := JcModelBuilder new.
 	modelBuilder jenkinsClient: self.
 	model := modelBuilder modelFrom: (NeoJSONReader fromString: json).
-	^ model.
+	^ model anyOne.
 ]
 
 { #category : #accessing }

@@ -19,13 +19,16 @@ JcBlueJUnitStageTestResult >> gtAllCasesFor: aView [
 		title: 'All Cases' translated;
 		priority: 60;
 		items: [ at];
-		column: 'Index' translated item: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray] width: 20;
-		column: 'Status' translated do: [ :column | 
-			column
-				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each statusBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
-				noResize ];
+		column: 'Index' translated item: [ :eachItem :eachIndex | 
+			eachIndex asRopedText foreground: Color gray] width: 20;
+		column: 'Status' translated 
+			icon: [ :each | BlElement new 
+				geometry: BlCircle new; 
+				background: each statusBackgroundColor; 
+				size: 10@10 ]
+			width: 50;
 		column: 'Class' translated format: [ :eachItem | eachItem className] width: 350;
-		column: 'Class' translated format: [ :eachItem | eachItem methodName] width: 250
+		column: 'Method' translated format: [ :eachItem | eachItem methodName] width: 250
 ]
 
 { #category : #accessing }

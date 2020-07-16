@@ -54,12 +54,12 @@ JcPipelineNode >> gtAllTestsFor: aView [
 	^ aView columnedList
 		title: 'Tests' translated;
 		priority: 60;
-		items: [ at];
+		items: [ at ];
 		column: 'Index' translated item: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray] width: 20;
 		column: 'Status' translated do: [ :column | 
 			column
-				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each statusBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
-				noResize ];
+				stencil: [ :each | BlElement new geometry: BlCircle new; background: each statusBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
+				width: 20 ];
 		column: 'Package' translated format: [ :eachItem | eachItem testClassName] width: 250;
 		column: 'Examples' translated format: [ :eachItem | eachItem allCases size] width: 50
 ]
@@ -72,20 +72,29 @@ JcPipelineNode >> gtDisplayOn: stream [
 { #category : #accessing }
 JcPipelineNode >> gtFailedTestsFor: aView [
 	<gtView>
-	| ft|
+	| ft |
 	ft := self failedTests.
-	ft isEmpty ifTrue:[ ^ aView empty].
+	ft isEmpty
+		ifTrue: [ ^ aView empty ].
 	^ aView columnedList
 		title: 'Failed Examples' translated;
 		priority: 60;
-		items: [ self failedTests];
-		column: 'Index' translated item: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray] width: 20;
-		column: 'Status' translated do: [ :column | 
-			column
-				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each statusBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
-				noResize ];
-		column: 'Class' translated format: [ :eachItem | eachItem testClassName] width: 250;
-		column: 'Method' translated format: [ :eachItem | eachItem testMethodName]
+		items: [ self failedTests ];
+		column: 'Index' translated
+			item: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray ]
+			width: 20;
+		column: 'Status' translated
+			icon: [ :each | 
+					BlElement new
+						geometry: BlCircle new;
+						background: each statusBackgroundColor;
+						size: 10 @ 10 ]
+			width: 50;
+		column: 'Class' translated
+			text: [ :eachItem | eachItem testClassName ]
+			width: 250;
+		column: 'Method' translated
+			text: [ :eachItem | eachItem testMethodName ]
 ]
 
 { #category : #accessing }
@@ -95,10 +104,12 @@ JcPipelineNode >> gtStepsFor: aView [
 		title: 'Steps' translated;
 		priority: 50;
 		items: [ self steps];
-		column: 'Status' translated do: [ :column | 
-			column
-				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each resultBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
-				noResize ];
+		column: 'Status' translated 
+			icon: [ :each | BlElement new 
+				geometry: BlCircle new; 
+				background: each resultBackgroundColor; 
+				size: 10@10 ]
+			width: 50;
 		column: 'Item' translated format: [ :eachItem | eachItem gtDisplayText ]
 ]
 

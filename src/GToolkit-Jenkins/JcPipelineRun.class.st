@@ -52,14 +52,21 @@ JcPipelineRun >> gtNodesFor: aView [
 	^ aView columnedList
 		title: 'Nodes' translated;
 		priority: 50;
-		items: [ self nodes sort:[:a :b | a id asInteger < b id asInteger]];
-		column: 'Status' translated do: [ :column | 
-			column
-				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each resultBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
-				noResize ];
+		items: [ self nodes sort: [ :a :b | a id asInteger < b id asInteger ] ];
+		column: 'Status' translated
+			icon: [ :each | 
+					BlElement new
+						geometry: BlCircle new;
+						background: each resultBackgroundColor;
+						size: 10 @ 10 ]
+			width: 50;
 		column: 'Result' translated item: [ :each | each result ] width: 70;
-		column: 'Item' translated format: [ :each | each gtDisplayText ] width: 200;
-		column: 'Duration' translated item: [ :each | (each duration) ] width: 200
+		column: 'Item' translated
+			text: [ :each | each gtDisplayText ]
+			width: 200;
+		column: 'Duration' translated
+			item: [ :each | each duration ]
+			width: 200
 ]
 
 { #category : #accessing }
@@ -162,19 +169,29 @@ JcPipelineRun >> gtStagesMapFor: aView [
 { #category : #accessing }
 JcPipelineRun >> gtTestsFor: aView [
 	<gtView>
-	((rawData at: 'state') = 'RUNNING') ifTrue: [^ aView empty].
+	(rawData at: 'state') = 'RUNNING'
+		ifTrue: [ ^ aView empty ].
 	^ aView columnedList
 		title: (rawData at: 'runSummary') translated;
 		priority: 50;
-		items: [ self tests];
-		column: 'Status' translated do: [ :column | 
-			column
-				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each statusBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
-				noResize ];
-		column: 'Status' translated format: [ :eachTest | eachTest status ] width: 70;
-		column: 'Class' translated format: [ :eachTest | eachTest testClassName ] width: 250;
-		column: 'Method' translated format: [ :eachTest | eachTest testMethodName ];
-		column: 'Stage' translated format: [:eachTest | eachTest fullStageName ]
+		items: [ self tests ];
+		column: 'Status' translated
+			icon: [ :each | 
+					BlElement new
+						geometry: BlCircle new;
+						background: each statusBackgroundColor;
+						size: 10 @ 10 ]
+			width: 50;
+		column: 'Status' translated
+			text: [ :eachTest | eachTest status ]
+			width: 70;
+		column: 'Class' translated
+			text: [ :eachTest | eachTest testClassName ]
+			width: 250;
+		column: 'Method' translated
+			text: [ :eachTest | eachTest testMethodName ];
+		column: 'Stage' translated
+			text: [ :eachTest | eachTest fullStageName ]
 ]
 
 { #category : #accessing }

@@ -24,10 +24,12 @@ JcWorkflowJob >> gtBuildsFor: aView [
 		title: 'Builds' translated;
 		priority: 50;
 		items: [ self builds];
-		column: 'Status' translated do: [ :column | 
-			column
-				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each resultBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
-				noResize ];
+		column: 'Status' translated 
+			icon: [ :each | BlElement new 
+				geometry: BlCircle new; 
+				background: each resultBackgroundColor; 
+				size: 10@10 ]
+			width: 50;
 		column: 'Item' translated format: [ :each | each gtDisplayText ] width: 200
 ]
 

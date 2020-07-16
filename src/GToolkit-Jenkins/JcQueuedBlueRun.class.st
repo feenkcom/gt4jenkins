@@ -159,10 +159,12 @@ JcQueuedBlueRun >> gtTestsFor: aView [
 		title: (rawData at: 'runSummary') translated;
 		priority: 50;
 		items: [ self tests];
-		column: 'Status' translated do: [ :column | 
-			column
-				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each statusBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
-				noResize ];
+		column: 'Status' translated 
+			icon: [ :each | BlElement new 
+				geometry: BlCircle new; 
+				background: each statusBackgroundColor; 
+				size: 10@10 ]
+			width: 50;
 		column: 'Status' translated format: [ :eachTest | eachTest status ] width: 70;
 		column: 'Class' translated format: [ :eachTest | eachTest testClassName ] width: 250;
 		column: 'Method' translated format: [ :eachTest | eachTest testMethodName ];

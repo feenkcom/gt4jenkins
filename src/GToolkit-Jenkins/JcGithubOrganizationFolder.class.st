@@ -11,10 +11,7 @@ JcGithubOrganizationFolder >> gtPipelinesFor: aView [
 		title: 'Pipelines' translated;
 		priority: 10;
 		items: [ self pipelines ];
-		column: 'Name' translated do: [ :aColumn | 
-			aColumn 
-				item: [ :p | p rawData at: 'name' ]; 
-				matchParent ]
+		column: 'Name' translated item: [ :p | p rawData at: 'name' ]
 ]
 
 { #category : #accessing }

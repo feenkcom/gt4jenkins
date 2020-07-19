@@ -23,20 +23,29 @@ JcBranch >> gtRunsFor: aView [
 	^ aView columnedList
 		title: 'Runs' translated;
 		priority: 50;
-		items: [ self runs];
-		column: 'Status' translated do: [ :column | 
-			column
-				itemStencil: [ :each | BlElement new geometry: BlCircle new; background: each resultBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
-				noResize ];
+		items: [ self runs ];
+		column: 'Status' translated 
+			icon: [ :each | 
+					BlElement new
+						geometry: BlCircle new;
+						background: each resultBackgroundColor;
+						size: 10 @ 10 ]
+			width: 50;
 		column: 'Result' translated item: [ :each | each result ] width: 70;
-		column: 'Item' translated format: [ :each | each gtDisplayText ] width: 50;
+		column: 'Item' translated
+			text: [ :each | each gtDisplayText ]
+			width: 50;
 		"column: 'Tests' translated format: [:each | (each tests select: [:test | test isFailed]) size asString] width: 200;"
-		column: 'Duration' translated item: [ :each | (each duration) ] width: 200;
-		column: 'Start time' translated item: [ :each | 
+			column: 'Duration' translated
+			item: [ :each | each duration ]
+			width: 200;
+		column: 'Start time' translated
+			item: [ :each | 
 			each startTime = 'QUEUED'
 				ifTrue: [ each startTime ]
-				ifFalse:
-					[ String streamContents: [:s | each startTime asDateAndTime asLocal printSeparateDateAndTimeOn: s ] ] ]
+				ifFalse: [ String
+						streamContents:
+							[ :s | each startTime asDateAndTime asLocal printSeparateDateAndTimeOn: s ] ] ]
 ]
 
 { #category : #accessing }

@@ -103,14 +103,16 @@ JcPipelineNode >> gtStepsFor: aView [
 	^ aView columnedList
 		title: 'Steps' translated;
 		priority: 50;
-		items: [ self steps];
-		column: 'Status' translated 
-			icon: [ :each | BlElement new 
-				geometry: BlCircle new; 
-				background: each resultBackgroundColor; 
-				size: 10@10 ]
+		items: [ self steps ];
+		column: 'Status' translated
+			icon: [ :each | 
+			BlElement new
+				geometry: BlCircle new;
+				background: each resultBackgroundColor;
+				size: 10 @ 10 ]
 			width: 50;
-		column: 'Item' translated format: [ :eachItem | eachItem gtDisplayText ]
+		column: 'Item' translated
+			text: [ :eachItem | eachItem gtDisplayText ]
 ]
 
 { #category : #accessing }

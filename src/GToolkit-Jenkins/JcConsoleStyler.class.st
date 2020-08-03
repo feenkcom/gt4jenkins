@@ -82,6 +82,16 @@ JcConsoleStyler >> exceptionAccessViolationOn: aText [
 ]
 
 { #category : #accessing }
+JcConsoleStyler >> exceptionIllegalInstructionOn: aText [
+	^ (#startOfLine asPParser
+		, 'EXCEPTION_ILLEGAL' asPParser token
+		, #endOfLine asPParser negate star token , #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens second start to: tokens third stop)
+				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
+]
+
+{ #category : #accessing }
 JcConsoleStyler >> executeActionFailureOn: aText [
 	^ (#startOfLine asPParser
 		,
@@ -245,6 +255,7 @@ JcConsoleStyler >> privateStyle: aText [
 	parser := (self metacelloNotificationFetched: aText)
 		/ (self metacelloNotificationLoaded: aText)
 		/ (self illegalInstructionOn: aText) 
+		/ ((self exceptionIllegalInstructionOn: aText))
 		/ (self exceptionAccessViolationOn: aText)
 		/ (self coreDumpedOn: aText)
 		/ (self exitOneParserOn: aText)

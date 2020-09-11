@@ -181,6 +181,17 @@ JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop underline:
 ]
 
 { #category : #accessing }
+JcConsoleStyler >> jenkinsError: aText [
+	^ (#startOfLine asPParser
+		, '[ERROR]' asPParser token
+		, #endOfLine asPParser negate plus token
+		, #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens second start to: tokens third stop)
+				highlight: self errorBackgroundColor ]
+]
+
+{ #category : #accessing }
 JcConsoleStyler >> makeErrorOn: aText [
 	^ (#startOfLine asPParser
 		, 'make: ***' asPParser token
@@ -269,6 +280,7 @@ JcConsoleStyler >> privateStyle: aText [
 		/ (self makeErrorOn: aText)
 		/ (self makefileFailedOn: aText)
 		/ (self shellError: aText)
+		/ (self jenkinsError: aText)
 		/ (self neutralOn: aText).
 	parser sea star optimize parse: aString.
 	(self hardSpaceOn: aText) sea star optimize parse: aString.

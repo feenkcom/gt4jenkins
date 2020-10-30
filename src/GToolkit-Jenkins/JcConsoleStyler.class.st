@@ -181,16 +181,15 @@ JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop [
 ]
 
 { #category : #'text attributes' }
-JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop underline: aColor [	
+JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop underline: aColor [
 	| aSubText aCompiledMethod |
 	self includeMethodCoderIn: aText from: aStart to: aStop.
 	aSubText := aText from: aStart to: aStop.
 	aCompiledMethod := self compiledMethodFrom: aSubText asString.
 	aCompiledMethod
-		ifNotNil: [ aSubText
-			underlineDo: [ :anAttribute | anAttribute paint: aColor ] ]
-		ifNil: [ aSubText
-			highlight: aColor ]
+		ifNotNil:
+			[ aSubText underlineDo: [ :anAttribute | anAttribute color: aColor ] ]
+		ifNil: [ aSubText highlight: aColor ]
 ]
 
 { #category : #accessing }

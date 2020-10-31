@@ -15,6 +15,19 @@ JcConsoleStyler >> archiveCreatingInflatingExtractingOn: aText [
 ]
 
 { #category : #accessing }
+JcConsoleStyler >> bashError: aText [
+	^ (#startOfLine asPParser
+		, 'bash: line ' asPParser token
+		, #digit asPParser plus
+		, ': ' asPParser
+		, #endOfLine asPParser negate plus token
+		, #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens second start to: tokens fifth stop)
+				highlight: self errorBackgroundColor ]
+]
+
+{ #category : #accessing }
 JcConsoleStyler >> classDependecesOn: aText [
 	^ (#startOfLine asPParser
 		, 'MetacelloNotification: Warning: This package depends on the following classes:' asPParser token 
@@ -167,16 +180,15 @@ JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop [
 ]
 
 { #category : #'text attributes' }
-JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop underline: aColor [	
+JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop underline: aColor [
 	| aSubText aCompiledMethod |
 	self includeMethodCoderIn: aText from: aStart to: aStop.
 	aSubText := aText from: aStart to: aStop.
 	aCompiledMethod := self compiledMethodFrom: aSubText asString.
 	aCompiledMethod
-		ifNotNil: [ aSubText
-			underlineDo: [ :anAttribute | anAttribute paint: aColor ] ]
-		ifNil: [ aSubText
-			highlight: aColor ]
+		ifNotNil:
+			[ aSubText underlineDo: [ :anAttribute | anAttribute color: aColor ] ]
+		ifNil: [ aSubText highlight: aColor ]
 ]
 
 { #category : #accessing }
@@ -280,6 +292,7 @@ JcConsoleStyler >> privateStyle: aText [
 		/ (self makefileFailedOn: aText)
 		/ (self shellError: aText)
 		/ (self jenkinsError: aText)
+		/ (self bashError: aText)
 		/ (self neutralOn: aText).
 	parser sea star optimize parse: aString.
 	(self hardSpaceOn: aText) sea star optimize parse: aString.

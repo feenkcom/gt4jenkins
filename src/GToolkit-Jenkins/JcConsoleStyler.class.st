@@ -167,8 +167,7 @@ JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop [
 						stencil: [ | editorElement coder |
 							coder := GtMethodCoder forMethod: aCompiledMethod.
 							coder subscribeToSystem.
-							coder expanded: true.
-							editorElement := coder asElement.
+							editorElement := (coder asCoderUIModel expanded: true) asElement.
 							editorElement
 								border: (BlBorder paint: Color veryLightGray width: 1).
 							editorElement

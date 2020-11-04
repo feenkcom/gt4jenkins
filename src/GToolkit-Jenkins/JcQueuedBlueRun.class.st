@@ -37,22 +37,18 @@ JcQueuedBlueRun >> gtDisplayOn: stream [
 JcQueuedBlueRun >> gtNodesFor: aView [
 	<gtView>
 	| aList |
-
 	aList := aView columnedList
 		title: 'Nodes' translated;
 		priority: 60;
-		items: [ self nodes].
-
+		items: [ self nodes ].
 	aList column
 		title: 'Index' translated;
 		width: 30;
-		item: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray].
-	
+		item: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray ].
 	aList column
 		title: 'Item' translated;
 		item: [ :eachItem :eachIndex | eachItem ];
-		itemFormat: [ :eachItem | eachItem gtDisplayText ].
-	
+		text: [ :eachItem | eachItem gtDisplayText ].
 	^ aList
 ]
 

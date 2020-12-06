@@ -43,7 +43,7 @@ GtJenkinsClientSnippet >> asElement [
 			c vertical fitContent ].
 	playInspectButton := BrButton new.
 	playInspectButton 
-		beSmall;
+		beSmallSize;
 		look: BrGlamorousButtonWithIconLook;
 		label: 'Inspect connection';
 		icon: BrGlamorousVectorIcons playinspect;

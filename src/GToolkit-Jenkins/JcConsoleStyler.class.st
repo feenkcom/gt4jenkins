@@ -161,7 +161,7 @@ JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop [
 	aCompiledMethod := self compiledMethodFrom: aSubText asString.
 	aCompiledMethod ifNil: [ ^ self ].
 	aSubText attribute:
-		(BrTextExpandButtonAttribute new
+		(BrGlamorousTrangleExpanderTextAttribute new
 				attributesCreatingBlock: [ BrTextAdornmentDynamicAttribute new
 						beAppend;
 						stencil: [ | editorElement coder |

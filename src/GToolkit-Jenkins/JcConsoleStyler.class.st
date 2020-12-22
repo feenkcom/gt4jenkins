@@ -46,6 +46,30 @@ JcConsoleStyler >> compiledMethodFrom: aString [
 ]
 
 { #category : #accessing }
+JcConsoleStyler >> consoleErrorSequenceOn: aText [
+	^ (Character escape asPParser token
+		, '[31m' asPParser token
+		, Character escape asPParser negate star token
+		, Character escape asPParser token
+		, '[0m' asPParser token
+		, Character escape asPParser negate star token
+		, Character escape asPParser token
+		, '[0m' asPParser token
+		)
+		==> [ :tokens | 
+			(aText from: tokens first start to: tokens second stop)
+				replacingAdornment: [ :aPiece :aEDitorElement | #() ].
+			(aText from: tokens third start to: tokens third stop)
+				highlight: self errorBackgroundColor.
+			(aText from: tokens fourth start to: tokens fifth stop)
+				replacingAdornment: [ :aPiece :aEDitorElement | #() ].
+			(aText from: tokens sixth start to: tokens sixth stop)
+				underlineColor: self errorBackgroundColor.
+			(aText from: tokens seventh start to: tokens eighth stop)
+				replacingAdornment: [ :aPiece :aEDitorElement | #() ] ].
+]
+
+{ #category : #accessing }
 JcConsoleStyler >> coreDumpedOn: aText [
 	^ (#startOfLine asPParser
 		, 'Aborted (core dumped)' asPParser token
@@ -161,7 +185,7 @@ JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop [
 	aCompiledMethod := self compiledMethodFrom: aSubText asString.
 	aCompiledMethod ifNil: [ ^ self ].
 	aSubText attribute:
-		(BrTextExpandButtonAttribute new
+		(BrGlamorousTrangleExpanderTextAttribute new
 				attributesCreatingBlock: [ BrTextAdornmentDynamicAttribute new
 						beAppend;
 						stencil: [ | editorElement coder |
@@ -274,7 +298,9 @@ JcConsoleStyler >> newUndeclaredOn: aText [
 JcConsoleStyler >> privateStyle: aText [
 	| parser aString |
 	aString := aText asString.
-	parser := (self metacelloNotificationFetched: aText)
+	parser := 
+		(self consoleErrorSequenceOn: aText)
+		/ (self metacelloNotificationFetched: aText)
 		/ (self metacelloNotificationLoaded: aText)
 		/ (self illegalInstructionOn: aText) 
 		/ ((self exceptionIllegalInstructionOn: aText))

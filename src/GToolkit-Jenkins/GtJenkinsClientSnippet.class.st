@@ -23,18 +23,28 @@ GtJenkinsClientSnippet class >> xdocSnippetMappingFor: aNeoJSONMapper [
 
 { #category : #converting }
 GtJenkinsClientSnippet >> asElement [
-	| snippetContainer formElement urlInputElement tokenInputElement toolbar playInspectButton playBlueInspectButton userInputElement anExpanderElement |
+	| snippetContainer formElement urlInputElement tokenInputElement toolbar playInspectButton playBlueInspectButton userInputElement anExpanderElement jenkinsAccount |
 	formElement := BlElement new.
+	
 	formElement constraintsDo: [ :c |  
 		c vertical fitContent.
 		c horizontal matchParent ].
 	formElement layout: (BlGridLayout horizontal columnCount: 2; cellSpacing: 10).
 
 	urlInputElement := self inputElementNamed: 'Url' in: formElement.
+	
 	userInputElement := self inputElementNamed: 'User' in: formElement.
 	tokenInputElement := self inputElementNamed: 'Token' in: formElement.
 	tokenInputElement editor text replacingText: $*.
 	
+	jenkinsAccount := GtJenkinsUserIdentity instance jenkinsAccount.
+	jenkinsAccount ifNotNil:[
+		userInputElement editor text: (jenkinsAccount username asRopedText).
+		urlInputElement editor text: (jenkinsAccount jenkinsUrl asRopedText).
+		tokenInputElement editor text: (jenkinsAccount token asRopedText).
+		tokenInputElement editor text replacingText: $*.
+	].
+
 	toolbar := BrToolbar new
 		look: BrToolbarLook new;
 		layout: (BlGridLayout horizontal rowCount: 1; cellSpacing: 10);
@@ -48,14 +58,20 @@ GtJenkinsClientSnippet >> asElement [
 		label: 'Inspect connection';
 		icon: BrGlamorousVectorIcons playinspect;
 		action: [ 
-			| client |
+			| client username tokenString urlString |
+			username := userInputElement editor text asString.
+			tokenString := tokenInputElement editor text asString.
+			urlString := urlInputElement editor text asString.
+			self storeJenkinsAccountToPreferencesFolderWith: username 
+				token: tokenString 
+				andUrl:urlString.
 			client := JcJenkinsClient new
-				username: userInputElement editor text asString
-				token: tokenInputElement editor text asString
+				username: username
+				token: tokenString
 				url: urlInputElement editor text asString.
-			[playInspectButton phlow spawnObject: client blueOcean] on: KeyNotFound do:[playInspectButton phlow spawnObject: client plainJenkinsApi]
-			
-			 ].
+			[ playInspectButton phlow spawnObject: client blueOcean ]
+				on: KeyNotFound 
+					do:[playInspectButton phlow spawnObject: client plainJenkinsApi]].
 			
 	toolbar addItem: playInspectButton.
 	
@@ -112,6 +128,15 @@ GtJenkinsClientSnippet >> inputElementNamed: aString in: formElement [
 	formElement addChild: labelElement.
 	formElement addChild: inputElement.
 	^ inputElement
+]
+
+{ #category : #converting }
+GtJenkinsClientSnippet >> storeJenkinsAccountToPreferencesFolderWith: username token: tokenString andUrl: aJenkinsUrl [
+	GtJenkinsUserIdentity instance 
+		jenkinsAccount: (GtJenkinsAccount new 
+			username:username; 
+			token: tokenString;
+			jenkinsUrl: aJenkinsUrl).
 ]
 
 { #category : #accessing }

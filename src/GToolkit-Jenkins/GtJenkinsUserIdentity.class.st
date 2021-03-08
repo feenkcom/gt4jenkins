@@ -49,9 +49,9 @@ GtJenkinsUserIdentity >> loadSavedTokens [
 	rawData := self authTokenPreferences readStreamDo: [ :aReadStream | 
 		STONJSON fromStream: aReadStream].
 		
-	(rawData isDictionary and: [ rawData includesKey: 'com.gt.jenkins.auth' ]) ifFalse: [
+	(rawData isDictionary and: [ rawData includesKey: self jsonKey ]) ifFalse: [
 		^ nil ].
-	gtJenkinsAccountJson := rawData at: self jsonKey. .
+	gtJenkinsAccountJson := rawData at: self jsonKey.
 	gtJenkinsAccountJson ifNotNil: [
 		jenkinsAccount := GtJenkinsAccount new
 				 		username: (gtJenkinsAccountJson at: 'username');

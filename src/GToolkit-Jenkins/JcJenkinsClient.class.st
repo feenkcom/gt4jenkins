@@ -30,11 +30,21 @@ JcJenkinsClient class >> backgroundColorForTestStatus: aString [
 JcJenkinsClient >> blueOcean [
 	|json modelBuilder model|
 	self setupJwtToken.
-	json := znclient get: ('' join:{url .'/blue/rest/organizations'}).
+	json := znclient get: self blueOceanUrl.
 	modelBuilder := JcModelBuilder new.
 	modelBuilder jenkinsClient: self.
 	model := modelBuilder modelFrom: (NeoJSONReader fromString: json).
-	^ model anyOne.
+	^ model.
+]
+
+{ #category : #accessing }
+JcJenkinsClient >> blueOceanUrl [
+	|result|
+	result := self url.
+	^ (result findString:'/blue/rest/organizations/jenkins') > 0 
+		ifTrue:[ result ]
+		ifFalse: [result,'/blue/rest/organizations/jenkins']
+	
 ]
 
 { #category : #accessing }
@@ -60,8 +70,9 @@ JcJenkinsClient >> setBasicAuth [
 
 { #category : #accessing }
 JcJenkinsClient >> setupJwtToken [
-	| jwt |
-	znclient get: ('' join: { url .'/jwt-auth/token?maxExpiryTimeInMins=120'}).
+	| jwt rootUrl|
+	rootUrl := url asUrl scheme, '://', url asUrl host.
+	znclient get: ('' join: { rootUrl .'/jwt-auth/token?maxExpiryTimeInMins=120'}).
 	jwt := znclient response headers at:'X-Blueocean-Jwt'.
 	znclient request headers removeKey: 'Authorization' ifAbsent: [].
 	znclient request setAuthorization: 'Bearer ', jwt.

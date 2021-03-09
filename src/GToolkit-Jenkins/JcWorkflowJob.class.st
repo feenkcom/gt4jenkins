@@ -23,14 +23,17 @@ JcWorkflowJob >> gtBuildsFor: aView [
 	^ aView columnedList
 		title: 'Builds' translated;
 		priority: 50;
-		items: [ self builds];
-		column: 'Status' translated 
-			icon: [ :each | BlElement new 
-				geometry: BlCircle new; 
-				background: each resultBackgroundColor; 
-				size: 10@10 ]
+		items: [ self builds ];
+		column: 'Status' translated
+			icon: [ :each | 
+			BlElement new
+				geometry: BlCircle new;
+				background: each resultBackgroundColor;
+				size: 10 @ 10 ]
 			width: 50;
-		column: 'Item' translated format: [ :each | each gtDisplayText ] width: 200
+		column: 'Item' translated
+			text: [ :each | each gtDisplayText ]
+			width: 200
 ]
 
 { #category : #accessing }

@@ -18,14 +18,17 @@ JcWorkflowMultiBranchProject >> gtJobsFor: aView [
 	^ aView columnedList
 		title: 'Jobs' translated;
 		priority: 50;
-		items: [ self jobs];
-		column: 'Status' translated 
-			icon: [ :each | BlElement new 
-				geometry: BlCircle new; 
-				background: each resultBackgroundColor; 
-				size: 10@10 ]
+		items: [ self jobs ];
+		column: 'Status' translated
+			icon: [ :each | 
+			BlElement new
+				geometry: BlCircle new;
+				background: each resultBackgroundColor;
+				size: 10 @ 10 ]
 			width: 50;
-		column: 'Branch' translated format: [ :each | each gtDisplayText ] width: 200
+		column: 'Branch' translated
+			text: [ :each | each gtDisplayText ]
+			width: 200
 ]
 
 { #category : #accessing }

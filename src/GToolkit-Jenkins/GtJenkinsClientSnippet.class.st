@@ -39,9 +39,9 @@ GtJenkinsClientSnippet >> asElement [
 	
 	jenkinsAccount := GtJenkinsUserIdentity instance jenkinsAccount.
 	jenkinsAccount ifNotNil:[
-		userInputElement editor text: (jenkinsAccount username asRopedText).
-		urlInputElement editor text: (jenkinsAccount jenkinsUrl asRopedText).
-		tokenInputElement editor text: (jenkinsAccount token asRopedText).
+		userInputElement editor text: (jenkinsAccount username asRopedText glamorousRegularFont).
+		urlInputElement editor text: (jenkinsAccount jenkinsUrl asRopedText glamorousRegularFont).
+		tokenInputElement editor text: (jenkinsAccount token asRopedText glamorousRegularFont).
 		tokenInputElement editor text replacingText: $*.
 	].
 

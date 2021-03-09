@@ -6,7 +6,6 @@ Class {
 
 { #category : #accessing }
 JcPipelineStep >> getLogText [
-	
 	|text logURL|
 	logURL := ((((rawData at:'actions') detect: ([:a | (a at:'urlName') = 'log'])) at: '_links') at: 'self') at: 'href'.
 	text := (super urlClientFor: logURL) getRawData.

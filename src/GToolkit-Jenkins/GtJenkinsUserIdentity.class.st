@@ -66,15 +66,7 @@ GtJenkinsUserIdentity >> saveJsonFor: aValue into: aWriteStream [
 		onStreamPretty: (ZnCharacterWriteStream on: aWriteStream encoding: 'utf8')
 ]
 
-{ #category : #accessing }
-GtJenkinsUserIdentity >> saveJsonFor: json into: aPreferenceStream 
-saveJsonFor: aValue into: aWriteStream [
-	STONJSON 
-		put: aValue 
-		onStreamPretty: (ZnCharacterWriteStream on: aWriteStream encoding: 'utf8')
-]
-
-{ #category : #accessing }
+{ #category : #serialization }
 GtJenkinsUserIdentity >> storeAuthTokens [
 	|json|
 	self defaultPreferencesFolder ensureCreateDirectory.

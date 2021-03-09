@@ -39,9 +39,9 @@ GtJenkinsClientSnippet >> asElement [
 	
 	jenkinsAccount := GtJenkinsUserIdentity instance jenkinsAccount.
 	jenkinsAccount ifNotNil:[
-		userInputElement editor text: (jenkinsAccount username asRopedText).
-		urlInputElement editor text: (jenkinsAccount jenkinsUrl asRopedText).
-		tokenInputElement editor text: (jenkinsAccount token asRopedText).
+		userInputElement text: (jenkinsAccount username).
+		urlInputElement text: (jenkinsAccount jenkinsUrl).
+		tokenInputElement text: (jenkinsAccount token ).
 		tokenInputElement editor text replacingText: $*.
 	].
 
@@ -117,14 +117,13 @@ GtJenkinsClientSnippet >> inputElementNamed: aString in: formElement [
 		c vertical fitContent.
 		c horizontal fitContent.
 		c grid vertical alignCenter ].
-	inputElement := BrEditorElement new.
-	inputElement look: BrGlamorousInputFieldSpacingLook.
-	inputElement constraintsDo: [ :c | 
-		c vertical fitContent.
-		c horizontal matchParent.
-		c grid vertical alignCenter ].
-	text := '' asRopedText glamorousRegularFont.
-	inputElement editor: (BrTextEditor new text: text).
+	
+	inputElement := BrEditor new
+				hMatchParent;
+				vFitContentLimited;
+				look: BrGlamorousInputFieldSpacingLook new + BrGlamorousRegularEditorLook new;
+				text: ''.
+	
 	formElement addChild: labelElement.
 	formElement addChild: inputElement.
 	^ inputElement
@@ -137,6 +136,7 @@ GtJenkinsClientSnippet >> storeJenkinsAccountToPreferencesFolderWith: username t
 			username:username; 
 			token: tokenString;
 			jenkinsUrl: aJenkinsUrl).
+	GtJenkinsUserIdentity instance storeAuthTokens.
 ]
 
 { #category : #accessing }

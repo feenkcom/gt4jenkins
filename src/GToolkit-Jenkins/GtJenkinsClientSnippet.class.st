@@ -136,6 +136,7 @@ GtJenkinsClientSnippet >> storeJenkinsAccountToPreferencesFolderWith: username t
 			username:username; 
 			token: tokenString;
 			jenkinsUrl: aJenkinsUrl).
+	GtJenkinsUserIdentity instance storeAuthTokens.
 ]
 
 { #category : #accessing }

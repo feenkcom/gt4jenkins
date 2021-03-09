@@ -18,7 +18,7 @@ GtJenkinsAccount >> asDictionary [
 
 { #category : #accessing }
 GtJenkinsAccount >> jenkinsUrl [
-	^ jenkinsUrl
+	^ jenkinsUrl ifNil:[ '' ]
 ]
 
 { #category : #converting }

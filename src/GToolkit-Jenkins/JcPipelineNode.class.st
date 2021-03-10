@@ -48,20 +48,38 @@ JcPipelineNode >> failedTests [
 { #category : #accessing }
 JcPipelineNode >> gtAllTestsFor: aView [
 	<gtView>
-	| at|
+	| at |
 	at := self allTests.
-	at isEmpty ifTrue:[ ^ aView empty].
+	at isEmpty
+		ifTrue: [ ^ aView empty ].
 	^ aView columnedList
 		title: 'Tests' translated;
 		priority: 60;
 		items: [ at ];
-		column: 'Index' translated item: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray] width: 20;
-		column: 'Status' translated do: [ :column | 
+		column: 'Index' translated
+			item: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray ]
+			width: 20;
+		column: 'Status' translated
+			do: [ :column | 
 			column
-				stencil: [ :each | BlElement new geometry: BlCircle new; background: each statusBackgroundColor; size: 10@10; margin: (BlInsets top: 5 left: 5 bottom: 5 right: 5) ];
+				stencil: [ :each | 
+					BlElement new
+						geometry: BlCircle new;
+						background: each statusBackgroundColor;
+						size: 10 @ 10;
+						margin:
+							(BlInsets
+								top: 5
+								left: 5
+								bottom: 5
+								right: 5) ];
 				width: 20 ];
-		column: 'Package' translated format: [ :eachItem | eachItem testClassName] width: 250;
-		column: 'Examples' translated format: [ :eachItem | eachItem allCases size] width: 50
+		column: 'Package' translated
+			text: [ :eachItem | eachItem testClassName ]
+			width: 250;
+		column: 'Examples' translated
+			text: [ :eachItem | eachItem allCases size ]
+			width: 50
 ]
 
 { #category : #accessing }

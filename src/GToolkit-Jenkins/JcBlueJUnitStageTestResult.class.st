@@ -12,23 +12,31 @@ JcBlueJUnitStageTestResult >> allCases [
 { #category : #accessing }
 JcBlueJUnitStageTestResult >> gtAllCasesFor: aView [
 	<gtView>
-	| at|
+	| at |
 	at := self allCases.
-	at isEmpty ifTrue:[ ^ aView empty].
+	at isEmpty
+		ifTrue: [ ^ aView empty ].
 	^ aView columnedList
 		title: 'All Cases' translated;
 		priority: 60;
-		items: [ at];
-		column: 'Index' translated item: [ :eachItem :eachIndex | 
-			eachIndex asRopedText foreground: Color gray] width: 20;
-		column: 'Status' translated 
-			icon: [ :each | BlElement new 
-				geometry: BlCircle new; 
-				background: each statusBackgroundColor; 
-				size: 10@10 ]
+		items: [ at ];
+		column: 'Index' translated
+			item:
+				[ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray ]
+			width: 20;
+		column: 'Status' translated
+			icon: [ :each | 
+			BlElement new
+				geometry: BlCircle new;
+				background: each statusBackgroundColor;
+				size: 10 @ 10 ]
 			width: 50;
-		column: 'Class' translated format: [ :eachItem | eachItem className] width: 350;
-		column: 'Method' translated format: [ :eachItem | eachItem methodName] width: 250
+		column: 'Class' translated
+			text: [ :eachItem | eachItem className ]
+			width: 350;
+		column: 'Method' translated
+			text: [ :eachItem | eachItem methodName ]
+			width: 250
 ]
 
 { #category : #accessing }

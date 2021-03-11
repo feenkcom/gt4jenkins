@@ -29,7 +29,7 @@ JcModelElement >> fullUrlClientFor: aUrl [
 JcModelElement >> gtStringFor: aView [
 	<gtView>
 	^ aView explicit
-		title: 'Self URL';
+		title: 'URL';
 		priority: 90;
 		stencil: [
 			BrEditorElement new

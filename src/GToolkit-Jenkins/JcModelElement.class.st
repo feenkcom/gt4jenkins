@@ -26,8 +26,25 @@ JcModelElement >> fullUrlClientFor: aUrl [
 ]
 
 { #category : #accessing }
+JcModelElement >> gtStringFor: aView [
+	<gtView>
+	^ aView explicit
+		title: 'Self URL';
+		priority: 90;
+		stencil: [
+			BrEditorElement new
+				margin: (BlInsets all: 10);
+				constraintsDo: [ :c | 
+					c vertical matchParent. 
+					c horizontal matchParent ];
+				editor: (BrTextEditor new
+					text: ( self selfUrl asRopedText
+						glamorousRegularFontAndSize) ) ]
+]
+
+{ #category : #accessing }
 JcModelElement >> links [
-	^ nil
+	^ rawData at:'_links' ifAbsent: [Dictionary new]
 ]
 
 { #category : #accessing }
@@ -58,6 +75,13 @@ JcModelElement >> rawData [
 { #category : #accessing }
 JcModelElement >> rawData: aDictionary [
 	rawData := aDictionary
+]
+
+{ #category : #accessing }
+JcModelElement >> selfUrl [
+	| relativeUrl |
+	relativeUrl := self links at: 'self' ifPresent: [:link | link at: 'href' ifAbsent: [''] ] ifAbsent: [''].
+	^ self modelBuilder jenkinsClient getRootOfUrl, relativeUrl
 ]
 
 { #category : #accessing }

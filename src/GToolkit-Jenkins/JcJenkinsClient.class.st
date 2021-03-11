@@ -48,6 +48,19 @@ JcJenkinsClient >> blueOceanUrl [
 ]
 
 { #category : #accessing }
+JcJenkinsClient >> getRootOfUrl [
+	^ url asUrl scheme, '://', url asUrl host.
+]
+
+{ #category : #accessing }
+JcJenkinsClient >> hasValidUrl [
+	url asUrl ifNil: [ ^ false ].
+	url asUrl scheme ifNil: [ ^ false ].
+	url asUrl host ifNil: [ ^ false ].
+	^ true
+]
+
+{ #category : #accessing }
 JcJenkinsClient >> password [
 	^ password
 ]
@@ -71,7 +84,7 @@ JcJenkinsClient >> setBasicAuth [
 { #category : #accessing }
 JcJenkinsClient >> setupJwtToken [
 	| jwt rootUrl|
-	rootUrl := url asUrl scheme, '://', url asUrl host.
+	rootUrl := self getRootOfUrl.
 	znclient get: ('' join: { rootUrl .'/jwt-auth/token?maxExpiryTimeInMins=120'}).
 	jwt := znclient response headers at:'X-Blueocean-Jwt'.
 	znclient request headers removeKey: 'Authorization' ifAbsent: [].

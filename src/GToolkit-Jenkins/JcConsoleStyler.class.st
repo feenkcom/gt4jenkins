@@ -189,7 +189,7 @@ JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop [
 				attributesCreatingBlock: [ BrTextAdornmentDynamicAttribute new
 						beAppend;
 						stencil: [ | editorElement coder |
-							coder := GtMethodCoder forMethod: aCompiledMethod.
+							coder := GtPharoMethodCoder forMethod: aCompiledMethod.
 							coder subscribeToSystem.
 							editorElement := (coder asCoderUIModel expanded: true) asElement.
 							editorElement

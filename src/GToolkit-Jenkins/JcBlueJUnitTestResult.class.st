@@ -19,6 +19,24 @@ JcBlueJUnitTestResult class >> testStatusParser [
 ]
 
 { #category : #accessing }
+JcBlueJUnitTestResult >> errorDetails [
+	<return: #String>
+	^ self rawData
+		at: 'errorDetails'
+		ifPresent: [ :aValue | aValue asString ]
+		ifAbsent: [ String empty ]
+]
+
+{ #category : #accessing }
+JcBlueJUnitTestResult >> errorStackTrace [
+	<return: #String>
+	^ self rawData
+		at: 'errorStackTrace'
+		ifPresent: [ :aValue | aValue asString ]
+		ifAbsent: [ String empty ]
+]
+
+{ #category : #accessing }
 JcBlueJUnitTestResult >> fullStageName [
 	^ '/ ' join: self testNameParsed allButLast 
 ]
@@ -26,6 +44,28 @@ JcBlueJUnitTestResult >> fullStageName [
 { #category : #accessing }
 JcBlueJUnitTestResult >> gtDisplayOn: stream [
 	stream nextPutAll: self name
+]
+
+{ #category : #accessing }
+JcBlueJUnitTestResult >> gtErrorDetailsFor: aView [ 
+	<gtView>
+	self isPassed ifTrue: [ ^ aView empty ].
+	^ aView textEditor
+		title: 'Error Details';
+		priority: 4;
+		look: [ BrGlamorousRegularEditorLook ];
+		text: [
+			| aText |
+			aText := 'Details' asRopedText bold.
+			aText append: String cr asRopedText.
+			
+			aText append: self errorDetails asRopedText.
+			aText append: String cr asRopedText.
+			aText append: String cr asRopedText.
+			
+			aText append: 'Stack' asRopedText bold.
+			aText append: String cr asRopedText.
+			aText append: self errorStackTrace asRopedText ]
 ]
 
 { #category : #accessing }

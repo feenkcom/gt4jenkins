@@ -51,7 +51,7 @@ JcPipelineRun >> gtNodesFor: aView [
 	<gtView>
 	^ aView columnedList
 		title: 'Nodes' translated;
-		priority: 50;
+		priority: 1;
 		items: [ self nodes sort: [ :a :b | a id asInteger < b id asInteger ] ];
 		column: 'Status' translated
 			icon: [ :each | 

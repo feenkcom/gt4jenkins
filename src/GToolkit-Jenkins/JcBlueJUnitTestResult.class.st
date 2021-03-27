@@ -53,7 +53,7 @@ JcBlueJUnitTestResult >> gtErrorDetailsFor: aView [
 	^ aView textEditor
 		title: 'Error Details';
 		priority: 4;
-		look: [ BrGlamorousRegularEditorLook ];
+		aptitude: [ BrGlamorousRegularEditorAptitude ];
 		text: [
 			| aText |
 			aText := 'Details' asRopedText bold.

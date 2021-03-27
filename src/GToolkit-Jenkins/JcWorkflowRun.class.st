@@ -85,7 +85,7 @@ JcWorkflowRun >> gtLogFor: aView [
 	text := self getLogText.
 	text ifNil: [^aView empty].
 	^ aView textEditor
-		look: BrGlamorousCodeEditorLook;
+		aptitude: BrGlamorousCodeEditorAptitude;
 		styler: JcConsoleStyler new;
 		title: 'Console Log';
 		text: [text]

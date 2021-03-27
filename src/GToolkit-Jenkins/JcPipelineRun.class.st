@@ -85,7 +85,7 @@ JcPipelineRun >> gtStagesMapFor: aView [
 					container := BrHorizontalPane new
 						hExact: 200;
 						vFitContent;
-						look: BrShadowLook;
+						aptitude: BrShadowAptitude;
 						clipChildren: false;
 						margin: (BlInsets all: 10);
 						background: Color white;
@@ -107,12 +107,12 @@ JcPipelineRun >> gtStagesMapFor: aView [
 								c ignored horizontal alignRight.
 								c ignored vertical alignTop.
 								c margin: (BlInsets top: -10 right: -10) ];
-							look: BrGlamorousBadgeWithLabelLook +
-								(BrGlamorousWithDropdownLook
+							aptitude: BrGlamorousBadgeWithLabelAptitude +
+								(BrGlamorousWithDropdownAptitude
 								handle: [ BrBadge new
 										label: (aStage failedTests size);
 										exact: 20 @ 20;
-										look: BrGlamorousBadgeWithLabelLook;
+										aptitude: BrGlamorousBadgeWithLabelAptitude;
 										yourself ]
 								content: [ | aPhlowView aPopupElement |
 								aPhlowView := aStage gtFailedTestsFor: GtPhlowEmptyView new.
@@ -131,16 +131,16 @@ JcPipelineRun >> gtStagesMapFor: aView [
 													when: GtPhlowObjectToSpawn do: [:e | 
 													container phlow spawnTool: e tool] ].
 										aPopupElement ]).
-					labelContainer addChild: (BrLabel new text: aStage name asRopedText; look: BrGlamorousLabelLook).
+					labelContainer addChild: (BrLabel new text: aStage name asRopedText; aptitude: BrGlamorousLabelAptitude).
 					duration := aStage duration.
 					duration < 1 second ifFalse: [
 						labelContainer addChild: (BrLabel new 
 						text: duration gtHumanReadableString asRopedText;
-						look: (BrGlamorousLabelLook new foreground: Color gray)) ].
+						aptitude: (BrGlamorousLabelAptitude new foreground: Color gray)) ].
 					examplesSize := aStage allCasesSize.
 					(examplesSize > 0) ifTrue: [
 						labelContainer addChild: (
-							BrLabel new text: aStage allCasesSize asString,' tests'; look: (BrGlamorousLabelLook new foreground: Color gray))].
+							BrLabel new text: aStage allCasesSize asString,' tests'; aptitude: (BrGlamorousLabelAptitude new foreground: Color gray))].
 					labelContainer addChild: aDropdown.
 					container
 						addChild: (BrVerticalPane new vMatchParent; hExact: 15; background: statusColor );

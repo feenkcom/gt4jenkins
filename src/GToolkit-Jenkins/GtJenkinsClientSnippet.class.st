@@ -46,7 +46,7 @@ GtJenkinsClientSnippet >> asElement [
 	].
 
 	toolbar := BrToolbar new
-		look: BrToolbarLook new;
+		aptitude: BrToolbarAptitude new;
 		layout: (BlGridLayout horizontal rowCount: 1; cellSpacing: 10);
 		constraintsDo: [ :c |
 			c horizontal fitContent.
@@ -54,7 +54,7 @@ GtJenkinsClientSnippet >> asElement [
 	playInspectButton := BrButton new.
 	playInspectButton 
 		beSmallSize;
-		look: BrGlamorousButtonWithIconLook;
+		aptitude: BrGlamorousButtonWithIconAptitude;
 		label: 'Inspect connection';
 		icon: BrGlamorousVectorIcons playinspect;
 		action: [ 
@@ -86,9 +86,9 @@ GtJenkinsClientSnippet >> asElement [
 		vFitContent;
 		hMatchParent;
 		expand;
-		look: GtCoderExpanderLook new recreateHeader;
+		aptitude: GtCoderExpanderAptitude new recreateHeader;
 		header: [ BrLabel new
-			look: (BrGlamorousLabelLook new glamorousCodeFontAndSize foreground: BrGlamorousColors disabledButtonTextColor);
+			aptitude: (BrGlamorousLabelAptitude new glamorousCodeFontAndSize foreground: BrGlamorousColors disabledButtonTextColor);
 			text: ('Jenkins: ', userInputElement editor text asString, '@',urlInputElement editor text asString) ];
 		content: [ snippetContainer ].
 	
@@ -96,7 +96,7 @@ GtJenkinsClientSnippet >> asElement [
 	^ BrFrame new
 		vFitContent;
 		hMatchParent;
-		look: (GtSnippetContainerLook new snippet: self);
+		aptitude: (GtSnippetContainerAptitude new snippet: self);
 		addChild: anExpanderElement
 ]
 
@@ -112,7 +112,7 @@ GtJenkinsClientSnippet >> bind: aSnippet to: aSnippetElement [
 { #category : #converting }
 GtJenkinsClientSnippet >> inputElementNamed: aString in: formElement [
 	| labelElement inputElement text |
-	labelElement := BrLabel new text: aString, ':'; look: BrGlamorousLabelLook.
+	labelElement := BrLabel new text: aString, ':'; aptitude: BrGlamorousLabelAptitude.
 	labelElement constraintsDo: [ :c | 
 		c vertical fitContent.
 		c horizontal fitContent.
@@ -121,7 +121,7 @@ GtJenkinsClientSnippet >> inputElementNamed: aString in: formElement [
 	inputElement := BrEditor new
 				hMatchParent;
 				vFitContentLimited;
-				look: BrGlamorousInputFieldSpacingLook new + BrGlamorousRegularEditorLook new;
+				aptitude: BrGlamorousInputFieldSpacingAptitude new + BrGlamorousRegularEditorAptitude new;
 				text: ''.
 	
 	formElement addChild: labelElement.

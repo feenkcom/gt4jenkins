@@ -67,7 +67,7 @@ JcQueuedBlueRun >> gtStagesMapFor: aView [
 					statusColor := aStage resultBackgroundColor.
 					container := BlElement new
 						layout: BlLinearLayout horizontal;
-						look:BrShadowLook;
+						aptitude:BrShadowAptitude;
 						clipChildren: false;
 						margin:(BlInsets all:10);
 						background: Color white;
@@ -78,7 +78,7 @@ JcQueuedBlueRun >> gtStagesMapFor: aView [
 							c vertical fitContent].
 					editor := BrLabel new 
 						text: aStage name asRopedText;
-						look: BrGlamorousLabelLook;
+						aptitude: BrGlamorousLabelAptitude;
 						constraintsDo: [ :c | 
 							c margin: (BlInsets all: 5).
 							c vertical fitContent.
@@ -98,12 +98,12 @@ JcQueuedBlueRun >> gtStagesMapFor: aView [
 						c ignored horizontal alignRight.
 						c ignored vertical alignTop.
 						c margin: (BlInsets top: -10 right: -10) ];
-					look: BrGlamorousBadgeWithLabelLook +
-						(BrGlamorousWithDropdownLook
+					aptitude: BrGlamorousBadgeWithLabelAptitude +
+						(BrGlamorousWithDropdownAptitude
 							handle: [ BrBadge new
 										label: (aStage failedTests size);
 										exact: 20 @ 20;
-										look: BrGlamorousBadgeWithLabelLook;
+										aptitude: BrGlamorousBadgeWithLabelAptitude;
 										yourself ]
 							content: [ | aPhlowView aPopupElement |
 								aPhlowView := aStage gtFailedTestsFor: GtPhlowEmptyView new.

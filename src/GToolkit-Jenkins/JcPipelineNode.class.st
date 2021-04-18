@@ -120,7 +120,7 @@ JcPipelineNode >> gtStepsFor: aView [
 	<gtView>
 	^ aView columnedList
 		title: 'Steps' translated;
-		priority: 50;
+		priority: 1;
 		items: [ self steps ];
 		column: 'Status' translated
 			icon: [ :each | 
@@ -128,9 +128,23 @@ JcPipelineNode >> gtStepsFor: aView [
 				geometry: BlCircle new;
 				background: each resultBackgroundColor;
 				size: 10 @ 10 ]
-			width: 50;
-		column: 'Item' translated
-			text: [ :eachItem | eachItem gtDisplayText ]
+			width: 40;
+		column: 'Step' translated
+			icon: [ :eachItem |
+				BrExpander new
+					vFitContent;
+					hMatchParent;
+					collapse;
+					margin: (BlInsets all: 10);
+					aptitude: GtCoderExpanderAptitude new;
+					header: [ BrLabel new aptitude: BrGlamorousLabelAptitude; text: eachItem gtDisplayString ];
+					content: [ | container |
+						container := BrFrame new 
+							vExact: 400;
+							hMatchParent;
+							aptitude: BrGlamorousWithVerticalResizerAptitude;
+							addChild: ((eachItem gtLogFor: GtPhlowEmptyView new) asElement) matchParent ] ]
+			weight: 1
 ]
 
 { #category : #accessing }

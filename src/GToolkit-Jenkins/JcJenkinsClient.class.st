@@ -49,7 +49,11 @@ JcJenkinsClient >> blueOceanUrl [
 
 { #category : #accessing }
 JcJenkinsClient >> getRootOfUrl [
-	^ url asUrl scheme, '://', url asUrl host.
+	| rootUrl |
+	rootUrl := url asUrl scheme, '://', url asUrl host.
+	^ url asUrl port
+		ifNil: [ rootUrl ]
+		ifNotNil: [:port | rootUrl, ':', port asString ]
 ]
 
 { #category : #accessing }

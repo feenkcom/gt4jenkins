@@ -1,10 +1,10 @@
 Class {
-	#name : #JcGithubOrganizationFolder,
-	#superclass : #JcModelElement,
-	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanBlueocean_github_pipeline'
+	#name : 'JcGithubOrganizationFolder',
+	#superclass : 'JcModelElement',
+	#category : 'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanBlueocean_github_pipeline'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcGithubOrganizationFolder >> gtPipelinesFor: aView [
 	<gtView>
 	^ aView columnedList
@@ -14,7 +14,7 @@ JcGithubOrganizationFolder >> gtPipelinesFor: aView [
 		column: 'Name' translated item: [ :p | p rawData at: 'name' ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcGithubOrganizationFolder >> pipelines [
 	^ (super linksClientFor: 'pipelines') execute
 ]

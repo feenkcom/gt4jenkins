@@ -1,15 +1,15 @@
 Class {
-	#name : #JcWorkflowRun,
-	#superclass : #JcModelElement,
+	#name : 'JcWorkflowRun',
+	#superclass : 'JcModelElement',
 	#instVars : [
 		'allTests',
 		'consoleText',
 		'rawWfApiData'
 	],
-	#category : #'GToolkit-Jenkins-Generated-OrgJenkinsciPluginsWorkflowJob'
+	#category : 'GToolkit-Jenkins-Generated-OrgJenkinsciPluginsWorkflowJob'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcWorkflowRun >> allTests [
 	|client stageId allTestsResult|
 	allTests ifNil: [
@@ -29,17 +29,17 @@ JcWorkflowRun >> allTests [
 	^ allTests.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcWorkflowRun >> allTestsFlattened [
 	^ self allTests flatCollect: [:e | super modelBuilder modelFrom: (e value) className: 'IoJenkinsBlueoceanServiceEmbeddedRestJunit.BlueJUnitStageTestResult' ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcWorkflowRun >> allTestsURL [
 		^ (rawData at: 'url'), '/testReport/api/json'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcWorkflowRun >> getLogText [
 	|text logURL|
 	consoleText ifNil: [
@@ -52,7 +52,7 @@ JcWorkflowRun >> getLogText [
 	^ consoleText
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcWorkflowRun >> gtAllTestsFor: aView [
 	<gtView>
 	| at|
@@ -73,12 +73,12 @@ JcWorkflowRun >> gtAllTestsFor: aView [
 		column: 'Examples' translated format: [ :eachItem | eachItem allCases size] width: 50
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcWorkflowRun >> gtDisplayOn: stream [
 	stream nextPutAll: (rawData at: 'id')
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcWorkflowRun >> gtLogFor: aView [
 	<gtView>
 	|text logURL|
@@ -91,7 +91,7 @@ JcWorkflowRun >> gtLogFor: aView [
 		text: [text]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcWorkflowRun >> gtStagesFor: aView [
 	<gtView>
 	| at|
@@ -115,17 +115,17 @@ JcWorkflowRun >> gtStagesFor: aView [
 		
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcWorkflowRun >> result [
 	^ rawData at: 'result'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcWorkflowRun >> resultBackgroundColor [
 	^ JcJenkinsClient backgroundColorForStatus: self result
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcWorkflowRun >> startTime [
 	|st|
 	st := DateAndTime fromSeconds: ((rawData at: 'timestamp') / 1000 ).
@@ -133,7 +133,7 @@ JcWorkflowRun >> startTime [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcWorkflowRun >> wfapi [
 	|client|
 	rawWfApiData ifNil: [
@@ -142,7 +142,7 @@ JcWorkflowRun >> wfapi [
 	^ NeoJSONReader fromString:rawWfApiData
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcWorkflowRun >> wfapiModel [
 	^ self modelBuilder modelFrom: self wfapi className:'IoJenkinsWfapi.WfWorkflowRun'. 
 ]

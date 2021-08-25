@@ -1,47 +1,47 @@
 Class {
-	#name : #GtJenkinsAccount,
-	#superclass : #Object,
+	#name : 'GtJenkinsAccount',
+	#superclass : 'Object',
 	#instVars : [
 		'username',
 		'token',
 		'jenkinsUrl'
 	],
-	#category : #'GToolkit-Jenkins-Login'
+	#category : 'GToolkit-Jenkins-Login'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsAccount >> asDictionary [
 	^ {'username' -> self username .
 	   'token' -> self token.
 	   'jenkinsUrl' -> self jenkinsUrl} asDictionary
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsAccount >> jenkinsUrl [
 	^ jenkinsUrl ifNil:[ '' ]
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 GtJenkinsAccount >> jenkinsUrl: aJenkinsUrl [
 	 jenkinsUrl := aJenkinsUrl
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsAccount >> token [
 	^ token
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsAccount >> token: aToken [
 	token := aToken
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsAccount >> username [
 	^ username
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsAccount >> username: anUsernname [
 	username := anUsernname
 ]

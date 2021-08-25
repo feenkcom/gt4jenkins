@@ -1,15 +1,15 @@
 Class {
-	#name : #JcOrganizationFolder,
-	#superclass : #JcModelElement,
-	#category : #'GToolkit-Jenkins-Generated-JenkinsBranch'
+	#name : 'JcOrganizationFolder',
+	#superclass : 'JcModelElement',
+	#category : 'GToolkit-Jenkins-Generated-JenkinsBranch'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcOrganizationFolder >> gtDisplayOn: stream [
 	stream nextPutAll: (rawData at: 'name')
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcOrganizationFolder >> gtJobsFor: aView [
 	<gtView>
 	^ aView columnedList
@@ -19,7 +19,7 @@ JcOrganizationFolder >> gtJobsFor: aView [
 		column: 'Item' translated format: [ :each | each gtDisplayText ] width: 200.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcOrganizationFolder >> jobs [
 	^ super modelBuilder modelFrom: (rawData at: 'jobs')
 ]

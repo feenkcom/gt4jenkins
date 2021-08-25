@@ -1,16 +1,16 @@
 Class {
-	#name : #JcPipelineRun,
-	#superclass : #JcModelElement,
+	#name : 'JcPipelineRun',
+	#superclass : 'JcModelElement',
 	#instVars : [
 		'tests',
 		'parentBranchName',
 		'allTests',
 		'nodesDictionary'
 	],
-	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
+	#category : 'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineRun >> allTests [
 	|client stageId allTestsResult|
 	allTests ifNil: [
@@ -31,22 +31,22 @@ JcPipelineRun >> allTests [
 	^ allTests.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineRun >> allTestsURL [
 		^ '/job/', (parentBranchName copyReplaceAll: '/' with: '/job/'), '/' , (rawData at: 'id'), '/testReport/api/json'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineRun >> duration [
 	^ ((rawData at: 'durationInMillis')  asNumber milliSeconds roundTo: 1 second) humanReadablePrintString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineRun >> gtDisplayOn: stream [
 	stream nextPutAll: (rawData at: 'id')
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineRun >> gtNodesFor: aView [
 	<gtView>
 	^ aView columnedList
@@ -69,7 +69,7 @@ JcPipelineRun >> gtNodesFor: aView [
 			width: 200
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineRun >> gtStagesMapFor: aView [
 	<gtView> 
 	^ aView mondrian 
@@ -166,7 +166,7 @@ JcPipelineRun >> gtStagesMapFor: aView [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineRun >> gtTestsFor: aView [
 	<gtView>
 	(rawData at: 'state') = 'RUNNING'
@@ -194,7 +194,7 @@ JcPipelineRun >> gtTestsFor: aView [
 			text: [ :eachTest | eachTest fullStageName ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineRun >> nodes [
 	nodesDictionary ifNil: [nodesDictionary := Dictionary new.
 	((super linksClientFor: 'nodes') execute) collect: [:each | nodesDictionary at:( each id) put: (each parentRun: self)]].
@@ -202,27 +202,27 @@ JcPipelineRun >> nodes [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineRun >> nodesDictionary [
 	^ nodesDictionary
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineRun >> parentBranchName: aBranchName [
 	parentBranchName := aBranchName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineRun >> result [
 	^ rawData at: 'result'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineRun >> resultBackgroundColor [
 	^ JcJenkinsClient backgroundColorForStatus: self result
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineRun >> startTime [
 	|st|
 	st := DateAndTime fromString: (rawData at: 'startTime').
@@ -231,7 +231,7 @@ JcPipelineRun >> startTime [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineRun >> tests [
 	tests ifNil: [ tests := ((super linksClientFor: 'tests') execute)].
 	tests ifNil: [ ^ OrderedCollection new].

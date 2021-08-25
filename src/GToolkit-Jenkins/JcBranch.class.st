@@ -1,23 +1,23 @@
 Class {
-	#name : #JcBranch,
-	#superclass : #JcModelElement,
+	#name : 'JcBranch',
+	#superclass : 'JcModelElement',
 	#instVars : [
 		'runs'
 	],
-	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
+	#category : 'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcBranch >> duration [
 	^ (( rawData at: 'latestRun') at: 'durationInMillis') asNumber milliSeconds
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcBranch >> gtDisplayOn: stream [
 	stream nextPutAll: (rawData at: 'name')
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcBranch >> gtRunsFor: aView [
 	<gtView>
 	^ aView columnedList
@@ -48,17 +48,17 @@ JcBranch >> gtRunsFor: aView [
 							[ :s | each startTime asDateAndTime asLocal printSeparateDateAndTimeOn: s ] ] ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcBranch >> result [
 	^ ( rawData at: 'latestRun') at: 'result'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcBranch >> resultBackgroundColor [
 	^ JcJenkinsClient backgroundColorForStatus: self result
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcBranch >> runs [
 	
 	runs ifNil: [runs := (super linksClientFor: 'runs') execute. runs := runs collect: [:r | r parentBranchName: (rawData at: 'fullName')]].
@@ -66,7 +66,7 @@ JcBranch >> runs [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcBranch >> startTime [
 	^ (DateAndTime fromString: (( rawData at: 'latestRun') at: 'startTime')) asLocal
 ]

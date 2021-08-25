@@ -1,47 +1,47 @@
 Class {
-	#name : #GtJenkinsUserIdentity,
-	#superclass : #Object,
+	#name : 'GtJenkinsUserIdentity',
+	#superclass : 'Object',
 	#instVars : [
 		'jenkinsAccount'
 	],
 	#classInstVars : [
 		'instance'
 	],
-	#category : #'GToolkit-Jenkins-Login'
+	#category : 'GToolkit-Jenkins-Login'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsUserIdentity class >> instance [
 	instance ifNil: [ instance := GtJenkinsUserIdentity new. instance loadSavedTokens.].
 	^ instance
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsUserIdentity >> authTokenPreferences [
 	^ self defaultPreferencesFolder / 'com.glamoroustoolkit.jenkins.v1.ston'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsUserIdentity >> defaultPreferencesFolder [
 	^ FileLocator preferences / 'pharo'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsUserIdentity >> jenkinsAccount [
 	^ jenkinsAccount
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsUserIdentity >> jenkinsAccount: aJenkinsAccount [
 	jenkinsAccount := aJenkinsAccount
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 GtJenkinsUserIdentity >> jsonKey [
 	^ 'com.gt.jenkins.auth'
 ]
 
-{ #category : #loading }
+{ #category : 'loading' }
 GtJenkinsUserIdentity >> loadSavedTokens [
 	| rawData authClient registeredDatabasesResponse gtJenkinsAccountJson |
 
@@ -59,14 +59,14 @@ GtJenkinsUserIdentity >> loadSavedTokens [
 					 	token: (gtJenkinsAccountJson at: 'token')]]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsUserIdentity >> saveJsonFor: aValue into: aWriteStream [
 	STONJSON 
 		put: aValue 
 		onStreamPretty: (ZnCharacterWriteStream on: aWriteStream encoding: 'utf8')
 ]
 
-{ #category : #serialization }
+{ #category : 'serialization' }
 GtJenkinsUserIdentity >> storeAuthTokens [
 	|json|
 	self defaultPreferencesFolder ensureCreateDirectory.

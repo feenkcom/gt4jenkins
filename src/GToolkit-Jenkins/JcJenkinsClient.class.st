@@ -1,16 +1,16 @@
 Class {
-	#name : #JcJenkinsClient,
-	#superclass : #Object,
+	#name : 'JcJenkinsClient',
+	#superclass : 'Object',
 	#instVars : [
 		'znclient',
 		'url',
 		'username',
 		'password'
 	],
-	#category : #'GToolkit-Jenkins'
+	#category : 'GToolkit-Jenkins'
 }
 
-{ #category : #constants }
+{ #category : 'constants' }
 JcJenkinsClient class >> backgroundColorForStatus: aString [
 	aString = 'SUCCESS' ifTrue: [^ BrGlamorousColors successBackgroundColor].
 	aString = 'FAILURE' ifTrue: [^ BrGlamorousColors errorBackgroundColor].
@@ -19,14 +19,14 @@ JcJenkinsClient class >> backgroundColorForStatus: aString [
 	^ BrGlamorousColors lightBorderColor.
 ]
 
-{ #category : #constants }
+{ #category : 'constants' }
 JcJenkinsClient class >> backgroundColorForTestStatus: aString [
 	aString = 'PASSED' ifTrue: [^ BrGlamorousColors successBackgroundColor].
 	aString = 'FAILED' ifTrue: [^ BrGlamorousColors failureBackgroundColor].
 	^ BrGlamorousColors lightBorderColor.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcJenkinsClient >> blueOcean [
 	|json modelBuilder model|
 	self setupJwtToken.
@@ -37,7 +37,7 @@ JcJenkinsClient >> blueOcean [
 	^ model.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcJenkinsClient >> blueOceanUrl [
 	|result|
 	result := self url.
@@ -47,12 +47,12 @@ JcJenkinsClient >> blueOceanUrl [
 	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcJenkinsClient >> getRootOfUrl [
 	^ url asUrl scheme, '://', url asUrl host.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcJenkinsClient >> hasValidUrl [
 	url asUrl ifNil: [ ^ false ].
 	url asUrl scheme ifNil: [ ^ false ].
@@ -60,12 +60,12 @@ JcJenkinsClient >> hasValidUrl [
 	^ true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcJenkinsClient >> password [
 	^ password
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcJenkinsClient >> plainJenkinsApi [
 	| modelBuilder model jobs|
 	modelBuilder := JcModelBuilder new.
@@ -75,13 +75,13 @@ JcJenkinsClient >> plainJenkinsApi [
 	^ model.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcJenkinsClient >> setBasicAuth [
 	znclient := ZnClient new
 	username: username password: password.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcJenkinsClient >> setupJwtToken [
 	| jwt rootUrl|
 	rootUrl := self getRootOfUrl.
@@ -91,17 +91,17 @@ JcJenkinsClient >> setupJwtToken [
 	znclient request setAuthorization: 'Bearer ', jwt.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcJenkinsClient >> url [
 	^ url
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcJenkinsClient >> username [
 	^ username
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcJenkinsClient >> username: anUsername token: aToken url: anUrl [
 	znclient := ZnClient new
 	username: anUsername password: aToken.
@@ -110,7 +110,7 @@ JcJenkinsClient >> username: anUsername token: aToken url: anUrl [
 	url := anUrl.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcJenkinsClient >> znclient [
 	^ znclient
 ]

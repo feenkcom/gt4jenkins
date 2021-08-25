@@ -1,27 +1,27 @@
 Class {
-	#name : #GtJenkinsClientSnippet,
-	#superclass : #GtSnippet,
+	#name : 'GtJenkinsClientSnippet',
+	#superclass : 'GtSnippet',
 	#instVars : [
 		'url',
 		'user',
 		'token'
 	],
-	#category : #'GToolkit-Jenkins'
+	#category : 'GToolkit-Jenkins'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsClientSnippet class >> typeName [
 	<return: #String>
 
 	^ 'jenkins'
 ]
 
-{ #category : #'json mapping' }
+{ #category : 'json mapping' }
 GtJenkinsClientSnippet class >> xdocSnippetMappingFor: aNeoJSONMapper [
 	"ignore"
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 GtJenkinsClientSnippet >> asElement [
 	| snippetContainer formElement urlInputElement tokenInputElement toolbar playInspectButton playBlueInspectButton userInputElement anExpanderElement jenkinsAccount |
 	formElement := BlElement new.
@@ -100,16 +100,16 @@ GtJenkinsClientSnippet >> asElement [
 		addChild: anExpanderElement
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 GtJenkinsClientSnippet >> asStencilBuilder [
 	^ self
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 GtJenkinsClientSnippet >> bind: aSnippet to: aSnippetElement [
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 GtJenkinsClientSnippet >> inputElementNamed: aString in: formElement [
 	| labelElement inputElement text |
 	labelElement := BrLabel new text: aString, ':'; aptitude: BrGlamorousLabelAptitude.
@@ -129,7 +129,7 @@ GtJenkinsClientSnippet >> inputElementNamed: aString in: formElement [
 	^ inputElement
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 GtJenkinsClientSnippet >> storeJenkinsAccountToPreferencesFolderWith: username token: tokenString andUrl: aJenkinsUrl [
 	GtJenkinsUserIdentity instance 
 		jenkinsAccount: (GtJenkinsAccount new 
@@ -139,7 +139,7 @@ GtJenkinsClientSnippet >> storeJenkinsAccountToPreferencesFolderWith: username t
 	GtJenkinsUserIdentity instance storeAuthTokens.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsClientSnippet >> string [
 	<return: #String>
 	^ String streamContents: [ :aStream | 
@@ -148,38 +148,38 @@ GtJenkinsClientSnippet >> string [
 		self user ifNotNil: [ aStream space; print: self user ]. ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsClientSnippet >> text [
 	<return: #BlRope>
 	^ self string asRopedText
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsClientSnippet >> token [
 	^ token
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsClientSnippet >> token: anObject [
 	token := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsClientSnippet >> url [
 	^ url
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsClientSnippet >> url: anObject [
 	url := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsClientSnippet >> user [
 	^ user
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 GtJenkinsClientSnippet >> user: anObject [
 	user := anObject
 ]

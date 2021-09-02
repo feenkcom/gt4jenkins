@@ -1,18 +1,18 @@
 Class {
-	#name : #JcWorkflowMultiBranchProject,
-	#superclass : #JcModelElement,
+	#name : 'JcWorkflowMultiBranchProject',
+	#superclass : 'JcModelElement',
 	#instVars : [
 		'jobs'
 	],
-	#category : #'GToolkit-Jenkins-Generated-OrgJenkinsciPluginsWorkflowMultibranch'
+	#category : 'GToolkit-Jenkins-Generated-OrgJenkinsciPluginsWorkflowMultibranch'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcWorkflowMultiBranchProject >> gtDisplayOn: stream [
 	stream nextPutAll: (rawData at: 'name')
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcWorkflowMultiBranchProject >> gtJobsFor: aView [
 	<gtView>
 	^ aView columnedList
@@ -31,7 +31,7 @@ JcWorkflowMultiBranchProject >> gtJobsFor: aView [
 			width: 200
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcWorkflowMultiBranchProject >> jobs [
 	jobs ifNil:[jobs:=  super modelBuilder modelFrom: (rawData at: 'jobs')].
 	^ jobs

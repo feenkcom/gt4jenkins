@@ -1,13 +1,13 @@
 Class {
-	#name : #JcPipeline,
-	#superclass : #JcModelElement,
+	#name : 'JcPipeline',
+	#superclass : 'JcModelElement',
 	#instVars : [
 		'runs'
 	],
-	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
+	#category : 'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipeline >> gtRunsFor: aView [
 	<gtView>
 	^ aView columnedList
@@ -21,16 +21,16 @@ JcPipeline >> gtRunsFor: aView [
 						background: each resultBackgroundColor;
 						size: 10 @ 10 ]
 			width: 50;
-		column: 'Result' translated item: [ :each | each result ] width: 70;
+		column: 'Result' translated text: [ :each | each result ] width: 70;
 		column: 'Item' translated
 			text: [ :each | each gtDisplayText ]
 			width: 50;
 		"column: 'Tests' translated format: [:each | (each tests select: [:test | test isFailed]) size asString] width: 200;"
 			column: 'Duration' translated
-			item: [ :each | each duration ]
+			text: [ :each | each duration ]
 			width: 200;
 		column: 'Start time' translated
-			item: [ :each | 
+			text: [ :each | 
 			each startTime = 'QUEUED'
 				ifTrue: [ each startTime ]
 				ifFalse: [ String
@@ -38,7 +38,7 @@ JcPipeline >> gtRunsFor: aView [
 							[ :s | each startTime asDateAndTime asLocal printSeparateDateAndTimeOn: s ] ] ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipeline >> runs [
 	runs ifNil: [runs := (super linksClientFor: 'runs') execute. runs := runs collect: [:r | r parentBranchName: (rawData at: 'fullName')]].
 	^ runs

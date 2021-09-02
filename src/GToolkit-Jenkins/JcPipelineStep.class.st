@@ -1,10 +1,10 @@
 Class {
-	#name : #JcPipelineStep,
-	#superclass : #JcModelElement,
-	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
+	#name : 'JcPipelineStep',
+	#superclass : 'JcModelElement',
+	#category : 'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineStep >> getLogText [
 	|text logURL|
 	logURL := ((((rawData at:'actions') detect: ([:a | (a at:'urlName') = 'log'])) at: '_links') at: 'self') at: 'href'.
@@ -14,7 +14,7 @@ JcPipelineStep >> getLogText [
 	^ text
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineStep >> gtDisplayOn: stream [
 	|displayDescription|
 	displayDescription := (rawData at: 'displayDescription').
@@ -22,7 +22,7 @@ JcPipelineStep >> gtDisplayOn: stream [
 	displayDescription ifNotNil: [stream nextPutAll: ('', displayDescription  )]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineStep >> gtLogFor: aView [
 	<gtView>
 	|text logURL|
@@ -35,12 +35,12 @@ JcPipelineStep >> gtLogFor: aView [
 		text: [text]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineStep >> result [
 	^ rawData at: 'result'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcPipelineStep >> resultBackgroundColor [
 	^ JcJenkinsClient backgroundColorForStatus: self result
 ]

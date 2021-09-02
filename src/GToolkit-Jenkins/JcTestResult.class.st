@@ -1,10 +1,10 @@
 Class {
-	#name : #JcTestResult,
-	#superclass : #JcModelElement,
-	#category : #'GToolkit-Jenkins'
+	#name : 'JcTestResult',
+	#superclass : 'JcModelElement',
+	#category : 'GToolkit-Jenkins'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcTestResult >> rawSuites [
 	^ rawData at: 'suites'
 ]

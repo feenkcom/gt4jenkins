@@ -1,14 +1,14 @@
 Class {
-	#name : #JcQueuedBlueRun,
-	#superclass : #JcModelElement,
+	#name : 'JcQueuedBlueRun',
+	#superclass : 'JcModelElement',
 	#instVars : [
 		'parentBranchName',
 		'tests'
 	],
-	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanServiceEmbeddedRest'
+	#category : 'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanServiceEmbeddedRest'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcQueuedBlueRun >> allTests [
 	|client|
 	client := (super urlClientFor: self allTestsURL).
@@ -17,23 +17,23 @@ JcQueuedBlueRun >> allTests [
  
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcQueuedBlueRun >> allTestsURL [
 		^ '/job/', (parentBranchName copyReplaceAll: '/' with: '/job/'), '/' , (rawData at: 'id'), '/testReport/api/json'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcQueuedBlueRun >> duration [
 	((rawData at: 'result') = 'UNKNOWN') ifTrue: [^ (rawData at: 'state')].
 	^ (rawData at: 'durationInMillis')  asNumber milliSeconds
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcQueuedBlueRun >> gtDisplayOn: stream [
 	stream nextPutAll: (rawData at: 'id')
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcQueuedBlueRun >> gtNodesFor: aView [
 	<gtView>
 	| aList |
@@ -52,7 +52,7 @@ JcQueuedBlueRun >> gtNodesFor: aView [
 	^ aList
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcQueuedBlueRun >> gtStagesMapFor: aView [
 	<gtView> 
 	^ aView mondrian 
@@ -147,7 +147,7 @@ JcQueuedBlueRun >> gtStagesMapFor: aView [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcQueuedBlueRun >> gtTestsFor: aView [
 	<gtView>
 	((rawData at: 'state') = 'RUNNING') ifTrue: [^ aView empty].
@@ -161,38 +161,38 @@ JcQueuedBlueRun >> gtTestsFor: aView [
 				background: each statusBackgroundColor; 
 				size: 10@10 ]
 			width: 50;
-		column: 'Status' translated format: [ :eachTest | eachTest status ] width: 70;
-		column: 'Class' translated format: [ :eachTest | eachTest testClassName ] width: 250;
-		column: 'Method' translated format: [ :eachTest | eachTest testMethodName ];
-		column: 'Stage' translated format: [:eachTest | eachTest fullStageName ]
+		column: 'Status' translated text: [ :eachTest | eachTest status ] width: 70;
+		column: 'Class' translated text: [ :eachTest | eachTest testClassName ] width: 250;
+		column: 'Method' translated text: [ :eachTest | eachTest testMethodName ];
+		column: 'Stage' translated text: [:eachTest | eachTest fullStageName ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcQueuedBlueRun >> nodes [
 	^ ((super linksClientFor: 'nodes') execute) collect: [:each | each parentRun: self]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcQueuedBlueRun >> parentBranchName: aName [
 	parentBranchName := aName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcQueuedBlueRun >> result [
 	^ rawData at: 'result'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcQueuedBlueRun >> resultBackgroundColor [
 	^ JcJenkinsClient backgroundColorForStatus: self result
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcQueuedBlueRun >> startTime [
 	^ (rawData at: 'state')
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 JcQueuedBlueRun >> tests [
 	^ ((super linksClientFor: 'tests') execute).
 ]

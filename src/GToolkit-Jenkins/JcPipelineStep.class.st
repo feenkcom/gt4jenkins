@@ -23,6 +23,15 @@ JcPipelineStep >> gtDisplayOn: stream [
 ]
 
 { #category : 'accessing' }
+JcPipelineStep >> gtInstructionsFor: aView [
+	<gtView>
+	^ aView textEditor
+		title: 'Instructions';
+		aptitude: BrGlamorousCodeEditorAptitude;
+		text: [ self gtDisplayString ]
+]
+
+{ #category : 'accessing' }
 JcPipelineStep >> gtLogFor: aView [
 	<gtView>
 	|text logURL|

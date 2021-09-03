@@ -57,7 +57,7 @@ JcPipelineNode >> gtAllTestsFor: aView [
 		priority: 60;
 		items: [ at ];
 		column: 'Index' translated
-			item: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray ]
+			text: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray ]
 			width: 20;
 		column: 'Status' translated
 			do: [ :column | 
@@ -99,7 +99,7 @@ JcPipelineNode >> gtFailedTestsFor: aView [
 		priority: 60;
 		items: [ self failedTests ];
 		column: 'Index' translated
-			item: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray ]
+			text: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray ]
 			width: 20;
 		column: 'Status' translated
 			icon: [ :each | 

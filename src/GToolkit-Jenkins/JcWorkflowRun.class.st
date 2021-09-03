@@ -62,15 +62,15 @@ JcWorkflowRun >> gtAllTestsFor: aView [
 		title: 'All Examples' translated;
 		priority: 60;
 		items: [ at];
-		column: 'Index' translated item: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray] width: 20;
+		column: 'Index' translated text: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray] width: 20;
 		column: 'Status' translated 
 			icon: [ :each | BlElement new 
 				geometry: BlCircle new; 
 				background: each statusBackgroundColor; 
 				size: 10@10 ]
 			width: 50;
-		column: 'Package' translated format: [ :eachItem | eachItem testClassName] width: 250;
-		column: 'Examples' translated format: [ :eachItem | eachItem allCases size] width: 50
+		column: 'Package' translated text: [ :eachItem | eachItem testClassName] width: 250;
+		column: 'Examples' translated text: [ :eachItem | eachItem allCases size] width: 50
 ]
 
 { #category : 'accessing' }
@@ -102,7 +102,7 @@ JcWorkflowRun >> gtStagesFor: aView [
 		priority: 60;
 		items: [ at];
 		column: 'Index' translated 
-			item: [ :eachItem :eachIndex | 
+			text: [ :eachItem :eachIndex | 
 				eachIndex asRopedText foreground: Color gray] 
 			width: 20;
 		column: 'Status' translated 
@@ -111,7 +111,7 @@ JcWorkflowRun >> gtStagesFor: aView [
 				background: each resultBackgroundColor; 
 				size: 10@10 ]
 			width: 50;
-		column: 'Name' translated format: [ :eachItem | eachItem gtDisplayText] width: 250
+		column: 'Name' translated text: [ :eachItem | eachItem gtDisplayText] width: 250
 		
 ]
 

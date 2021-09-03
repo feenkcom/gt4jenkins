@@ -17,7 +17,7 @@ JcOrganization >> gtPipelinesFor: aView [
 		priority: 10;
 		items: [ self pipelines ];
 		children: [:each | (each class canUnderstand: #pipelines) ifTrue: [ each pipelines ] ifFalse: [{}]];
-		column: 'Name' translated item: [ :p | p rawData at: 'name' ]
+		column: 'Name' translated text: [ :p | p rawData at: 'name' ]
 ]
 
 { #category : 'accessing' }

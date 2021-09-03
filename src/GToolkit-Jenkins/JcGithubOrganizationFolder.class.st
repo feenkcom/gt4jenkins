@@ -11,7 +11,7 @@ JcGithubOrganizationFolder >> gtPipelinesFor: aView [
 		title: 'Pipelines' translated;
 		priority: 10;
 		items: [ self pipelines ];
-		column: 'Name' translated item: [ :p | p rawData at: 'name' ]
+		column: 'Name' translated text: [ :p | p rawData at: 'name' ]
 ]
 
 { #category : 'accessing' }

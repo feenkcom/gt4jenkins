@@ -161,10 +161,10 @@ JcQueuedBlueRun >> gtTestsFor: aView [
 				background: each statusBackgroundColor; 
 				size: 10@10 ]
 			width: 50;
-		column: 'Status' translated format: [ :eachTest | eachTest status ] width: 70;
-		column: 'Class' translated format: [ :eachTest | eachTest testClassName ] width: 250;
-		column: 'Method' translated format: [ :eachTest | eachTest testMethodName ];
-		column: 'Stage' translated format: [:eachTest | eachTest fullStageName ]
+		column: 'Status' translated text: [ :eachTest | eachTest status ] width: 70;
+		column: 'Class' translated text: [ :eachTest | eachTest testClassName ] width: 250;
+		column: 'Method' translated text: [ :eachTest | eachTest testMethodName ];
+		column: 'Stage' translated text: [:eachTest | eachTest fullStageName ]
 ]
 
 { #category : 'accessing' }

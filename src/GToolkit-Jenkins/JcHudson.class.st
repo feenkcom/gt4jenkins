@@ -11,7 +11,7 @@ JcHudson >> gtJobsFor: aView [
 		title: 'Jobs' translated;
 		priority: 50;
 		items: [ self jobs];
-		column: 'Item' translated format: [ :each | each gtDisplayText ] width: 200.
+		column: 'Item' translated text: [ :each | each gtDisplayText ] width: 200.
 ]
 
 { #category : 'accessing' }

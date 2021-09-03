@@ -60,12 +60,12 @@ JcPipelineRun >> gtNodesFor: aView [
 						background: each resultBackgroundColor;
 						size: 10 @ 10 ]
 			width: 50;
-		column: 'Result' translated item: [ :each | each result ] width: 70;
+		column: 'Result' translated text: [ :each | each result ] width: 70;
 		column: 'Item' translated
 			text: [ :each | each gtDisplayText ]
 			width: 200;
 		column: 'Duration' translated
-			item: [ :each | each duration ]
+			text: [ :each | each duration ]
 			width: 200
 ]
 

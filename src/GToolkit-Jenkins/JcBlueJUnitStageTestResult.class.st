@@ -21,7 +21,7 @@ JcBlueJUnitStageTestResult >> gtAllCasesFor: aView [
 		priority: 60;
 		items: [ at ];
 		column: 'Index' translated
-			item:
+			text:
 				[ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray ]
 			width: 20;
 		column: 'Status' translated

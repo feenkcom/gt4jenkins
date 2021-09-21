@@ -380,7 +380,8 @@ JcConsoleStyler >> privateStyle: aText [
 
 	| parser aString |
 	aString := aText asString.
-	parser := (self consoleErrorSequenceOn: aText)
+	parser := (self vmErrorOn: aText) / (self brackettedErrorOn: aText)
+	          / (self consoleErrorSequenceOn: aText)
 	          / (self metacelloNotificationFetched: aText)
 	          / (self metacelloNotificationLoaded: aText)
 	          / (self illegalInstructionOn: aText)
@@ -401,8 +402,9 @@ JcConsoleStyler >> privateStyle: aText [
 	          / (self postgresNeutralLog: aText)
 	          / (self neutralOn: aText).
 	parser sea star optimize parse: aString.
-	
-	(self segmentationFaultParserOn: aText) sea star optimize parse: aString.
+
+	(self segmentationFaultParserOn: aText) sea star optimize parse:
+		aString.
 	(self hardSpaceOn: aText) sea star optimize parse: aString.
 	^ aText
 ]

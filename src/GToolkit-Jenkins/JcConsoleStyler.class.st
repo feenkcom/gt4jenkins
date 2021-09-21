@@ -28,6 +28,15 @@ JcConsoleStyler >> bashError: aText [
 ]
 
 { #category : 'accessing' }
+JcConsoleStyler >> brackettedErrorOn: aText [ 
+	^ ('[ERROR]' asPParser token
+		, #endOfLine asPParser negate star token , #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens first start to: tokens second stop)
+				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
+]
+
+{ #category : 'accessing' }
 JcConsoleStyler >> classDependecesOn: aText [
 	^ (#startOfLine asPParser
 		, 'MetacelloNotification: Warning: This package depends on the following classes:' asPParser token 
@@ -299,7 +308,9 @@ JcConsoleStyler >> privateStyle: aText [
 	| parser aString |
 	aString := aText asString.
 	parser := 
-		(self consoleErrorSequenceOn: aText)
+		(self vmErrorOn: aText)
+		/ (self brackettedErrorOn: aText)
+		/ (self consoleErrorSequenceOn: aText)
 		/ (self metacelloNotificationFetched: aText)
 		/ (self metacelloNotificationLoaded: aText)
 		/ (self illegalInstructionOn: aText) 
@@ -354,5 +365,15 @@ JcConsoleStyler >> squareBracketErrorOn: aText [
 		, #endOfLine asPParser negate star token , #endOfLine asPParser)
 		==> [ :tokens | 
 			(aText from: tokens second start to: tokens fifth stop)
+				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
+]
+
+{ #category : 'accessing' }
+JcConsoleStyler >> vmErrorOn: aText [ 
+	^ (#startOfLine asPParser
+		, 'VM Error' asPParser token
+		, #endOfLine asPParser negate star token , #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens second start to: tokens third stop)
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]

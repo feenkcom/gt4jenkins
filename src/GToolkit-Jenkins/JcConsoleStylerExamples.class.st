@@ -12,7 +12,7 @@ JcConsoleStylerExamples >> postgresError [
 2021-09-18 14:16:14 116 [P3] 4529 #Error P3Notification PostgreSQL relation "relation_name" already exists, skipping
 2021-09-18 14:16:14 117 [P3] 4529 #Result CREATE TABLE, 20 ms
 2021-09-18 14:16:14 118 [P3] 4529 #Close' asRopedText.
-	^ self style: aText attributeClass: BlTextHighlightAttribute from: 60 to: 175.
+	^ self style: aText attributeClass: BlTextHighlightAttribute from: 59 to: 174.
 ]
 
 { #category : 'accessing' }
@@ -25,7 +25,7 @@ JcConsoleStylerExamples >> postgresNeutralLog [
 2021-09-18 14:16:20 239 [P3] 4565 #Result CREATE TABLE, 20 ms
 2021-09-18 14:16:20 240 [P3] 4565 #Close
 ' asRopedText.
-	^ self style: aText attributeClass: BlTextForegroundAttribute from: 102 to: 305.
+	^ self style: aText attributeClass: BlTextForegroundAttribute from: 101 to: 304.
 ]
 
 { #category : 'accessing' }

@@ -1,10 +1,10 @@
 Class {
-	#name : 'JcBlueJUnitTestResult',
-	#superclass : 'JcModelElement',
+	#name : #JcBlueJUnitTestResult,
+	#superclass : #JcModelElement,
 	#category : 'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanServiceEmbeddedRestJunit'
 }
 
-{ #category : 'as yet unclassified' }
+{ #category : #'as yet unclassified' }
 JcBlueJUnitTestResult class >> testStatusParser [
 	|method fullClass p|
 	method := #word asPParser plus flatten.
@@ -18,7 +18,7 @@ JcBlueJUnitTestResult class >> testStatusParser [
 	^ p optimize
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcBlueJUnitTestResult >> errorDetails [
 	<return: #String>
 	^ self rawData
@@ -27,7 +27,7 @@ JcBlueJUnitTestResult >> errorDetails [
 		ifAbsent: [ String empty ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcBlueJUnitTestResult >> errorStackTrace [
 	<return: #String>
 	^ self rawData
@@ -36,17 +36,17 @@ JcBlueJUnitTestResult >> errorStackTrace [
 		ifAbsent: [ String empty ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcBlueJUnitTestResult >> fullStageName [
 	^ '/ ' join: self testNameParsed allButLast 
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcBlueJUnitTestResult >> gtDisplayOn: stream [
 	stream nextPutAll: self name
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcBlueJUnitTestResult >> gtErrorDetailsFor: aView [ 
 	<gtView>
 	self isPassed ifTrue: [ ^ aView empty ].
@@ -68,7 +68,7 @@ JcBlueJUnitTestResult >> gtErrorDetailsFor: aView [
 			aText append: self errorStackTrace asRopedText ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcBlueJUnitTestResult >> gtTestFor: aView [
 	<gtView>
 	self testMethod 
@@ -83,32 +83,32 @@ JcBlueJUnitTestResult >> gtTestFor: aView [
 				nextPutAll: ' - method: '; print: self testMethodName; cr ] ]
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 JcBlueJUnitTestResult >> isFailed [
 	^ self status = 'FAILED'
 ]
 
-{ #category : 'testing' }
+{ #category : #testing }
 JcBlueJUnitTestResult >> isPassed [
 	^ self status = 'PASSED'
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcBlueJUnitTestResult >> name [ 
 	^ rawData at: 'name'
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcBlueJUnitTestResult >> status [
 	^ rawData at: 'status'
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcBlueJUnitTestResult >> statusBackgroundColor [
 	^ JcJenkinsClient backgroundColorForTestStatus: self status
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcBlueJUnitTestResult >> testClassName [
 	| aClassName |
 	aClassName := self testNameParsed last.
@@ -117,7 +117,7 @@ JcBlueJUnitTestResult >> testClassName [
 		ifFalse: [ aClassName key ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcBlueJUnitTestResult >> testMethod [
 	<return: #CompiledMethod or: nil>
 	| aClass aSelector aMethod |
@@ -128,12 +128,12 @@ JcBlueJUnitTestResult >> testMethod [
 		aClass classSide lookupSelector: aSelector ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcBlueJUnitTestResult >> testMethodName [
 	^ self testNameParsed last value
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcBlueJUnitTestResult >> testNameParsed [
 	^ self class testStatusParser parse: self name
 ]

@@ -1,20 +1,20 @@
 Class {
-	#name : 'JcWfWorkflowRunStage',
-	#superclass : 'JcModelElement',
+	#name : #JcWfWorkflowRunStage,
+	#superclass : #JcModelElement,
 	#category : 'GToolkit-Jenkins-Generated-IoJenkinsWfapi'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcWfWorkflowRunStage >> gtDisplayOn: stream [
 	stream nextPutAll: (rawData at: 'name')
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcWfWorkflowRunStage >> result [
 	^ rawData at: 'status'
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcWfWorkflowRunStage >> resultBackgroundColor [
 	^ JcJenkinsClient backgroundColorForStatus: self result
 ]

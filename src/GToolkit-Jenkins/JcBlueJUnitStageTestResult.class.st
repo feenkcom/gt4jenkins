@@ -1,15 +1,15 @@
 Class {
-	#name : 'JcBlueJUnitStageTestResult',
-	#superclass : 'JcModelElement',
-	#category : 'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanServiceEmbeddedRestJunit'
+	#name : #JcBlueJUnitStageTestResult,
+	#superclass : #JcModelElement,
+	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanServiceEmbeddedRestJunit'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcBlueJUnitStageTestResult >> allCases [
 	^ theModelBuilder modelFrom: (rawData at: 'cases') className: 'IoJenkinsBlueoceanServiceEmbeddedRestJunit.BlueJUnitStageTestCase'
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcBlueJUnitStageTestResult >> gtAllCasesFor: aView [
 	<gtView>
 	| at |
@@ -27,7 +27,7 @@ JcBlueJUnitStageTestResult >> gtAllCasesFor: aView [
 		column: 'Status' translated
 			icon: [ :each | 
 			BlElement new
-				geometry: BlCircle new;
+				geometry: BlCircleGeometry new;
 				background: each statusBackgroundColor;
 				size: 10 @ 10 ]
 			width: 50;
@@ -39,7 +39,7 @@ JcBlueJUnitStageTestResult >> gtAllCasesFor: aView [
 			width: 250
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcBlueJUnitStageTestResult >> status [
 	|result|
 	result := 'SUCCESS'.
@@ -47,12 +47,12 @@ JcBlueJUnitStageTestResult >> status [
 	^ result
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcBlueJUnitStageTestResult >> statusBackgroundColor [
 	^ JcJenkinsClient backgroundColorForStatus: self status
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcBlueJUnitStageTestResult >> testClassName [
 	^ rawData at: 'name'
 ]

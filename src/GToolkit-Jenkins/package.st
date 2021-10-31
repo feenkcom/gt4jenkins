@@ -1,1 +1,1 @@
-Package { #name : 'GToolkit-Jenkins' }
+Package { #name : #'GToolkit-Jenkins' }

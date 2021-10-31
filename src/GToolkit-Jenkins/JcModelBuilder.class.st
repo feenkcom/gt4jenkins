@@ -1,6 +1,6 @@
 Class {
-	#name : 'JcModelBuilder',
-	#superclass : 'Object',
+	#name : #JcModelBuilder,
+	#superclass : #Object,
 	#instVars : [
 		'packageOrganizer',
 		'jenkinsClient'
@@ -8,7 +8,7 @@ Class {
 	#category : 'GToolkit-Jenkins'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcModelBuilder >> ensureClass: aFullClassName [
 	|fullPackageName classSymbol |
 	fullPackageName := (aFullClassName findTokens: '.') allButLast 
@@ -24,28 +24,28 @@ JcModelBuilder >> ensureClass: aFullClassName [
 								  category: fullPackageName ].
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcModelBuilder >> ensurePackage: aFullPackageName [
 	^ packageOrganizer ensureExistAndRegisterPackageNamed: aFullPackageName
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcModelBuilder >> initialize [ 
 	packageOrganizer := RPackageOrganizer new.
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcModelBuilder >> jenkinsClient [
 	^ jenkinsClient
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcModelBuilder >> jenkinsClient: aJenkinsClient [
 	jenkinsClient := aJenkinsClient
 	
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcModelBuilder >> modelFrom: aDictionary [
 	| theClass theObject theArray|
 	(aDictionary isDictionary) ifFalse: [
@@ -62,7 +62,7 @@ JcModelBuilder >> modelFrom: aDictionary [
 	
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcModelBuilder >> modelFrom: aDictionary className: aClasName [
 	| theClass theObject theArray|
 	(aDictionary isDictionary) ifFalse: [

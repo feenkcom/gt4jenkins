@@ -1,15 +1,15 @@
 Class {
-	#name : 'JcOrganization',
-	#superclass : 'JcModelElement',
+	#name : #JcOrganization,
+	#superclass : #JcModelElement,
 	#category : 'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanServiceEmbeddedRest'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcOrganization >> gtDisplayOn: stream [
 	stream nextPutAll: (rawData at:'name')
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcOrganization >> gtPipelinesFor: aView [
 	<gtView>
 	^ aView columnedTree
@@ -20,7 +20,7 @@ JcOrganization >> gtPipelinesFor: aView [
 		column: 'Name' translated text: [ :p | p rawData at: 'name' ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcOrganization >> pipelines [
 	^ (super linksClientFor: 'pipelines') execute
 ]

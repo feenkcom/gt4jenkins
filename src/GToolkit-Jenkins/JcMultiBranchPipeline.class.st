@@ -1,15 +1,15 @@
 Class {
-	#name : 'JcMultiBranchPipeline',
-	#superclass : 'JcModelElement',
-	#category : 'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
+	#name : #JcMultiBranchPipeline,
+	#superclass : #JcModelElement,
+	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcMultiBranchPipeline >> branches [
 	^ (super linksClientFor: 'branches') execute
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcMultiBranchPipeline >> gtBranchesFor: aView [
 	<gtView>
 	^ aView columnedList
@@ -19,7 +19,7 @@ JcMultiBranchPipeline >> gtBranchesFor: aView [
 		column: 'Status' translated
 			icon: [ :each | 
 					BlElement new
-						geometry: BlCircle new;
+						geometry: BlCircleGeometry new;
 						background: each resultBackgroundColor;
 						size: 10 @ 10;
 						margin:

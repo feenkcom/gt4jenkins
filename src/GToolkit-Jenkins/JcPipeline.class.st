@@ -1,13 +1,13 @@
 Class {
-	#name : 'JcPipeline',
-	#superclass : 'JcModelElement',
+	#name : #JcPipeline,
+	#superclass : #JcModelElement,
 	#instVars : [
 		'runs'
 	],
-	#category : 'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
+	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipeline >> gtRunsFor: aView [
 	<gtView>
 	^ aView columnedList
@@ -17,7 +17,7 @@ JcPipeline >> gtRunsFor: aView [
 		column: 'Status' translated 
 			icon: [ :each | 
 					BlElement new
-						geometry: BlCircle new;
+						geometry: BlCircleGeometry new;
 						background: each resultBackgroundColor;
 						size: 10 @ 10 ]
 			width: 50;
@@ -38,7 +38,7 @@ JcPipeline >> gtRunsFor: aView [
 							[ :s | each startTime asDateAndTime asLocal printSeparateDateAndTimeOn: s ] ] ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipeline >> runs [
 	runs ifNil: [runs := (super linksClientFor: 'runs') execute. runs := runs collect: [:r | r parentBranchName: (rawData at: 'fullName')]].
 	^ runs

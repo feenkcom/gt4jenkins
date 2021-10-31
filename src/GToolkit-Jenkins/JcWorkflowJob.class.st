@@ -1,13 +1,13 @@
 Class {
-	#name : 'JcWorkflowJob',
-	#superclass : 'JcModelElement',
+	#name : #JcWorkflowJob,
+	#superclass : #JcModelElement,
 	#instVars : [
 		'builds'
 	],
-	#category : 'GToolkit-Jenkins-Generated-OrgJenkinsciPluginsWorkflowJob'
+	#category : #'GToolkit-Jenkins-Generated-OrgJenkinsciPluginsWorkflowJob'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcWorkflowJob >> builds [
 	builds ifNil: [ 
 	rawData at: 'builds' ifPresent: [:data | 
@@ -17,7 +17,7 @@ JcWorkflowJob >> builds [
 	^ builds
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcWorkflowJob >> gtBuildsFor: aView [
 	<gtView>
 	^ aView columnedList
@@ -27,7 +27,7 @@ JcWorkflowJob >> gtBuildsFor: aView [
 		column: 'Status' translated
 			icon: [ :each | 
 			BlElement new
-				geometry: BlCircle new;
+				geometry: BlCircleGeometry new;
 				background: each resultBackgroundColor;
 				size: 10 @ 10 ]
 			width: 50;
@@ -36,19 +36,19 @@ JcWorkflowJob >> gtBuildsFor: aView [
 			width: 200
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcWorkflowJob >> gtDisplayOn: stream [
 	stream nextPutAll: (rawData at: 'name')
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcWorkflowJob >> resultBackgroundColor [
 	self builds size > 0 ifTrue:[^ self builds last resultBackgroundColor ].
 	^ Color gray
 	
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcWorkflowJob >> startTime [
 	^ self builds last startTime
 ]

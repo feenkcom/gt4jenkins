@@ -1,15 +1,15 @@
 Class {
-	#name : 'JcJcBlueJUnitStageTestResult',
-	#superclass : 'JcModelElement',
+	#name : #JcJcBlueJUnitStageTestResult,
+	#superclass : #JcModelElement,
 	#category : 'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanServiceEmbeddedRestJunit'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcJcBlueJUnitStageTestResult >> resultBackgroundColor [
 	^ JcJenkinsClient backgroundColorForStatus: self result
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcJcBlueJUnitStageTestResult >> status [
 	|result|
 	result := 'SUCCESS'.
@@ -20,7 +20,7 @@ JcJcBlueJUnitStageTestResult >> status [
 	^ result
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcJcBlueJUnitStageTestResult >> statusBackgroundColor [
 	^ JcJenkinsClient backgroundColorForStatus: self status
 ]

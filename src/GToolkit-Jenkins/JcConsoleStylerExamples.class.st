@@ -1,10 +1,10 @@
 Class {
-	#name : 'JcConsoleStylerExamples',
-	#superclass : 'Object',
+	#name : #JcConsoleStylerExamples,
+	#superclass : #Object,
 	#category : 'GToolkit-Jenkins-Examples'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStylerExamples >> postgresError [
 	<gtExample>
 	| aText |
@@ -15,7 +15,7 @@ JcConsoleStylerExamples >> postgresError [
 	^ self style: aText attributeClass: BlTextHighlightAttribute from: 59 to: 174.
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStylerExamples >> postgresNeutralLog [
 	<gtExample>
 	| aText |
@@ -28,7 +28,7 @@ JcConsoleStylerExamples >> postgresNeutralLog [
 	^ self style: aText attributeClass: BlTextForegroundAttribute from: 101 to: 304.
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStylerExamples >> segmentationFault [
 
 	<gtExample>
@@ -43,7 +43,7 @@ script returned exit code 139
 		  to: 72
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStylerExamples >> style: aText attributeClass: anAttributeClass from: aStart to: aStop [
 
 	<gtExample>
@@ -76,7 +76,7 @@ JcConsoleStylerExamples >> style: aText attributeClass: anAttributeClass from: a
 	^ aStyledText
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStylerExamples >> styler [
 	<gtExample>
 	^ JcConsoleStyler new

@@ -1,41 +1,41 @@
 Class {
-	#name : 'JcPipelineNode',
-	#superclass : 'JcModelElement',
+	#name : #JcPipelineNode,
+	#superclass : #JcModelElement,
 	#instVars : [
 		'parentRun',
 		'allRawTests'
 	],
-	#category : 'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
+	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipelineNode >> addRawTest: aDictionary [
 	allRawTests add: aDictionary
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipelineNode >> allCasesSize [
 	^ (self allTests flatCollect: [:c | c allCases]) size
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipelineNode >> allRawTests [
 	^ allRawTests
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipelineNode >> allTests [
 	allRawTests := parentRun allTests at: self id ifAbsent:[nil]. "this will trigger a get in the parent to cache all test results"
 	allRawTests ifNil: [^ OrderedCollection new].
 	^ theModelBuilder modelFrom: allRawTests className: 'IoJenkinsBlueoceanServiceEmbeddedRestJunit.BlueJUnitStageTestResult'
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipelineNode >> duration [
 	^ Duration milliSeconds: (rawData at: 'durationInMillis' )
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipelineNode >> failedTests [
 	|allFailed|
 	allFailed := OrderedCollection new.
@@ -45,7 +45,7 @@ JcPipelineNode >> failedTests [
 	^ allFailed
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipelineNode >> gtAllTestsFor: aView [
 	<gtView>
 	| at |
@@ -64,7 +64,7 @@ JcPipelineNode >> gtAllTestsFor: aView [
 			column
 				stencil: [ :each | 
 					BlElement new
-						geometry: BlCircle new;
+						geometry: BlCircleGeometry new;
 						background: each statusBackgroundColor;
 						size: 10 @ 10;
 						margin:
@@ -82,12 +82,12 @@ JcPipelineNode >> gtAllTestsFor: aView [
 			width: 50
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipelineNode >> gtDisplayOn: stream [
 	stream nextPutAll: (self name)
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipelineNode >> gtFailedTestsFor: aView [
 	<gtView>
 	| ft |
@@ -104,7 +104,7 @@ JcPipelineNode >> gtFailedTestsFor: aView [
 		column: 'Status' translated
 			icon: [ :each | 
 					BlElement new
-						geometry: BlCircle new;
+						geometry: BlCircleGeometry new;
 						background: each statusBackgroundColor;
 						size: 10 @ 10 ]
 			width: 50;
@@ -115,7 +115,7 @@ JcPipelineNode >> gtFailedTestsFor: aView [
 			text: [ :eachItem | eachItem testMethodName ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipelineNode >> gtStepsFor: aView [
 	<gtView>
 	^ aView columnedList
@@ -125,7 +125,7 @@ JcPipelineNode >> gtStepsFor: aView [
 		column: 'Status' translated
 			icon: [ :each | 
 			BlElement new
-				geometry: BlCircle new;
+				geometry: BlCircleGeometry new;
 				background: each resultBackgroundColor;
 				size: 10 @ 10 ]
 			width: 40;
@@ -147,42 +147,42 @@ JcPipelineNode >> gtStepsFor: aView [
 			weight: 1
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipelineNode >> id [ 
 	^ rawData at:'id'
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipelineNode >> name [
 	^ rawData at: 'displayName'
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipelineNode >> nextStagesIds [
 	^ (rawData at: 'edges') collect: [:e | e at: 'id']
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipelineNode >> parentRun [
 	^ parentRun
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipelineNode >> parentRun: aParentRun [
 	parentRun := aParentRun
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipelineNode >> result [
 	^ rawData at: 'result'
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipelineNode >> resultBackgroundColor [
 	^ JcJenkinsClient backgroundColorForStatus: self result
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcPipelineNode >> steps [
 	^ (super linksClientFor: 'steps') execute
 ]

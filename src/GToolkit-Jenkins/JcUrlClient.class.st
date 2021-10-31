@@ -1,6 +1,6 @@
 Class {
-	#name : 'JcUrlClient',
-	#superclass : 'Object',
+	#name : #JcUrlClient,
+	#superclass : #Object,
 	#instVars : [
 		'linksKey',
 		'url',
@@ -9,7 +9,7 @@ Class {
 	#category : 'GToolkit-Jenkins'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcUrlClient >> execute [
 	|rawData model|
 	rawData:=self getRawData.
@@ -17,7 +17,7 @@ JcUrlClient >> execute [
 	^ model.
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcUrlClient >> getRawData [
 	|model jc rootUrl |
 	jc := modelBuilder jenkinsClient.
@@ -26,17 +26,17 @@ JcUrlClient >> getRawData [
 	
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcUrlClient >> modelBuilder [
 	^ modelBuilder
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcUrlClient >> modelBuilder: aModelBuilder [
 	modelBuilder := aModelBuilder
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcUrlClient >> url: aUrl [
 	url := aUrl
 ]

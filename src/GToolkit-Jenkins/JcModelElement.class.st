@@ -1,6 +1,6 @@
 Class {
-	#name : 'JcModelElement',
-	#superclass : 'Object',
+	#name : #JcModelElement,
+	#superclass : #Object,
 	#instVars : [
 		'rawData',
 		'theModelBuilder'
@@ -8,7 +8,7 @@ Class {
 	#category : 'GToolkit-Jenkins'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcModelElement >> fullUrlClientFor: aUrl [
 	|client newModelBuilder jc|
 	client := JcFullURLClient new.
@@ -25,7 +25,7 @@ JcModelElement >> fullUrlClientFor: aUrl [
 	^ client.
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcModelElement >> gtStringFor: aView [
 	<gtView>
 	^ aView explicit
@@ -42,12 +42,12 @@ JcModelElement >> gtStringFor: aView [
 						glamorousRegularFontAndSize) ) ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcModelElement >> links [
 	^ rawData at:'_links' ifAbsent: [Dictionary new]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcModelElement >> linksClientFor: aLinkKey [
 	|client|
 	client := JcLinksClient new.
@@ -57,34 +57,34 @@ JcModelElement >> linksClientFor: aLinkKey [
 	^ client.
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcModelElement >> modelBuilder [
 	^ theModelBuilder
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcModelElement >> modelBuilder: aModelBuilder [.
 	theModelBuilder := aModelBuilder
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcModelElement >> rawData [
 	^ rawData
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcModelElement >> rawData: aDictionary [
 	rawData := aDictionary
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcModelElement >> selfUrl [
 	| relativeUrl |
 	relativeUrl := self links at: 'self' ifPresent: [:link | link at: 'href' ifAbsent: [''] ] ifAbsent: [''].
 	^ self modelBuilder jenkinsClient getRootOfUrl, relativeUrl
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcModelElement >> urlClientFor: aUrl [
 	|client newModelBuilder jc|
 	client := JcUrlClient new.

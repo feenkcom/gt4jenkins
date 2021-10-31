@@ -1,10 +1,10 @@
 Class {
-	#name : 'JcHudson',
-	#superclass : 'JcModelElement',
+	#name : #JcHudson,
+	#superclass : #JcModelElement,
 	#category : 'GToolkit-Jenkins-Generated-HudsonModel'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcHudson >> gtJobsFor: aView [
 	<gtView>
 	^ aView columnedList
@@ -14,7 +14,7 @@ JcHudson >> gtJobsFor: aView [
 		column: 'Item' translated text: [ :each | each gtDisplayText ] width: 200.
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcHudson >> jobs [
 	^ super modelBuilder modelFrom: (rawData at: 'jobs')
 ]

@@ -1,10 +1,10 @@
 Class {
-	#name : 'JcConsoleStyler',
-	#superclass : 'BlTextStyler',
+	#name : #JcConsoleStyler,
+	#superclass : #BlTextStyler,
 	#category : 'GToolkit-Jenkins'
 }
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> archiveCreatingInflatingExtractingOn: aText [
 	^ (#startOfLine asPParser
 		, ('   creating: ' asPParser / '  inflating: ' asPParser / ' extracting: ' asPParser) token
@@ -14,7 +14,7 @@ JcConsoleStyler >> archiveCreatingInflatingExtractingOn: aText [
 				foreground: (BrGlamorousColors defaultButtonTextColor alpha: 0.5) ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> bashError: aText [
 	^ (#startOfLine asPParser
 		, 'bash: line ' asPParser token
@@ -27,7 +27,7 @@ JcConsoleStyler >> bashError: aText [
 				highlight: self errorBackgroundColor ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> brackettedErrorOn: aText [ 
 	^ ('[ERROR]' asPParser token
 		, #endOfLine asPParser negate star token , #endOfLine asPParser)
@@ -36,7 +36,7 @@ JcConsoleStyler >> brackettedErrorOn: aText [
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> classDependecesOn: aText [
 	^ (#startOfLine asPParser
 		, 'MetacelloNotification: Warning: This package depends on the following classes:' asPParser token 
@@ -46,7 +46,7 @@ JcConsoleStyler >> classDependecesOn: aText [
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
-{ #category : 'system' }
+{ #category : #system }
 JcConsoleStyler >> compiledMethodFrom: aString [
 	| aMethodDefinition |
 	aMethodDefinition := GtSystemUtility methodDefinitionFromString: aString.
@@ -54,7 +54,7 @@ JcConsoleStyler >> compiledMethodFrom: aString [
 	^ aMethodDefinition compiledMethod
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> consoleErrorSequenceOn: aText [
 	^ (Character escape asPParser token
 		, '[31m' asPParser token
@@ -78,7 +78,7 @@ JcConsoleStyler >> consoleErrorSequenceOn: aText [
 				replacingAdornment: [ :aPiece :aEDitorElement | #() ] ].
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> coreDumpedOn: aText [
 	^ (#startOfLine asPParser
 		, 'Aborted (core dumped)' asPParser token
@@ -88,12 +88,12 @@ JcConsoleStyler >> coreDumpedOn: aText [
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
-{ #category : 'colors' }
+{ #category : #colors }
 JcConsoleStyler >> defaultForegroundColor [
 	^ Color black
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> deprecationOn: aText [
 	^ (#startOfLine asPParser
 		, 'DeprecationPerformedNotification: Automatic deprecation code rewrite: The method ' asPParser token
@@ -117,12 +117,12 @@ JcConsoleStyler >> deprecationOn: aText [
 			]
 ]
 
-{ #category : 'colors' }
+{ #category : #colors }
 JcConsoleStyler >> errorBackgroundColor [
 	^ BrGlamorousColors errorBackgroundColor alpha: 0.5
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> exceptionAccessViolationOn: aText [
 	^ (#startOfLine asPParser
 		, 'EXCEPTION_ACCESS_VIOLATION' asPParser token
@@ -132,7 +132,7 @@ JcConsoleStyler >> exceptionAccessViolationOn: aText [
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> exceptionIllegalInstructionOn: aText [
 	^ (#startOfLine asPParser
 		, 'EXCEPTION_ILLEGAL' asPParser token
@@ -142,7 +142,7 @@ JcConsoleStyler >> exceptionIllegalInstructionOn: aText [
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> executeActionFailureOn: aText [
 	^ (#startOfLine asPParser
 		,
@@ -158,7 +158,7 @@ JcConsoleStyler >> executeActionFailureOn: aText [
 				highlight: color ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> exitOneParserOn: aText [
 	^ (#startOfLine asPParser
 		, 'script returned exit code 1' asPParser token
@@ -168,12 +168,12 @@ JcConsoleStyler >> exitOneParserOn: aText [
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
-{ #category : 'colors' }
+{ #category : #colors }
 JcConsoleStyler >> failureBackgroundColor [
 	^ BrGlamorousColors failureBackgroundColor alpha: 0.5
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> hardSpaceOn: aText [
 	"ASCII value 160"
 	^ ' ' asPParser plus token
@@ -182,7 +182,7 @@ JcConsoleStyler >> hardSpaceOn: aText [
 					highlight: (self failureBackgroundColor alpha: 0.75) ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> illegalInstructionOn: aText [
 	^ (#startOfLine asPParser
 		, 'Illegal instruction' asPParser token
@@ -192,7 +192,7 @@ JcConsoleStyler >> illegalInstructionOn: aText [
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
-{ #category : 'text attributes' }
+{ #category : #'text attributes' }
 JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop [
 	| aSubText aCompiledMethod |
 	aSubText := aText from: aStart to: aStop.
@@ -217,7 +217,7 @@ JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop [
 										left: 10) ] ])
 ]
 
-{ #category : 'text attributes' }
+{ #category : #'text attributes' }
 JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop underline: aColor [
 	| aSubText aCompiledMethod |
 	self includeMethodCoderIn: aText from: aStart to: aStop.
@@ -229,7 +229,7 @@ JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop underline:
 		ifNil: [ aSubText highlight: aColor ]
 ]
 
-{ #category : 'parsers' }
+{ #category : #parsers }
 JcConsoleStyler >> isoDateParser [
 
 	"Parser for YYYY-MM-DD, e.g., 2021-09-03"
@@ -239,7 +239,7 @@ JcConsoleStyler >> isoDateParser [
 	  , (#digit asPParser times: 2) token
 ]
 
-{ #category : 'parsers' }
+{ #category : #parsers }
 JcConsoleStyler >> isoTimeParser [
 
 	"Parser for HH:MM:SS, e.g., 17:03:59"
@@ -249,7 +249,7 @@ JcConsoleStyler >> isoTimeParser [
 	  , (#digit asPParser times: 2) token
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> jenkinsError: aText [
 	^ (#startOfLine asPParser
 		, '[ERROR]' asPParser token
@@ -260,7 +260,7 @@ JcConsoleStyler >> jenkinsError: aText [
 				highlight: self errorBackgroundColor ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> makeErrorOn: aText [
 	^ (#startOfLine asPParser
 		, 'make: ***' asPParser token
@@ -273,7 +273,7 @@ JcConsoleStyler >> makeErrorOn: aText [
 				highlight: self errorBackgroundColor ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> makefileFailedOn: aText [
 	^ (#startOfLine asPParser
 		, 'Makefile:' asPParser token
@@ -285,7 +285,7 @@ JcConsoleStyler >> makefileFailedOn: aText [
 				highlight: self errorBackgroundColor ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> metacelloNotificationFetched: aText [
 	^ (#startOfLine asPParser
 		, 'MetacelloNotification: Fetched' asPParser token
@@ -295,7 +295,7 @@ JcConsoleStyler >> metacelloNotificationFetched: aText [
 				foreground: (BrGlamorousColors defaultButtonTextColor alpha: 0.5) ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> metacelloNotificationLoaded: aText [
 
 	^ #startOfLine asPParser
@@ -306,18 +306,18 @@ JcConsoleStyler >> metacelloNotificationLoaded: aText [
 			  foreground: self neutralForegroundColor ]
 ]
 
-{ #category : 'colors' }
+{ #category : #colors }
 JcConsoleStyler >> neutralBackgroundColor [
 	^ BrGlamorousColors neutralBackgroundColor
 ]
 
-{ #category : 'colors' }
+{ #category : #colors }
 JcConsoleStyler >> neutralForegroundColor [
 
 	^ BrGlamorousColors defaultButtonTextColor alpha: 0.5
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> neutralOn: aText [
 	^ (#startOfLine asPParser , '+' asPParser
 		, #endOfLine asPParser negate star token , #endOfLine asPParser)
@@ -326,7 +326,7 @@ JcConsoleStyler >> neutralOn: aText [
 				highlight: self neutralBackgroundColor ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> newUndeclaredOn: aText [
 	^ (#startOfLine asPParser 
 		, 'NewUndeclaredWarning: ' asPParser token
@@ -340,7 +340,7 @@ JcConsoleStyler >> newUndeclaredOn: aText [
 			self includeMethodCoderIn: aText from: tokens third start to: tokens third stop underline: self failureBackgroundColor ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> postgresError: aText [
 
 	^ self postgresTimeStampParser , ' #Error' asPParser token
@@ -352,7 +352,7 @@ JcConsoleStyler >> postgresError: aText [
 			  self errorBackgroundColor ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> postgresNeutralLog: aText [
 
 	^ self postgresTimeStampParser
@@ -367,7 +367,7 @@ JcConsoleStyler >> postgresNeutralLog: aText [
 			  self neutralForegroundColor ]
 ]
 
-{ #category : 'parsers' }
+{ #category : #parsers }
 JcConsoleStyler >> postgresTimeStampParser [
 
 	^ #startOfLine asPParser , self isoDateParser , ' ' asPParser
@@ -375,7 +375,7 @@ JcConsoleStyler >> postgresTimeStampParser [
 	  , ' [P3] ' asPParser , #digit asPParser plus token
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> privateStyle: aText [
 
 	| parser aString |
@@ -409,7 +409,7 @@ JcConsoleStyler >> privateStyle: aText [
 	^ aText
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> segmentationFaultParserOn: aText [
 	^ ('Segmentation fault' asPParser token
 		, #endOfLine asPParser negate star token , #endOfLine asPParser)
@@ -419,7 +419,7 @@ JcConsoleStyler >> segmentationFaultParserOn: aText [
 				highlight: self errorBackgroundColor ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> shellError: aText [
 	^ (#startOfLine asPParser
 		, '/bin/sh: ' asPParser token
@@ -432,7 +432,7 @@ JcConsoleStyler >> shellError: aText [
 				highlight: self errorBackgroundColor ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> squareBracketErrorOn: aText [
 	^ (#startOfLine asPParser , '[' asPParser token
 		, #digit asPParser plus , 'm' asPParser
@@ -442,7 +442,7 @@ JcConsoleStyler >> squareBracketErrorOn: aText [
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
-{ #category : 'accessing' }
+{ #category : #accessing }
 JcConsoleStyler >> vmErrorOn: aText [ 
 	^ (#startOfLine asPParser
 		, 'VM Error' asPParser token

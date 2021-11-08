@@ -1,7 +1,7 @@
 Class {
 	#name : #JcConsoleStyler,
 	#superclass : #BlTextStyler,
-	#category : 'GToolkit-Jenkins'
+	#category : #'GToolkit-Jenkins'
 }
 
 { #category : #accessing }
@@ -341,6 +341,13 @@ JcConsoleStyler >> newUndeclaredOn: aText [
 ]
 
 { #category : #accessing }
+JcConsoleStyler >> noGTVersion: aText [ 
+^ 'Failed to detect the version of the gtoolkit' asPParser token
+	==> [:token | (aText from: token start to: token stop)
+				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5)]
+]
+
+{ #category : #accessing }
 JcConsoleStyler >> postgresError: aText [
 
 	^ self postgresTimeStampParser , ' #Error' asPParser token
@@ -380,7 +387,7 @@ JcConsoleStyler >> privateStyle: aText [
 
 	| parser aString |
 	aString := aText asString.
-	parser := (self vmErrorOn: aText) / (self brackettedErrorOn: aText)
+	parser := (self noGTVersion: aText) / (self vmErrorOn: aText) / (self brackettedErrorOn: aText)
 	          / (self consoleErrorSequenceOn: aText)
 	          / (self metacelloNotificationFetched: aText)
 	          / (self metacelloNotificationLoaded: aText)

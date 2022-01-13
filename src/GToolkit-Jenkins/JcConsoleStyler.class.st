@@ -205,7 +205,7 @@ JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop [
 						stencil: [ | editorElement coder |
 							coder := GtPharoMethodCoder forMethod: aCompiledMethod.
 							coder subscribeToSystem.
-							editorElement := (coder asCoderUIModel expanded: true) asElement.
+							editorElement := (coder asCoderViewModel expanded: true) asElement.
 							editorElement
 								border: (BlBorder paint: Color veryLightGray width: 1).
 							editorElement

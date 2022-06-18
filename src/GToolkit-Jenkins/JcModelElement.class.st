@@ -5,7 +5,7 @@ Class {
 		'rawData',
 		'theModelBuilder'
 	],
-	#category : 'GToolkit-Jenkins'
+	#category : #'GToolkit-Jenkins'
 }
 
 { #category : #accessing }
@@ -37,7 +37,7 @@ JcModelElement >> gtStringFor: aView [
 				constraintsDo: [ :c | 
 					c vertical matchParent. 
 					c horizontal matchParent ];
-				editor: (BrTextEditor new
+				editor: (BrTextEditorModel new
 					text: ( self selfUrl asRopedText
 						glamorousRegularFontAndSize) ) ]
 ]

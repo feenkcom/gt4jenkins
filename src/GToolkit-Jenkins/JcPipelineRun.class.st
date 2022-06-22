@@ -80,7 +80,7 @@ JcPipelineRun >> gtStagesMapFor: aView [
 	  	  allNodes := self nodes.
 			mondrian nodes 
 				shape: [ :aStage | 
-				|container editor statusColor aDropdown allTestsDropdown examplesSize labelText runTimeLabel labelContainer duration|
+				|container statusColor aDropdown examplesSize labelContainer duration|
 					statusColor := aStage resultBackgroundColor.
 					container := BrHorizontalPane new
 						hExact: 200;

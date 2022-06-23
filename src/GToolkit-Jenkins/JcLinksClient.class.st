@@ -6,7 +6,7 @@ Class {
 		'url',
 		'modelBuilder'
 	],
-	#category : 'GToolkit-Jenkins'
+	#category : #'GToolkit-Jenkins'
 }
 
 { #category : #accessing }
@@ -24,7 +24,7 @@ JcLinksClient >> for: aLinksKey [
 
 { #category : #accessing }
 JcLinksClient >> getRawData [
-	|model jc rootUrl|
+	|jc rootUrl|
 	jc := modelBuilder jenkinsClient.
 	rootUrl := jc url asUrl scheme, '://', jc url asUrl host.
 	^ jc znclient get: ('' join:{rootUrl . url}).

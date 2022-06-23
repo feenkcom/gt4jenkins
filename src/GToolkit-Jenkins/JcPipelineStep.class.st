@@ -1,7 +1,7 @@
 Class {
 	#name : #JcPipelineStep,
 	#superclass : #JcModelElement,
-	#category : 'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
+	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanRestImplPipeline'
 }
 
 { #category : #accessing }
@@ -34,7 +34,7 @@ JcPipelineStep >> gtInstructionsFor: aView [
 { #category : #accessing }
 JcPipelineStep >> gtLogFor: aView [
 	<gtView>
-	|text logURL|
+	|text|
 	text := self getLogText.
 	text ifNil: [^aView empty].
 	^ aView textEditor

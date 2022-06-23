@@ -7,7 +7,7 @@ Class {
 	#classInstVars : [
 		'instance'
 	],
-	#category : 'GToolkit-Jenkins-Login'
+	#category : #'GToolkit-Jenkins-Login'
 }
 
 { #category : #accessing }
@@ -43,7 +43,7 @@ GtJenkinsUserIdentity >> jsonKey [
 
 { #category : #loading }
 GtJenkinsUserIdentity >> loadSavedTokens [
-	| rawData authClient registeredDatabasesResponse gtJenkinsAccountJson |
+	| rawData gtJenkinsAccountJson |
 
 	self authTokenPreferences exists ifTrue:[
 	rawData := self authTokenPreferences readStreamDo: [ :aReadStream | 

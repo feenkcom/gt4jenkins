@@ -81,7 +81,7 @@ JcWorkflowRun >> gtDisplayOn: stream [
 { #category : #accessing }
 JcWorkflowRun >> gtLogFor: aView [
 	<gtView>
-	|text logURL|
+	|text|
 	text := self getLogText.
 	text ifNil: [^aView empty].
 	^ aView textEditor

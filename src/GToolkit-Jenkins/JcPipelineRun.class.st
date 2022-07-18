@@ -71,37 +71,35 @@ JcPipelineRun >> gtNodesFor: aView [
 
 { #category : #accessing }
 JcPipelineRun >> gtStagesMapFor: aView [
-	<gtView>
-	^ aView mondrian
-		title: 'Stages Map' translated;
-		priority: 55;
-		painting: [ :mondrian | 
-			| allNodes |
-			allNodes := self nodes.
-			mondrian nodes
+	<gtView> 
+	^ aView mondrian 
+	  title: 'Stages Map' translated;
+	  priority: 55; 
+	  painting: [ :mondrian | 
+	  	  |allNodes|
+	  	  allNodes := self nodes.
+			mondrian nodes 
 				shape: [ :aStage | 
-					| container statusColor aDropdown examplesSize labelContainer duration |
+				|container statusColor aDropdown examplesSize labelContainer duration|
 					statusColor := aStage resultBackgroundColor.
 					container := BrHorizontalPane new
-							hExact: 200;
-							vFitContent;
-							aptitude: BrShadowAptitude;
-							clipChildren: false;
-							margin: (BlInsets all: 10);
-							background: Color white;
-							zIndex: 1;
-							when: BlClickEvent do: [ :e | e target phlow spawnObject: aStage ].
-					labelContainer := BrVerticalPane new
-							hMatchParent;
-							vFitContent;
-							padding: (BlInsets all: 5);
-							clipChildren: false.
+						hExact: 200;
+						vFitContent;
+						aptitude: BrShadowAptitude;
+						clipChildren: false;
+						margin: (BlInsets all: 10);
+						background: Color white;
+						zIndex: 1;
+						when: BlClickEvent do: [:e | e target phlow spawnObject: aStage].
+					labelContainer := BrVerticalPane new hMatchParent; vFitContent;
+						padding: (BlInsets all: 5);
+						clipChildren: false.
 					aDropdown := BrBadge new
-							label: aStage failedTests size;
+							label: (aStage failedTests size);
 							exact: 20 @ 20;
 							visibility: (aStage failedTests size isZero
-									ifTrue: [ BlVisibility gone ]
-									ifFalse: [ BlVisibility visible ]);
+						ifTrue: [ BlVisibility gone ]
+						ifFalse: [ BlVisibility visible ]);
 							constraintsDo: [ :c | 
 								c horizontal fitContent.
 								c vertical fitContent.
@@ -109,70 +107,63 @@ JcPipelineRun >> gtStagesMapFor: aView [
 								c ignored horizontal alignRight.
 								c ignored vertical alignTop.
 								c margin: (BlInsets top: -10 right: -10) ];
-							aptitude: BrGlamorousBadgeWithLabelAptitude
-									+ (BrGlamorousWithDropdownAptitude
-											handle: [ BrBadge new
-													label: aStage failedTests size;
-													exact: 20 @ 20;
-													aptitude: BrGlamorousBadgeWithLabelAptitude;
-													yourself ]
-											content: [ | aPhlowView aPopupElement |
-												aPhlowView := aStage gtFailedTestsFor: GtPhlowEmptyView new.
-												aPopupElement := BlElement new
-														border: (BlBorder paint: Color orange width: 2);
-														background: Color white;
-														layout: BlLinearLayout vertical;
-														constraintsDo: [ :c | 
-															c horizontal fitContent.
-															c vertical fitContent ].
-												aPhlowView
-													asElementDo: [ :anElement | 
-														anElement layout: BlLinearLayout vertical.
-														aPopupElement addChild: anElement.
-														anElement
-															when: GtPhlowObjectToSpawn
-															do: [ :e | container phlow spawnTool: e tool ] ].
-												aPopupElement ]).
-					labelContainer addChild: (BrLabel new text: aStage name asRopedText).
+							aptitude: BrGlamorousBadgeWithLabelAptitude +
+								(BrGlamorousWithDropdownAptitude
+								handle: [ BrBadge new
+										label: (aStage failedTests size);
+										exact: 20 @ 20;
+										aptitude: BrGlamorousBadgeWithLabelAptitude;
+										yourself ]
+								content: [ | aPhlowView aPopupElement |
+								aPhlowView := aStage gtFailedTestsFor: GtPhlowEmptyView new.
+								aPopupElement := BlElement new
+											border: (BlBorder paint: Color orange width: 2);
+											background: Color white;
+											layout: BlLinearLayout vertical;
+											constraintsDo: [ :c | 
+												c horizontal fitContent.
+												c vertical fitContent.
+												].
+								aPhlowView asElementDo: [ :anElement | 
+												anElement layout: BlLinearLayout vertical.
+												aPopupElement addChild: anElement.
+												anElement 
+													when: GtPhlowObjectToSpawn do: [:e | 
+													container phlow spawnTool: e tool] ].
+										aPopupElement ]).
+					labelContainer addChild: (BrLabel new text: aStage name asRopedText; aptitude: BrGlamorousLabelAptitude).
 					duration := aStage duration.
-					duration < 1 second
-						ifFalse: [ labelContainer
-								addChild: (BrLabel new
-										text: duration gtHumanReadableString asRopedText;
-										aptitude: (BrGlamorousLabelAptitude new foreground: Color gray)) ].
+					duration < 1 second ifFalse: [
+						labelContainer addChild: (BrLabel new 
+						text: duration gtHumanReadableString asRopedText;
+						aptitude: (BrGlamorousLabelAptitude new foreground: Color gray)) ].
 					examplesSize := aStage allCasesSize.
-					examplesSize > 0
-						ifTrue: [ labelContainer
-								addChild: (BrLabel new
-										text: aStage allCasesSize asString , ' tests';
-										aptitude: (BrGlamorousLabelAptitude new foreground: Color gray)) ].
+					(examplesSize > 0) ifTrue: [
+						labelContainer addChild: (
+							BrLabel new text: aStage allCasesSize asString,' tests'; aptitude: (BrGlamorousLabelAptitude new foreground: Color gray))].
 					labelContainer addChild: aDropdown.
 					container
-						addChild: (BrVerticalPane new
-								vMatchParent;
-								hExact: 15;
-								background: statusColor);
-						addChild: labelContainer ];
-				with: allNodes.
+						addChild: (BrVerticalPane new vMatchParent; hExact: 15; background: statusColor );
+						addChild: labelContainer.	
+				];
+			with: allNodes.
 			mondrian edges
-				shape: [ BlSigmoidElement new
+				shape: [
+					BlSigmoidElement new 
 						zIndex: 0;
 						beVertical;
-						bendingPoint: 0.3;
+						bendingPoint:0.3;
 						sharpness: 0.1;
-						border: (BlBorder paint: (Color gray alpha: 0.2) width: 2) ];
+						border: (BlBorder paint: (Color gray alpha: 0.2) width: 2)];
 				fromCenterBottom;
 				toCenterTop;
-				connectFrom: #yourself
-					toAll: [ :each | 
-						| pN |
-						pN := each nextStagesIds.
-						allNodes
-							select: [ :node | pN anySatisfy: [ :stageID | stageID = node id ] ] ].
-			mondrian layout
-				custom: (GtGraphDominanceTreeLayout new
-						verticalGap: 20;
-						horizontalGap: 20) ]
+				connectFrom: #yourself 
+				toAll: [:each | | pN |
+					pN := each nextStagesIds.
+					allNodes select: [ :node | pN anySatisfy: [ :stageID | stageID = node id ] ] ].
+			mondrian layout custom: ((GtGraphDominanceTreeLayout new verticalGap: 20; horizontalGap: 20)).
+			]
+
 ]
 
 { #category : #accessing }

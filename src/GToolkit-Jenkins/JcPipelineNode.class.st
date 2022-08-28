@@ -124,10 +124,13 @@ JcPipelineNode >> gtStepsFor: aView [
 		items: [ self steps ];
 		column: 'Status' translated
 			icon: [ :each | 
+			BrVerticalPane new 
+				addChild: (
 			BlElement new
-				geometry: BlCircleGeometry new;
+				"geometry: BlCircleGeometry new;"
 				background: each resultBackgroundColor;
-				size: 10 @ 10 ]
+				size: 16 @ 16);
+				alignCenter ]
 			width: 40;
 		column: 'Step' translated
 			icon: [ :eachItem |

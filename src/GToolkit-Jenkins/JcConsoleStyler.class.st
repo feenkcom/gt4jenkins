@@ -168,6 +168,15 @@ JcConsoleStyler >> exitOneParserOn: aText [
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
+{ #category : #accessing }
+JcConsoleStyler >> expectedVersionMismatchOn: aText [
+	^ ('Error: Expected version' asPParser token
+		, #endOfLine asPParser negate star token , #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens first start to: tokens second stop)
+				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
+]
+
 { #category : #colors }
 JcConsoleStyler >> failureBackgroundColor [
 	^ BrGlamorousColors failureBackgroundColor alpha: 0.5
@@ -336,7 +345,7 @@ JcConsoleStyler >> newUndeclaredOn: aText [
 			(aText from: tokens second start to: tokens second stop)
 				highlight: self failureBackgroundColor.
 			(aText from: tokens fourth start to: tokens fourth stop)
-				highlight: self failureBackgroundColor.
+				underlineDo: [ :anAttribute | anAttribute color: self failureBackgroundColor ].
 			self includeMethodCoderIn: aText from: tokens third start to: tokens third stop underline: self failureBackgroundColor ]
 ]
 
@@ -384,34 +393,27 @@ JcConsoleStyler >> postgresTimeStampParser [
 
 { #category : #accessing }
 JcConsoleStyler >> privateStyle: aText [
-
 	| parser aString |
 	aString := aText asString.
-	parser := (self noGTVersion: aText) / (self vmErrorOn: aText) / (self brackettedErrorOn: aText)
-	          / (self consoleErrorSequenceOn: aText)
-	          / (self metacelloNotificationFetched: aText)
-	          / (self metacelloNotificationLoaded: aText)
-	          / (self illegalInstructionOn: aText)
-	          / (self exceptionIllegalInstructionOn: aText)
-	          / (self exceptionAccessViolationOn: aText)
-	          / (self coreDumpedOn: aText)
-	          / (self exitOneParserOn: aText)
-	          / (self executeActionFailureOn: aText)
-	          / (self newUndeclaredOn: aText)
-	          / (self deprecationOn: aText)
-	          / (self squareBracketErrorOn: aText)
-	          / (self classDependecesOn: aText)
-	          / (self archiveCreatingInflatingExtractingOn: aText)
-	          / (self makeErrorOn: aText)
-	          / (self makefileFailedOn: aText) / (self shellError: aText)
-	          / (self jenkinsError: aText) / (self bashError: aText)
-	          / (self postgresError: aText)
-	          / (self postgresNeutralLog: aText)
-	          / (self neutralOn: aText).
+	parser := (self expectedVersionMismatchOn: aText) / (self noGTVersion: aText)
+			/ (self vmErrorOn: aText) / (self brackettedErrorOn: aText)
+			/ (self consoleErrorSequenceOn: aText)
+			/ (self metacelloNotificationFetched: aText)
+			/ (self metacelloNotificationLoaded: aText)
+			/ (self illegalInstructionOn: aText)
+			/ (self exceptionIllegalInstructionOn: aText)
+			/ (self exceptionAccessViolationOn: aText) / (self coreDumpedOn: aText)
+			/ (self exitOneParserOn: aText) / (self executeActionFailureOn: aText)
+			/ (self newUndeclaredOn: aText) / (self deprecationOn: aText)
+			/ (self squareBracketErrorOn: aText) / (self classDependecesOn: aText)
+			/ (self archiveCreatingInflatingExtractingOn: aText)
+			/ (self makeErrorOn: aText) / (self makefileFailedOn: aText)
+			/ (self shellError: aText) / (self jenkinsError: aText)
+			/ (self bashError: aText) / (self postgresError: aText)
+			/ (self postgresNeutralLog: aText) / (self neutralOn: aText).
 	parser sea star optimize parse: aString.
 
-	(self segmentationFaultParserOn: aText) sea star optimize parse:
-		aString.
+	(self segmentationFaultParserOn: aText) sea star optimize parse: aString.
 	(self hardSpaceOn: aText) sea star optimize parse: aString.
 	^ aText
 ]

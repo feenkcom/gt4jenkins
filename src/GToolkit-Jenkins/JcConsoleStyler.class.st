@@ -395,25 +395,37 @@ JcConsoleStyler >> postgresTimeStampParser [
 JcConsoleStyler >> privateStyle: aText [
 	| parser aString |
 	aString := aText asString.
-	parser := (self expectedVersionMismatchOn: aText) / (self noGTVersion: aText)
-			/ (self vmErrorOn: aText) / (self brackettedErrorOn: aText)
+	parser := (self expectedVersionMismatchOn: aText) 
+			/ (self noGTVersion: aText)
+			/ (self vmErrorOn: aText) 
+			/ (self brackettedErrorOn: aText)
 			/ (self consoleErrorSequenceOn: aText)
 			/ (self metacelloNotificationFetched: aText)
 			/ (self metacelloNotificationLoaded: aText)
 			/ (self illegalInstructionOn: aText)
 			/ (self exceptionIllegalInstructionOn: aText)
-			/ (self exceptionAccessViolationOn: aText) / (self coreDumpedOn: aText)
-			/ (self exitOneParserOn: aText) / (self executeActionFailureOn: aText)
-			/ (self newUndeclaredOn: aText) / (self deprecationOn: aText)
-			/ (self squareBracketErrorOn: aText) / (self classDependecesOn: aText)
+			/ (self exceptionAccessViolationOn: aText) 
+			/ (self coreDumpedOn: aText)
+			/ (self exitOneParserOn: aText) 
+			/ (self executeActionFailureOn: aText)
+			/ (self newUndeclaredOn: aText) 
+			/ (self shadowedVariableOn: aText)
+			/ (self deprecationOn: aText)
+			/ (self squareBracketErrorOn: aText) 
+			/ (self classDependecesOn: aText)
 			/ (self archiveCreatingInflatingExtractingOn: aText)
-			/ (self makeErrorOn: aText) / (self makefileFailedOn: aText)
-			/ (self shellError: aText) / (self jenkinsError: aText)
-			/ (self bashError: aText) / (self postgresError: aText)
-			/ (self postgresNeutralLog: aText) / (self neutralOn: aText).
+			/ (self makeErrorOn: aText) 
+			/ (self makefileFailedOn: aText)
+			/ (self shellError: aText) 
+			/ (self jenkinsError: aText)
+			/ (self bashError: aText) 
+			/ (self postgresError: aText)
+			/ (self postgresNeutralLog: aText) 
+			/ (self neutralOn: aText).
 	parser sea star optimize parse: aString.
 
 	(self segmentationFaultParserOn: aText) sea star optimize parse: aString.
+	"(self shadowedVariableOn: aText) sea star optimize parse: aString."
 	(self hardSpaceOn: aText) sea star optimize parse: aString.
 	^ aText
 ]
@@ -426,6 +438,24 @@ JcConsoleStyler >> segmentationFaultParserOn: aText [
 			(aText from: tokens first start to: tokens second stop)
 				foreground: self defaultForegroundColor;
 				highlight: self errorBackgroundColor ]
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> shadowedVariableOn: aText [
+	^ ('SystemNotification: ' asPParser token 
+		, '(' asPParser negate plus token
+		, '(' asPParser token 
+		, ' is shadowed)' asPParser negate plus token
+		, ' is shadowed)' asPParser token
+		, #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens first start to: tokens first stop)
+				highlight: self failureBackgroundColor.
+				
+			(aText from: tokens third start to: tokens fifth stop)
+				highlight: self failureBackgroundColor.
+				
+			self includeMethodCoderIn: aText from: tokens second start to: tokens second stop underline: self failureBackgroundColor ]
 ]
 
 { #category : #accessing }

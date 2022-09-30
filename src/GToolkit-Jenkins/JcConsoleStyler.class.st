@@ -425,7 +425,6 @@ JcConsoleStyler >> privateStyle: aText [
 	parser sea star optimize parse: aString.
 
 	(self segmentationFaultParserOn: aText) sea star optimize parse: aString.
-	"(self shadowedVariableOn: aText) sea star optimize parse: aString."
 	(self hardSpaceOn: aText) sea star optimize parse: aString.
 	^ aText
 ]

@@ -177,6 +177,15 @@ JcConsoleStyler >> expectedVersionMismatchOn: aText [
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
+{ #category : #accessing }
+JcConsoleStyler >> failedCommandOn: aText [ 
+	^ ('Failed command' asPParser token
+		, #endOfLine asPParser negate star token , #endOfLine asPParser)
+		==> [ :tokens | 
+			(aText from: tokens first start to: tokens second stop)
+				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
+]
+
 { #category : #colors }
 JcConsoleStyler >> failureBackgroundColor [
 	^ BrGlamorousColors failureBackgroundColor alpha: 0.5
@@ -395,7 +404,7 @@ JcConsoleStyler >> postgresTimeStampParser [
 JcConsoleStyler >> privateStyle: aText [
 	| parser aString |
 	aString := aText asString.
-	parser := (self expectedVersionMismatchOn: aText) 
+	parser := (self failedCommandOn: aText) / (self expectedVersionMismatchOn: aText) 
 			/ (self noGTVersion: aText)
 			/ (self vmErrorOn: aText) 
 			/ (self brackettedErrorOn: aText)

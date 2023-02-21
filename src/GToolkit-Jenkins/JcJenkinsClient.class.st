@@ -7,7 +7,7 @@ Class {
 		'username',
 		'password'
 	],
-	#category : 'GToolkit-Jenkins'
+	#category : #'GToolkit-Jenkins'
 }
 
 { #category : #constants }
@@ -28,13 +28,20 @@ JcJenkinsClient class >> backgroundColorForTestStatus: aString [
 
 { #category : #accessing }
 JcJenkinsClient >> blueOcean [
-	|json modelBuilder model|
+	| json modelBuilder model |
 	self setupJwtToken.
+
 	json := znclient get: self blueOceanUrl.
+
+	znclient isSuccess
+		ifFalse: [ ^ Error new
+				signal: 'Looks like we’re having trouble with connecting to the Jenkins service: '
+						, znclient response statusLine printString ].
+
 	modelBuilder := JcModelBuilder new.
 	modelBuilder jenkinsClient: self.
 	model := modelBuilder modelFrom: (NeoJSONReader fromString: json).
-	^ model.
+	^ model
 ]
 
 { #category : #accessing }

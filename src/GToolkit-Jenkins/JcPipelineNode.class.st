@@ -124,29 +124,28 @@ JcPipelineNode >> gtStepsFor: aView [
 		items: [ self steps ];
 		column: 'Status' translated
 			icon: [ :each | 
-			BrVerticalPane new 
-				addChild: (
-			BlElement new
-				"geometry: BlCircleGeometry new;"
-				background: each resultBackgroundColor;
-				size: 16 @ 16);
-				alignCenter ]
+				BrVerticalPane new alignCenter
+					addChild: (BlElement new
+							background: each resultBackgroundColor;
+							size: 16 @ 16)	"geometry: BlCircleGeometry new;" ]
 			width: 40;
 		column: 'Step' translated
-			icon: [ :eachItem |
+			icon: [ :eachItem | 
 				BrExpander new
 					vFitContent;
 					hMatchParent;
 					collapse;
 					margin: (BlInsets all: 10);
 					aptitude: GtCoderExpanderAptitude new;
-					header: [ BrLabel new aptitude: BrGlamorousLabelAptitude; text: eachItem gtDisplayString ];
+					header: [ BrLabel new
+							aptitude: BrGlamorousLabelAptitude;
+							text: eachItem gtDisplayString ];
 					content: [ | container |
-						container := BrFrame new 
-							vExact: 400;
-							hMatchParent;
-							aptitude: BrGlamorousWithVerticalResizerAptitude;
-							addChild: ((eachItem gtLogFor: GtPhlowEmptyView new) asElement) matchParent ] ]
+						container := BrFrame new
+								vExact: 400;
+								hMatchParent;
+								aptitude: BrGlamorousWithVerticalResizerAptitude;
+								addChild: (eachItem gtLogFor: GtPhlowEmptyView new) asElement matchParent ] ]
 			weight: 1
 ]
 

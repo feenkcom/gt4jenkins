@@ -59,7 +59,7 @@ JcWorkflowRun >> gtAllTestsFor: aView [
 	at := self allTestsFlattened.
 	at isEmpty ifTrue:[ ^ aView empty].
 	^ aView columnedList
-		title: 'All Examples' translated;
+		title: 'All examples' translated;
 		priority: 60;
 		items: [ at];
 		column: 'Index' translated text: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray] width: 20;
@@ -87,7 +87,7 @@ JcWorkflowRun >> gtLogFor: aView [
 	^ aView textEditor
 		aptitude: BrGlamorousCodeEditorAptitude;
 		styler: JcConsoleStyler new;
-		title: 'Console Log';
+		title: 'Console log';
 		text: [text]
 ]
 

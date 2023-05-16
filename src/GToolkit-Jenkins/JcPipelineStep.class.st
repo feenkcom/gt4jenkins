@@ -40,7 +40,7 @@ JcPipelineStep >> gtLogFor: aView [
 	^ aView textEditor
 		aptitude: BrGlamorousCodeEditorAptitude;
 		styler: JcConsoleStyler new;
-		title: 'Console Log';
+		title: 'Console log';
 		text: [text]
 ]
 

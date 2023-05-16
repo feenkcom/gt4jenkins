@@ -17,7 +17,7 @@ JcBlueJUnitStageTestResult >> gtAllCasesFor: aView [
 	at isEmpty
 		ifTrue: [ ^ aView empty ].
 	^ aView columnedList
-		title: 'All Cases' translated;
+		title: 'All cases' translated;
 		priority: 60;
 		items: [ at ];
 		column: 'Index' translated

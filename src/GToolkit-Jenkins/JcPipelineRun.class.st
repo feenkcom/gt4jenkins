@@ -73,7 +73,7 @@ JcPipelineRun >> gtNodesFor: aView [
 JcPipelineRun >> gtStagesMapFor: aView [
 	<gtView> 
 	^ aView mondrian 
-	  title: 'Stages Map' translated;
+	  title: 'Stages map' translated;
 	  priority: 55; 
 	  painting: [ :mondrian | 
 	  	  |allNodes|

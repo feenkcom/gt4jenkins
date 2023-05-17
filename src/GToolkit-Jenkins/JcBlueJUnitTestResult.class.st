@@ -1,7 +1,7 @@
 Class {
 	#name : #JcBlueJUnitTestResult,
 	#superclass : #JcModelElement,
-	#category : 'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanServiceEmbeddedRestJunit'
+	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanServiceEmbeddedRestJunit'
 }
 
 { #category : #'as yet unclassified' }
@@ -51,7 +51,7 @@ JcBlueJUnitTestResult >> gtErrorDetailsFor: aView [
 	<gtView>
 	self isPassed ifTrue: [ ^ aView empty ].
 	^ aView textEditor
-		title: 'Error Details';
+		title: 'Error details';
 		priority: 4;
 		aptitude: [ BrGlamorousRegularEditorAptitude ];
 		text: [
@@ -74,7 +74,7 @@ JcBlueJUnitTestResult >> gtTestFor: aView [
 	self testMethod 
 		ifNotNil: [ :aMethod | ^ aMethod gtSourceFor: aView ].
 	^ aView textEditor 
-		title: 'Not Found';
+		title: 'Not found';
 		glamorousRegularFontAndSize;
 		text: [ String streamContents: [ :aStream | 
 			aStream 

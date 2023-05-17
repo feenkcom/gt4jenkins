@@ -95,7 +95,7 @@ JcPipelineNode >> gtFailedTestsFor: aView [
 	ft isEmpty
 		ifTrue: [ ^ aView empty ].
 	^ aView columnedList
-		title: 'Failed Examples' translated;
+		title: 'Failed examples' translated;
 		priority: 60;
 		items: [ self failedTests ];
 		column: 'Index' translated

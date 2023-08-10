@@ -7,7 +7,7 @@ Class {
 		'username',
 		'password'
 	],
-	#category : 'GToolkit-Jenkins'
+	#category : #'GToolkit-Jenkins'
 }
 
 { #category : #constants }
@@ -60,6 +60,11 @@ JcJenkinsClient >> hasValidUrl [
 	^ true
 ]
 
+{ #category : #initialization }
+JcJenkinsClient >> initializeZnClient: aZnClient [
+	aZnClient maximumEntitySize: 32 * 1024 * 1024
+]
+
 { #category : #accessing }
 JcJenkinsClient >> password [
 	^ password
@@ -78,7 +83,8 @@ JcJenkinsClient >> plainJenkinsApi [
 { #category : #accessing }
 JcJenkinsClient >> setBasicAuth [
 	znclient := ZnClient new
-	username: username password: password.
+			in: [ :theClient | self initializeZnClient: theClient ];
+			username: username password: password
 ]
 
 { #category : #accessing }
@@ -104,10 +110,11 @@ JcJenkinsClient >> username [
 { #category : #accessing }
 JcJenkinsClient >> username: anUsername token: aToken url: anUrl [
 	znclient := ZnClient new
-	username: anUsername password: aToken.
+			in: [ :theClient | self initializeZnClient: theClient ];
+			username: anUsername password: aToken.
 	username := anUsername.
 	password := aToken.
-	url := anUrl.
+	url := anUrl
 ]
 
 { #category : #accessing }

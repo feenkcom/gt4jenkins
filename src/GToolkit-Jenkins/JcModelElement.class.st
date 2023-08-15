@@ -8,6 +8,34 @@ Class {
 	#category : #'GToolkit-Jenkins'
 }
 
+{ #category : #'accessing - raw data' }
+JcModelElement >> atPath: keyCollection [
+	"Use each key in keyCollection recursively, stop when nil is encountered"
+
+	| value |
+	rawData ifNil: [ ^ nil ].
+	
+	value := rawData.
+	keyCollection do: [ :each |
+		value := value at: each ifAbsent: [ ^ nil ].
+		value ifNil: [ ^ nil ] ].
+	^ value
+]
+
+{ #category : #'accessing - raw data' }
+JcModelElement >> atPath: keyCollection ifPresent: presentBlock ifAbsent: absentBlock [
+	"Use each key in keyCollection recursively, stop when nil is encountered"
+
+	| value |
+	rawData ifNil: [ ^ absentBlock value ].
+	
+	value := rawData.
+	keyCollection do: [ :each |
+		value := value at: each ifAbsent: [ ^ absentBlock value ].
+		value ifNil: [ ^ absentBlock value ] ].
+	^ presentBlock value: value
+]
+
 { #category : #accessing }
 JcModelElement >> fullUrlClientFor: aUrl [
 	|client newModelBuilder jc|
@@ -23,6 +51,18 @@ JcModelElement >> fullUrlClientFor: aUrl [
 	client modelBuilder: newModelBuilder.
 	client url: aUrl.
 	^ client.
+]
+
+{ #category : #'gt - extensions' }
+JcModelElement >> gtRawFor: aView [
+	<gtView>
+	rawData ifNil: [ ^ aView empty ].
+
+	^ aView forward
+		title: 'JSON';
+		priority: 90;
+		object: [ self rawData ];
+		view: #gtTreeFor:context:
 ]
 
 { #category : #accessing }

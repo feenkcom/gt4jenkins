@@ -10,6 +10,14 @@ JcBlueJUnitStageTestResult >> allCases [
 ]
 
 { #category : #accessing }
+JcBlueJUnitStageTestResult >> duration [
+	^ self
+		atPath: #(duration)
+		ifPresent: #yourself
+		ifAbsent: [ nil ]
+]
+
+{ #category : #accessing }
 JcBlueJUnitStageTestResult >> gtAllCasesFor: aView [
 	<gtView>
 	| at |
@@ -20,7 +28,7 @@ JcBlueJUnitStageTestResult >> gtAllCasesFor: aView [
 		title: 'All cases' translated;
 		priority: 60;
 		items: [ at ];
-		column: 'Index' translated
+		column: '' translated
 			text:
 				[ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray ]
 			width: 20;
@@ -33,10 +41,13 @@ JcBlueJUnitStageTestResult >> gtAllCasesFor: aView [
 			width: 50;
 		column: 'Class' translated
 			text: [ :eachItem | eachItem className ]
-			width: 350;
+			weight: 3;
 		column: 'Method' translated
 			text: [ :eachItem | eachItem methodName ]
-			width: 250
+			weight: 2;
+		column: 'Duration' translated
+			text: [ :eachItem | eachItem duration ]
+			width: 65
 ]
 
 { #category : #accessing }

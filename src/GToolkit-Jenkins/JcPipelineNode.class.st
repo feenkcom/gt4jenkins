@@ -56,10 +56,10 @@ JcPipelineNode >> gtAllTestsFor: aView [
 		title: 'Tests' translated;
 		priority: 60;
 		items: [ at ];
-		column: 'Index' translated
+		column: '' translated
 			text: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray ]
-			width: 20;
-		column: 'Status' translated
+			width: 30;
+		column: '' translated
 			do: [ :column | 
 			column
 				stencil: [ :each | 
@@ -67,6 +67,8 @@ JcPipelineNode >> gtAllTestsFor: aView [
 						geometry: BlCircleGeometry new;
 						background: each statusBackgroundColor;
 						size: 10 @ 10;
+						constraintsDo: [ :c |
+							c linear horizontal alignCenter ];
 						margin:
 							(BlInsets
 								top: 5
@@ -76,15 +78,77 @@ JcPipelineNode >> gtAllTestsFor: aView [
 				width: 20 ];
 		column: 'Package' translated
 			text: [ :eachItem | eachItem testClassName ]
-			width: 250;
-		column: 'Examples' translated
+			weight: 3;
+		column: 'Tests' translated
 			text: [ :eachItem | eachItem allCases size ]
-			width: 50
+			width: 65;
+		column: 'Duration' translated
+			text: [ :eachItem | eachItem duration ]
+			width: 60
 ]
 
 { #category : #accessing }
 JcPipelineNode >> gtDisplayOn: stream [
 	stream nextPutAll: (self name)
+]
+
+{ #category : #'gt - extensions' }
+JcPipelineNode >> gtExamplesDurationFor: aView [
+	<gtView>
+	| sortedTests |
+	sortedTests := (self allTests 
+		reject: [ :e | e duration isZero ]) 
+		sorted: [ :a :b | a duration > b duration ].
+	
+	sortedTests ifEmpty: [ ^ aView empty ].
+	
+	^ aView explicit
+		title: 'Durations';
+		priority: 80;
+		tooltip: 'Test execution durations (size = duration)';
+		stencil: [ GtNestedRectangleTreeMap new
+				roots: sortedTests;
+				leaves: [ :aNode | (aNode allCases 
+					reject: [ :e | e duration isZero ]) 
+					sorted: [ :a :b | a duration > b duration ] ];
+				leavesSize: [ :aNode | aNode duration ];
+				containerElement: [ :anElement :aNodeContext | 
+					| aLabel |
+					anElement background: Color white.
+					anElement
+						border: (BlBorder paint: BrGlamorousColors disabledButtonBorderColor width: 2).
+					anElement padding: (BlInsets all: 2) + (BlInsets top: 10).
+
+					anElement
+						addChild: (aLabel := BrLabel new
+									text: aNodeContext model testClassName;
+									aptitude: (BrGlamorousLabelAptitude new
+											fontSize: 8;
+											foreground: Color black);
+									visibility: BlVisibility hidden;
+									constraintsDo: [ :c | c ignoreByLayout ]).
+
+					anElement
+						addAptitude: (BrStyleCommonAptitude new
+								default: [ :aStyle |  ];
+								hovered: [ :aStyle | 
+									aStyle
+										do: [ :aWidget | aLabel visibility: BlVisibility visible ]
+										after: [ :aWidget | aLabel visibility: BlVisibility hidden ] ]) ];
+				leafElement: [ :anElement :aLeafContext | 
+					anElement background: aLeafContext model statusBackgroundColor.
+					anElement border: (BlBorder paint: Color white width: 1).
+					anElement
+						addAptitude: (BrGlamorousWithLabelTooltipAptitude new
+								text: aLeafContext model shortClassAndMethodName , ', duration='
+										, aLeafContext model duration asString).
+					anElement
+						when: BlClickEvent
+						do: [ :anEvent | anElement phlow spawnObject: aLeafContext model ] ] ]
+]
+
+{ #category : #'gt - extensions' }
+JcPipelineNode >> gtExamplesTreemapFor: aView [
 ]
 
 { #category : #accessing }

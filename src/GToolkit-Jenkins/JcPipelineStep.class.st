@@ -18,6 +18,26 @@ JcPipelineStep >> getLogText [
 ]
 
 { #category : #accessing }
+JcPipelineStep >> gtActionParseClonerLogFor: anAction [
+	<gtAction>
+	| displayDescription |
+	
+	rawData ifNil: [ ^ anAction noAction ].
+	displayDescription := (rawData at: 'displayDescription').
+	displayDescription ifNil: [ ^ anAction noAction ].
+	(displayDescription includesSubstring: 'gt-releaser run-releaser') ifFalse: [
+		^ anAction noAction ].
+	
+	^ anAction button
+		tooltip: 'Parse releaser logs';
+		priority: 11;
+		icon: BrGlamorousVectorIcons playinspect;
+		action: [ :aButton | 
+			aButton phlow spawnObject: (GtRlReleaserSignalsLogReader 
+				readFrom:  self getLogText readStream) ]
+]
+
+{ #category : #accessing }
 JcPipelineStep >> gtDisplayOn: stream [
 	|displayDescription|
 	displayDescription := (rawData at: 'displayDescription').

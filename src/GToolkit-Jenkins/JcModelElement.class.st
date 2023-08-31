@@ -54,7 +54,7 @@ JcModelElement >> fullUrlClientFor: aUrl [
 ]
 
 { #category : #'gt - extensions' }
-JcModelElement >> gtRawFor: aView [
+JcModelElement >> gtRawDataFor: aView [
 	<gtView>
 	rawData ifNil: [ ^ aView empty ].
 

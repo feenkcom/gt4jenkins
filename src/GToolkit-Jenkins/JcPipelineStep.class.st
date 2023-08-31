@@ -18,7 +18,43 @@ JcPipelineStep >> getLogText [
 ]
 
 { #category : #accessing }
-JcPipelineStep >> gtActionParseClonerLogFor: anAction [
+JcPipelineStep >> gtActionParseLoadingLogFor: anAction [
+	<gtAction>
+	| displayDescription |
+	
+	rawData ifNil: [ ^ anAction noAction ].
+	displayDescription := (rawData at: 'displayDescription').
+	displayDescription ifNil: [ ^ anAction noAction ].
+	(displayDescription includesSubstring: 'gt-releaser release-build --loader cloner') ifFalse: [
+		^ anAction noAction ].
+	
+	^ anAction dropdown
+		tooltip: 'Parse the loading logs';
+		priority: 11;
+		label: 'Loading Log';
+		icon: BrGlamorousVectorIcons playinspect;
+		content: [ :aButton | 
+			| actions |
+			actions := OrderedCollection new.
+			actions add: ('Cloner' -> [ :anElement | 
+				anElement phlow spawnObject: (GtRlClonerBaselineEvent 
+					fromContents: self getLogText).
+				aButton dispatchEvent: BrDropdownHideWish new ]).
+			actions add: ('Loader' -> [ :anElement | 
+				anElement phlow spawnObject: (GtRlLoaderEventsGroup 
+					fromContents: self getLogText).
+				aButton dispatchEvent: BrDropdownHideWish new ]).
+			actions add: ('Consolidated' -> [ :anElement | 
+				anElement phlow spawnObject: (GtRlLoadedConsolidatedBaselineEvent 
+					fromContents: self getLogText).
+				aButton dispatchEvent: BrDropdownHideWish new ]).
+			BrGlamorousSimpleContextMenuContent new
+				items:actions;
+				yourself]
+]
+
+{ #category : #accessing }
+JcPipelineStep >> gtActionParseReleaserLogFor: anAction [
 	<gtAction>
 	| displayDescription |
 	
@@ -31,6 +67,7 @@ JcPipelineStep >> gtActionParseClonerLogFor: anAction [
 	^ anAction button
 		tooltip: 'Parse releaser logs';
 		priority: 11;
+		label: 'Releaser Log';
 		icon: BrGlamorousVectorIcons playinspect;
 		action: [ :aButton | 
 			aButton phlow spawnObject: (GtRlReleaserSignalsLogReader 

@@ -123,6 +123,37 @@ JcConsoleStyler >> errorBackgroundColor [
 ]
 
 { #category : #accessing }
+JcConsoleStyler >> errorTextError: aText [
+
+	^ ('error' asPParser token)
+		==> [ :token | 
+			(aText from: token start to: token stop)
+				highlight: self errorBackgroundColor ]
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> exampleFailureError: aText [
+	"GtApServerInDockerExamples(GtApServerExamples) >> #publishPostOneWithTwoAttachmentPictures -- success
+	GtApServerInDockerExamples(GtApServerExamples) >> #publishPostOneWithTwoAttachmentPictures -- failure"
+
+	^ ('-- failure' asPParser token)
+		==> [ :token | 
+			(aText from: token start to: token stop)
+				highlight: self errorBackgroundColor ]
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> exampleSuccessError: aText [
+	"GtApServerInDockerExamples(GtApServerExamples) >> #publishPostOneWithTwoAttachmentPictures -- success
+	GtApServerInDockerExamples(GtApServerExamples) >> #publishPostOneWithTwoAttachmentPictures -- failure"
+
+	^ ('-- success' asPParser token)
+		==> [ :token | 
+			(aText from: token start to: token stop)
+				highlight: self successBackgroundColor ]
+]
+
+{ #category : #accessing }
 JcConsoleStyler >> exceptionAccessViolationOn: aText [
 	^ (#startOfLine asPParser
 		, 'EXCEPTION_ACCESS_VIOLATION' asPParser token
@@ -140,6 +171,15 @@ JcConsoleStyler >> exceptionIllegalInstructionOn: aText [
 		==> [ :tokens | 
 			(aText from: tokens second start to: tokens third stop)
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> exceptionTextError: aText [
+
+	^ ('exception' asPParser token)
+		==> [ :token | 
+			(aText from: token start to: token stop)
+				highlight: self errorBackgroundColor ]
 ]
 
 { #category : #accessing }
@@ -404,7 +444,8 @@ JcConsoleStyler >> postgresTimeStampParser [
 JcConsoleStyler >> privateStyle: aText [
 	| parser aString |
 	aString := aText asString.
-	parser := (self failedCommandOn: aText) / (self expectedVersionMismatchOn: aText) 
+	parser := (self failedCommandOn: aText) 
+			/ (self expectedVersionMismatchOn: aText) 
 			/ (self noGTVersion: aText)
 			/ (self vmErrorOn: aText) 
 			/ (self brackettedErrorOn: aText)
@@ -433,6 +474,10 @@ JcConsoleStyler >> privateStyle: aText [
 			/ (self neutralOn: aText).
 	parser sea star optimize parse: aString.
 
+	(self exampleSuccessError: aText) sea star optimize parse: aString.
+	(self exampleFailureError: aText) sea star optimize parse: aString.
+	(self exceptionTextError: aText) sea star optimize parse: aString.
+	(self errorTextError: aText) sea star optimize parse: aString.
 	(self segmentationFaultParserOn: aText) sea star optimize parse: aString.
 	(self hardSpaceOn: aText) sea star optimize parse: aString.
 	^ aText
@@ -487,6 +532,11 @@ JcConsoleStyler >> squareBracketErrorOn: aText [
 		==> [ :tokens | 
 			(aText from: tokens second start to: tokens fifth stop)
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
+]
+
+{ #category : #colors }
+JcConsoleStyler >> successBackgroundColor [
+	^ BrGlamorousColors successBackgroundColor alpha: 0.5
 ]
 
 { #category : #accessing }

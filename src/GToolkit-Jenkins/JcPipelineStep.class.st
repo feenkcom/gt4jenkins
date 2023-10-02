@@ -17,7 +17,7 @@ JcPipelineStep >> getLogText [
 	^ text
 ]
 
-{ #category : #accessing }
+{ #category : #'gt - extensions' }
 JcPipelineStep >> gtActionParseLoadingLogFor: anAction [
 	<gtAction>
 	| displayDescription |
@@ -53,7 +53,7 @@ JcPipelineStep >> gtActionParseLoadingLogFor: anAction [
 				yourself]
 ]
 
-{ #category : #accessing }
+{ #category : #'gt - extensions' }
 JcPipelineStep >> gtActionParseReleaserLogFor: anAction [
 	<gtAction>
 	| displayDescription |
@@ -74,6 +74,27 @@ JcPipelineStep >> gtActionParseReleaserLogFor: anAction [
 				readFrom:  self getLogText readStream) ]
 ]
 
+{ #category : #'gt - extensions' }
+JcPipelineStep >> gtActionParseVirtualMachineStatisticsFor: anAction [
+	<gtAction>
+	| displayDescription |
+	
+	rawData ifNil: [ ^ anAction noAction ].
+	displayDescription := (rawData at: 'displayDescription').
+	displayDescription ifNil: [ ^ anAction noAction ].
+	(displayDescription includesSubstring: 'gt-examples test') ifFalse: [
+		^ anAction noAction ].
+	
+	^ anAction button
+		tooltip: 'Parse virtual machine statistics';
+		priority: 11;
+		label: 'VM Statistics';
+		icon: BrGlamorousVectorIcons playinspect;
+		action: [ :aButton | 
+			aButton phlow spawnObject: (GtVmExecutionStatisticsReportLogLoader 
+				readFromString:  self getLogText readStream contents) ]
+]
+
 { #category : #accessing }
 JcPipelineStep >> gtDisplayOn: stream [
 	|displayDescription|
@@ -82,7 +103,7 @@ JcPipelineStep >> gtDisplayOn: stream [
 	displayDescription ifNotNil: [stream nextPutAll: ('', displayDescription  )]
 ]
 
-{ #category : #accessing }
+{ #category : #'gt - extensions' }
 JcPipelineStep >> gtInstructionsFor: aView [
 	<gtView>
 	^ aView textEditor

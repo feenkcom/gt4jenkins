@@ -141,7 +141,7 @@ JcPipelineStep >> isDisplayDescriptionMatching: aBlock [
 { #category : #testing }
 JcPipelineStep >> isGtInstallerTestRun [
 	^ self isDisplayDescriptionMatching: [ :aDescription |
-		(aDescription beginsWith: './gt-installer') and: [
+		(aDescription includesSubstring: './gt-installer') and: [
 			aDescription includesSubstring: 'gt-examples test' ] ]
 ]
 

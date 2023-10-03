@@ -213,9 +213,38 @@ JcPipelineNode >> gtStepsFor: aView [
 			weight: 1
 ]
 
+{ #category : #testing }
+JcPipelineNode >> gtTestingSteps [
+	^ self steps select: [ :aStep |
+		aStep isGtInstallerTestRun ]
+]
+
+{ #category : #'gt - extensions' }
+JcPipelineNode >> gtViewVmExecutionStatisticsReportsFor: aView [
+	<gtView>
+	
+	^ aView forward 
+		title: 'VM GC Statistics';
+		object: [ self gtVmExecutionStatisticsReports ];
+		view: #gtViewGcStatisticsFor: 
+]
+
+{ #category : #testing }
+JcPipelineNode >> gtVmExecutionStatisticsReports [
+	^ GtVmExecutionStatisticsReportsGroup withAll: (self gtTestingSteps 
+		flatCollect: [ :aStep |
+			aStep gtVmExecutionStatisticsReports ]) 
+]
+
 { #category : #accessing }
 JcPipelineNode >> id [ 
 	^ rawData at:'id'
+]
+
+{ #category : #testing }
+JcPipelineNode >> isGtTestNode [
+	^ {'Test MacOS' . 'Test Linux' . 'Test Windows'} anySatisfy: [ :aLabel |
+	self name beginsWith: aLabel ]
 ]
 
 { #category : #accessing }

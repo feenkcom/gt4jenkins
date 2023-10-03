@@ -78,21 +78,19 @@ JcPipelineStep >> gtActionParseReleaserLogFor: anAction [
 JcPipelineStep >> gtActionParseVirtualMachineStatisticsFor: anAction [
 	<gtAction>
 	| displayDescription |
-	
 	rawData ifNil: [ ^ anAction noAction ].
-	displayDescription := (rawData at: 'displayDescription').
+	displayDescription := rawData at: 'displayDescription'.
 	displayDescription ifNil: [ ^ anAction noAction ].
-	(displayDescription includesSubstring: 'gt-examples test') ifFalse: [
-		^ anAction noAction ].
-	
+	(displayDescription includesSubstring: 'gt-examples test')
+		ifFalse: [ ^ anAction noAction ].
+
 	^ anAction button
 		tooltip: 'Parse virtual machine statistics';
 		priority: 11;
 		label: 'VM Statistics';
 		icon: BrGlamorousVectorIcons playinspect;
-		action: [ :aButton | 
-			aButton phlow spawnObject: (GtVmExecutionStatisticsReportLogLoader 
-				readFromString:  self getLogText readStream contents) ]
+		action: [ :aButton | aButton phlow 
+			spawnObject: self gtVmExecutionStatisticsReports ]
 ]
 
 { #category : #accessing }
@@ -123,6 +121,28 @@ JcPipelineStep >> gtLogFor: aView [
 		styler: JcConsoleStyler new;
 		title: 'Console log';
 		text: [text]
+]
+
+{ #category : #'gt - extensions' }
+JcPipelineStep >> gtVmExecutionStatisticsReports [
+	^ GtVmExecutionStatisticsReportLogLoader
+		readFromString: self getLogText readStream contents
+]
+
+{ #category : #testing }
+JcPipelineStep >> isDisplayDescriptionMatching: aBlock [
+	| displayDescription |
+	
+	displayDescription := (rawData at: 'displayDescription').
+	displayDescription ifNil: [ ^ false ].
+	^ aBlock value: displayDescription
+]
+
+{ #category : #testing }
+JcPipelineStep >> isGtInstallerTestRun [
+	^ self isDisplayDescriptionMatching: [ :aDescription |
+		(aDescription beginsWith: './gt-installer') and: [
+			aDescription includesSubstring: 'gt-examples test' ] ]
 ]
 
 { #category : #accessing }

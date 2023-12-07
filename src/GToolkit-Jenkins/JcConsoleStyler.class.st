@@ -5,6 +5,15 @@ Class {
 }
 
 { #category : #accessing }
+JcConsoleStyler >> anErrorTextError: aText [
+
+	^ ('an error' asPParser token)
+		==> [ :token | 
+			(aText from: token start to: token stop)
+				highlight: self errorBackgroundColor ]
+]
+
+{ #category : #accessing }
 JcConsoleStyler >> archiveCreatingInflatingExtractingOn: aText [
 	^ (#startOfLine asPParser
 		, ('   creating: ' asPParser / '  inflating: ' asPParser / ' extracting: ' asPParser) token
@@ -123,15 +132,6 @@ JcConsoleStyler >> errorBackgroundColor [
 ]
 
 { #category : #accessing }
-JcConsoleStyler >> errorTextError: aText [
-
-	^ ('error' asPParser token)
-		==> [ :token | 
-			(aText from: token start to: token stop)
-				highlight: self errorBackgroundColor ]
-]
-
-{ #category : #accessing }
 JcConsoleStyler >> exampleFailureError: aText [
 	"GtApServerInDockerExamples(GtApServerExamples) >> #publishPostOneWithTwoAttachmentPictures -- success
 	GtApServerInDockerExamples(GtApServerExamples) >> #publishPostOneWithTwoAttachmentPictures -- failure"
@@ -238,6 +238,14 @@ JcConsoleStyler >> hardSpaceOn: aText [
 		==> [ :token | 
 				(aText from: token start to: token stop)
 					highlight: (self failureBackgroundColor alpha: 0.75) ]
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> httpErrorOn: aText [ 
+	^ ('Error: HTTP status code:' asPParser token), #endOfLine asPParser negate star token
+		==> [ :tokens | 
+			(aText from: tokens first start to: tokens last stop)
+				highlight: self errorBackgroundColor ]
 ]
 
 { #category : #accessing }
@@ -471,15 +479,16 @@ JcConsoleStyler >> privateStyle: aText [
 			/ (self bashError: aText) 
 			/ (self postgresError: aText)
 			/ (self postgresNeutralLog: aText) 
-			/ (self neutralOn: aText).
+			/ (self neutralOn: aText)
+			/ (self anErrorTextError: aText)
+			/ (self serverErrorTextError: aText)
+			/ (self exampleSuccessError: aText)
+			/ (self exceptionTextError: aText)
+			/ (self exampleFailureError: aText)
+			/ (self segmentationFaultParserOn: aText)
+			/ (self hardSpaceOn: aText)
+			"/ (self httpErrorOn: aText)".
 	parser sea star optimize parse: aString.
-
-	(self exampleSuccessError: aText) sea star optimize parse: aString.
-	(self exampleFailureError: aText) sea star optimize parse: aString.
-	(self exceptionTextError: aText) sea star optimize parse: aString.
-	(self errorTextError: aText) sea star optimize parse: aString.
-	(self segmentationFaultParserOn: aText) sea star optimize parse: aString.
-	(self hardSpaceOn: aText) sea star optimize parse: aString.
 	^ aText
 ]
 
@@ -490,6 +499,15 @@ JcConsoleStyler >> segmentationFaultParserOn: aText [
 		==> [ :tokens | 
 			(aText from: tokens first start to: tokens second stop)
 				foreground: self defaultForegroundColor;
+				highlight: self errorBackgroundColor ]
+]
+
+{ #category : #accessing }
+JcConsoleStyler >> serverErrorTextError: aText [
+
+	^ ('server error' asPParser token)
+		==> [ :token | 
+			(aText from: token start to: token stop)
 				highlight: self errorBackgroundColor ]
 ]
 

@@ -487,7 +487,7 @@ JcConsoleStyler >> privateStyle: aText [
 			/ (self exampleFailureError: aText)
 			/ (self segmentationFaultParserOn: aText)
 			/ (self hardSpaceOn: aText)
-			"/ (self httpErrorOn: aText)".
+			/ (self httpErrorOn: aText).
 	parser sea star optimize parse: aString.
 	^ aText
 ]

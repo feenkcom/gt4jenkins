@@ -132,6 +132,14 @@ JcConsoleStyler >> errorBackgroundColor [
 ]
 
 { #category : #accessing }
+JcConsoleStyler >> errorOn: aText [ 
+	^ ('[97;41;22mError:[91;49;1m' asPParser token), #endOfLine asPParser negate star token
+		==> [ :tokens | 
+			(aText from: tokens first start to: tokens last stop)
+				highlight: self errorBackgroundColor ]
+]
+
+{ #category : #accessing }
 JcConsoleStyler >> exampleFailureError: aText [
 	"GtApServerInDockerExamples(GtApServerExamples) >> #publishPostOneWithTwoAttachmentPictures -- success
 	GtApServerInDockerExamples(GtApServerExamples) >> #publishPostOneWithTwoAttachmentPictures -- failure"
@@ -487,7 +495,8 @@ JcConsoleStyler >> privateStyle: aText [
 			/ (self exampleFailureError: aText)
 			/ (self segmentationFaultParserOn: aText)
 			/ (self hardSpaceOn: aText)
-			/ (self httpErrorOn: aText).
+			/ (self httpErrorOn: aText)
+			/ (self errorOn: aText).
 	parser sea star optimize parse: aString.
 	^ aText
 ]

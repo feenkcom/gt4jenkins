@@ -25,7 +25,7 @@ JcPipelineStep >> gtActionParseLoadingLogFor: anAction [
 	rawData ifNil: [ ^ anAction noAction ].
 	displayDescription := (rawData at: 'displayDescription').
 	displayDescription ifNil: [ ^ anAction noAction ].
-	(displayDescription includesSubstring: 'gt-releaser release-build --loader cloner') ifFalse: [
+	(displayDescription includesSubstring: 'gt-releaser release-build') ifFalse: [
 		^ anAction noAction ].
 	
 	^ anAction dropdown

@@ -55,6 +55,22 @@ JcConsoleStyler >> classDependecesOn: aText [
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
+{ #category : #accessing }
+JcConsoleStyler >> clonerBaselineSignalFaultParserOn: aText [
+	^ (('GtRlClonerBaseline' asPParser , #space asPParser negate star flatten)
+		token , '|' asPParser trim , 'ClonerEvent' asPParser token
+		, '|' asPParser trim , #space asPParser negate star token
+		, '|' asPParser trim , #space asPParser negate star token
+		, '|' asPParser trim , #space asPParser negate star token)
+		==> [ :tokens | 
+			(aText from: tokens first start to: tokens first stop)
+				highlight: (Color blue alpha: 0.1).
+			(aText from: tokens fifth start to: tokens fifth stop)
+				highlight: (Color blue alpha: 0.1).
+			"(aText from: tokens seventh start to: tokens seventh stop)
+				highlight: (Color blue alpha: 0.1)" ]
+]
+
 { #category : #system }
 JcConsoleStyler >> compiledMethodFrom: aString [
 	| aMethodDefinition |
@@ -493,6 +509,7 @@ JcConsoleStyler >> privateStyle: aText [
 			/ (self exampleSuccessError: aText)
 			/ (self exceptionTextError: aText)
 			/ (self exampleFailureError: aText)
+			/ (self clonerBaselineSignalFaultParserOn: aText)
 			/ (self segmentationFaultParserOn: aText)
 			/ (self hardSpaceOn: aText)
 			/ (self httpErrorOn: aText)

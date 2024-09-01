@@ -80,7 +80,7 @@ JcPipelineRun >> gtStagesMapFor: aView [
 			allNodes := self nodes.
 			mondrian nodes
 				shape: [ :aStage | 
-					| container statusColor examplesSize labelContainer duration |
+					| container statusColor labelContainer duration |
 					statusColor := aStage resultBackgroundColor.
 					container := BrHorizontalPane new
 							hExact: 200;
@@ -94,17 +94,17 @@ JcPipelineRun >> gtStagesMapFor: aView [
 					labelContainer := BrVerticalPane new
 							hMatchParent;
 							vFitContent;
-							padding: (BlInsets all: 5);
 							clipChildren: false.
 
 					labelContainer
-						addChild: (BrLabel new
+						addChild: (BrEditor new
 								text: aStage name asRopedText;
-								aptitude: BrGlamorousLabelAptitude).
+								aptitude: BrGlamorousRegularEditorAptitude).
 					duration := aStage duration.
 					duration < 1 second
 						ifFalse: [ labelContainer
 								addChild: (BrLabel new
+										margin: (BlInsets top: 0 left: 5 bottom: 5 right: 5);
 										text: duration gtHumanReadableString asRopedText;
 										aptitude: (BrGlamorousLabelAptitude new foreground: Color gray)) ].	"examplesSize := aStage allCasesSize.
 		examplesSize > 0
@@ -134,10 +134,10 @@ JcPipelineRun >> gtStagesMapFor: aView [
 						pN := each nextStagesIds.
 						allNodes
 							select: [ :node | pN anySatisfy: [ :stageID | stageID = node id ] ] ].
-			mondrian layout
-				custom: (GtGraphDominanceTreeLayout new
-						verticalGap: 20;
-						horizontalGap: 20).
+			mondrian layout dominanceTree
+				"nodesAlignment: GtGradTreeNodesCenterAlignment new;"
+				levelDistance: 20;
+				nodeDistance: 20.
 			mondrian ]
 ]
 

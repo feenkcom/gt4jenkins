@@ -119,7 +119,7 @@ JcQueuedBlueRun >> gtStagesMapFor: aView [
 												aPopupElement addChild: anElement.
 												anElement 
 													when: GtPhlowObjectToSpawn do: [:e | 
-													container fireEvent: (GtPhlowObjectToSpawn new object: e object; sourceElement: e target)] ].
+													container phlow spawnPreviousEvent: e] ].
 										aPopupElement ]).
 					container
 						addChild: (BrVerticalPane new vMatchParent; hExact: 15; background: statusColor );

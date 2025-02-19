@@ -44,7 +44,6 @@ JcJenkinsClient >> blueOceanUrl [
 	^ (result findString:'/blue/rest/organizations/jenkins') > 0 
 		ifTrue:[ result ]
 		ifFalse: [result,'/blue/rest/organizations/jenkins']
-	
 ]
 
 { #category : #accessing }

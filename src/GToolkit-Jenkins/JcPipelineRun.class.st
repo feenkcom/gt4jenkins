@@ -171,10 +171,14 @@ JcPipelineRun >> gtTestsFor: aView [
 
 { #category : #accessing }
 JcPipelineRun >> nodes [
-	nodesDictionary ifNil: [nodesDictionary := Dictionary new.
-	((super linksClientFor: 'nodes') execute) collect: [:each | nodesDictionary at:( each id) put: (each parentRun: self)]].
+	nodesDictionary
+		ifNil: [ nodesDictionary := Dictionary new.
+			(self linksClientFor: 'nodes') execute
+				do: [ :each | 
+					nodesDictionary 
+						at: each id 
+						put: (each parentRun: self) ] ].
 	^ nodesDictionary values
-	
 ]
 
 { #category : #accessing }

@@ -438,6 +438,48 @@ JcConsoleStyler >> noGTVersion: aText [
 ]
 
 { #category : #accessing }
+JcConsoleStyler >> patternsParser: aText [
+	^ (self failedCommandOn: aText) 
+		/ (self expectedVersionMismatchOn: aText)
+		/ (self noGTVersion: aText) 
+		/ (self vmErrorOn: aText)
+		/ (self brackettedErrorOn: aText) 
+		/ (self consoleErrorSequenceOn: aText)
+		/ (self metacelloNotificationFetched: aText)
+		/ (self metacelloNotificationLoaded: aText)
+		/ (self illegalInstructionOn: aText)
+		/ (self exceptionIllegalInstructionOn: aText)
+		/ (self exceptionAccessViolationOn: aText)
+		/ (self coreDumpedOn: aText)
+		/ (self exitOneParserOn: aText) 
+		/ (self executeActionFailureOn: aText)
+		/ (self newUndeclaredOn: aText) 
+		/ (self shadowedVariableOn: aText)
+		/ (self deprecationOn: aText) 
+		/ (self squareBracketAtStartOfLineErrorOn: aText)
+		/ (self classDependecesOn: aText)
+		/ (self archiveCreatingInflatingExtractingOn: aText)
+		/ (self makeErrorOn: aText) 
+		/ (self makefileFailedOn: aText)
+		/ (self shellError: aText) 
+		/ (self jenkinsError: aText)
+		/ (self bashError: aText) 
+		/ (self postgresError: aText)
+		/ (self postgresNeutralLog: aText) 
+		/ (self neutralOn: aText)
+		/ (self anErrorTextError: aText) 
+		/ (self serverErrorTextError: aText)
+		/ (self exampleSuccessError: aText) 
+		/ (self exceptionTextError: aText)
+		/ (self exampleFailureError: aText)
+		/ (self clonerBaselineSignalFaultParserOn: aText)
+		/ (self segmentationFaultParserOn: aText) 
+		/ (self hardSpaceOn: aText)
+		/ (self httpErrorOn: aText) 
+		/ (self errorOn: aText)
+]
+
+{ #category : #accessing }
 JcConsoleStyler >> postgresError: aText [
 
 	^ self postgresTimeStampParser , ' #Error' asPParser token
@@ -476,44 +518,7 @@ JcConsoleStyler >> postgresTimeStampParser [
 JcConsoleStyler >> privateStyle: aText [
 	| parser aString |
 	aString := aText asString.
-	parser := (self failedCommandOn: aText) 
-			/ (self expectedVersionMismatchOn: aText) 
-			/ (self noGTVersion: aText)
-			/ (self vmErrorOn: aText) 
-			/ (self brackettedErrorOn: aText)
-			/ (self consoleErrorSequenceOn: aText)
-			/ (self metacelloNotificationFetched: aText)
-			/ (self metacelloNotificationLoaded: aText)
-			/ (self illegalInstructionOn: aText)
-			/ (self exceptionIllegalInstructionOn: aText)
-			/ (self exceptionAccessViolationOn: aText) 
-			/ (self coreDumpedOn: aText)
-			/ (self exitOneParserOn: aText) 
-			/ (self executeActionFailureOn: aText)
-			/ (self newUndeclaredOn: aText) 
-			/ (self shadowedVariableOn: aText)
-			/ (self deprecationOn: aText)
-			/ (self squareBracketErrorOn: aText) 
-			/ (self classDependecesOn: aText)
-			/ (self archiveCreatingInflatingExtractingOn: aText)
-			/ (self makeErrorOn: aText) 
-			/ (self makefileFailedOn: aText)
-			/ (self shellError: aText) 
-			/ (self jenkinsError: aText)
-			/ (self bashError: aText) 
-			/ (self postgresError: aText)
-			/ (self postgresNeutralLog: aText) 
-			/ (self neutralOn: aText)
-			/ (self anErrorTextError: aText)
-			/ (self serverErrorTextError: aText)
-			/ (self exampleSuccessError: aText)
-			/ (self exceptionTextError: aText)
-			/ (self exampleFailureError: aText)
-			/ (self clonerBaselineSignalFaultParserOn: aText)
-			/ (self segmentationFaultParserOn: aText)
-			/ (self hardSpaceOn: aText)
-			/ (self httpErrorOn: aText)
-			/ (self errorOn: aText).
+	parser := self patternsParser: aText.
 	parser sea star optimize parse: aString.
 	^ aText
 ]
@@ -569,7 +574,7 @@ JcConsoleStyler >> shellError: aText [
 ]
 
 { #category : #accessing }
-JcConsoleStyler >> squareBracketErrorOn: aText [
+JcConsoleStyler >> squareBracketAtStartOfLineErrorOn: aText [
 	^ (#startOfLine asPParser , '[' asPParser token
 		, #digit asPParser plus , 'm' asPParser
 		, #endOfLine asPParser negate star token , #endOfLine asPParser)

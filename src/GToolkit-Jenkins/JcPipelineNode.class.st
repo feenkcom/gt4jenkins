@@ -48,34 +48,28 @@ JcPipelineNode >> failedTests [
 { #category : #accessing }
 JcPipelineNode >> gtAllTestsFor: aView [
 	<gtView>
-	| at |
-	at := self allTests.
-	at isEmpty
-		ifTrue: [ ^ aView empty ].
 	^ aView columnedList
 		title: 'Tests' translated;
 		priority: 60;
-		items: [ at ];
+		items: [ self allTests ];
 		column: '' translated
 			text: [ :eachItem :eachIndex | eachIndex asRopedText foreground: Color gray ]
 			width: 30;
 		column: '' translated
 			do: [ :column | 
-			column
-				stencil: [ :each | 
-					BlElement new
-						geometry: BlCircleGeometry new;
-						background: each statusBackgroundColor;
-						size: 10 @ 10;
-						constraintsDo: [ :c |
-							c linear horizontal alignCenter ];
-						margin:
-							(BlInsets
-								top: 5
-								left: 5
-								bottom: 5
-								right: 5) ];
-				width: 20 ];
+				column
+					stencil: [ :each | 
+						BlElement new
+							geometry: BlCircleGeometry new;
+							background: each statusBackgroundColor;
+							size: 10 @ 10;
+							constraintsDo: [ :c | c linear horizontal alignCenter ];
+							margin: (BlInsets
+									top: 5
+									left: 5
+									bottom: 5
+									right: 5) ];
+					width: 20 ];
 		column: 'Package' translated
 			text: [ :eachItem | eachItem testClassName ]
 			weight: 3;
@@ -95,22 +89,19 @@ JcPipelineNode >> gtDisplayOn: stream [
 { #category : #'gt - extensions' }
 JcPipelineNode >> gtExamplesDurationFor: aView [
 	<gtView>
-	| sortedTests |
-	sortedTests := (self allTests 
-		reject: [ :e | e duration isZero ]) 
-		sorted: [ :a :b | a duration > b duration ].
-	
-	sortedTests ifEmpty: [ ^ aView empty ].
-	
 	^ aView explicit
 		title: 'Durations';
 		priority: 80;
 		tooltip: 'Test execution durations (size = duration)';
-		stencil: [ GtNestedRectangleTreeMap new
+		stencil: [ | sortedTests |
+			sortedTests := (self allTests reject: [ :e | e duration isZero ])
+					sorted: [ :a :b | a duration > b duration ].
+
+			GtNestedRectangleTreeMap new
 				roots: sortedTests;
-				leaves: [ :aNode | (aNode allCases 
-					reject: [ :e | e duration isZero ]) 
-					sorted: [ :a :b | a duration > b duration ] ];
+				leaves: [ :aNode | 
+					(aNode allCases reject: [ :e | e duration isZero ])
+						sorted: [ :a :b | a duration > b duration ] ];
 				leavesSize: [ :aNode | aNode duration ];
 				containerElement: [ :anElement :aNodeContext | 
 					| aLabel |
@@ -154,10 +145,6 @@ JcPipelineNode >> gtExamplesTreemapFor: aView [
 { #category : #accessing }
 JcPipelineNode >> gtFailedTestsFor: aView [
 	<gtView>
-	| ft |
-	ft := self failedTests.
-	ft isEmpty
-		ifTrue: [ ^ aView empty ].
 	^ aView columnedList
 		title: 'Failed examples' translated;
 		priority: 60;
@@ -209,7 +196,7 @@ JcPipelineNode >> gtStepsFor: aView [
 								vExact: 400;
 								hMatchParent;
 								aptitude: BrGlamorousWithVerticalResizerAptitude;
-								addChild: (eachItem gtLogFor: GtPhlowEmptyView new) asElement matchParent ] ]
+								addChild: ((eachItem gtLogFor: GtPhlowEmptyView new) asElement constraintsDo: [:c | c vertical matchParent. c horizontal matchParent ]) ] ]
 			weight: 1
 ]
 

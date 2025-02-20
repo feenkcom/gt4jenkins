@@ -59,14 +59,14 @@ JcModelElement >> gtRawDataFor: aView [
 	rawData ifNil: [ ^ aView empty ].
 
 	^ aView forward
-		title: 'JSON';
+		title: 'Raw data';
 		priority: 90;
 		object: [ self rawData ];
 		view: #gtTreeFor:context:
 ]
 
 { #category : #accessing }
-JcModelElement >> gtStringFor: aView [
+JcModelElement >> gtUrlStringFor: aView [
 	<gtView>
 	^ aView explicit
 		title: 'URL';

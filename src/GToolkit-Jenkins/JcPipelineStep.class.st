@@ -113,14 +113,12 @@ JcPipelineStep >> gtInstructionsFor: aView [
 { #category : #accessing }
 JcPipelineStep >> gtLogFor: aView [
 	<gtView>
-	|text|
-	text := self getLogText.
-	text ifNil: [^aView empty].
 	^ aView textEditor
+		priority: 1;
 		aptitude: BrGlamorousCodeEditorAptitude;
 		styler: JcConsoleStyler new;
 		title: 'Console log';
-		text: [text]
+		text: [ self getLogText ]
 ]
 
 { #category : #'gt - extensions' }

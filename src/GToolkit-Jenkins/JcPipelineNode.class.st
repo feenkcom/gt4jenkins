@@ -171,7 +171,7 @@ JcPipelineNode >> gtStepsFor: aView [
 	<gtView>
 	^ aView columnedList
 		title: 'Steps' translated;
-		priority: 100;
+		priority: 1;
 		items: [ self steps ];
 		column: 'Status' translated
 			icon: [ :each | 
@@ -196,7 +196,7 @@ JcPipelineNode >> gtStepsFor: aView [
 								vExact: 400;
 								hMatchParent;
 								aptitude: BrGlamorousWithVerticalResizerAptitude;
-								addChild: (eachItem gtLogFor: GtPhlowEmptyView new) asElement matchParent ] ]
+								addChild: ((eachItem gtLogFor: GtPhlowEmptyView new) asElement constraintsDo: [:c | c vertical matchParent. c horizontal matchParent ]) ] ]
 			weight: 1
 ]
 

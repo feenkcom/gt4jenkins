@@ -575,11 +575,11 @@ JcConsoleStyler >> shellError: aText [
 
 { #category : #accessing }
 JcConsoleStyler >> squareBracketAtStartOfLineErrorOn: aText [
-	^ (#startOfLine asPParser , '[' asPParser token
+	^ ("#startOfLine asPParser , "'[' asPParser token
 		, #digit asPParser plus , 'm' asPParser
 		, #endOfLine asPParser negate star token , #endOfLine asPParser)
 		==> [ :tokens | 
-			(aText from: tokens second start to: tokens fifth stop)
+			(aText from: tokens first start to: tokens fourth stop)
 				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 

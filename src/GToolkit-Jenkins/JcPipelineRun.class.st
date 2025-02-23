@@ -51,7 +51,7 @@ JcPipelineRun >> gtNodesFor: aView [
 	<gtView>
 	^ aView columnedList
 		title: 'Nodes' translated;
-		priority: 1;
+		priority: 2;
 		items: [ self nodes sort: [ :a :b | a id asInteger < b id asInteger ] ];
 		column: 'Status' translated
 			icon: [ :each | 
@@ -74,7 +74,7 @@ JcPipelineRun >> gtStagesMapFor: aView [
 	<gtView>
 	^ aView mondrian
 		title: 'Stages map' translated;
-		priority: 55;
+		priority: 1;
 		painting: [ :mondrian | 
 			| allNodes |
 			allNodes := self nodes.
@@ -135,7 +135,7 @@ JcPipelineRun >> gtStagesMapFor: aView [
 						allNodes
 							select: [ :node | pN anySatisfy: [ :stageID | stageID = node id ] ] ].
 			mondrian layout dominanceTree
-				"nodesAlignment: GtGradTreeNodesCenterAlignment new;"
+				nodesAlignment: GtGradTreeNodesCenterAlignment new;
 				levelDistance: 20;
 				nodeDistance: 20.
 			mondrian ]
@@ -147,9 +147,9 @@ JcPipelineRun >> gtTestsFor: aView [
 	(rawData at: 'state') = 'RUNNING'
 		ifTrue: [ ^ aView empty ].
 	^ aView columnedList
-		title: (rawData at: 'runSummary') translated;
+		title: 'Problematic tests/examples';
 		priority: 50;
-		items: [ self tests ];
+		items: [ self tests reject: #isPassed ];
 		column: 'Status' translated
 			icon: [ :each | 
 					BlElement new

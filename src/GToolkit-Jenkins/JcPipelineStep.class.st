@@ -117,8 +117,8 @@ JcPipelineStep >> gtConsoleProblemsFor: aView [
 		priority: 10;
 		items: [ self consoleRangesWithProblems ];
 		column: 'Text' text: [ :each | each gtDisplayString ];
-		column: 'From' text: [:each | each startPosition ];
-		column: 'To' text: [:each | each stopPosition]
+		column: 'From' text: [:each | each startPosition ] width: 50;
+		column: 'To' text: [:each | each stopPosition] width: 50
 ]
 
 { #category : #accessing }

@@ -5,6 +5,22 @@ Class {
 }
 
 { #category : #accessing }
+JcPipelineStep >> consoleRangesWithProblems [
+	| tokens log |
+	log := self getLogText.
+	^ ((JcConsoleProblemsScanner new sea ==> #second) star
+			optimize parse: log)
+			collect: [ :each | 
+				each isToken
+					ifTrue: [ each start -> each stop ]
+					ifFalse: [ tokens := each select: #isToken.
+						JcConsoleRange new
+							startPosition: tokens first start;
+							stopPosition: tokens last stop;
+							logString: log ] ]
+]
+
+{ #category : #accessing }
 JcPipelineStep >> getLogText [
 	|text logURL|
 	logURL := ((((rawData at:'actions') detect: ([:a | (a at:'urlName') = 'log'])) at: '_links') at: 'self') at: 'href'.
@@ -93,6 +109,18 @@ JcPipelineStep >> gtActionParseVirtualMachineStatisticsFor: anAction [
 			spawnObject: self gtVmExecutionStatisticsReports ]
 ]
 
+{ #category : #views }
+JcPipelineStep >> gtConsoleProblemsFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'Console problems';
+		priority: 10;
+		items: [ self consoleRangesWithProblems ];
+		column: 'Text' text: [ :each | each gtDisplayString ];
+		column: 'From' text: [:each | each startPosition ];
+		column: 'To' text: [:each | each stopPosition]
+]
+
 { #category : #accessing }
 JcPipelineStep >> gtDisplayOn: stream [
 	|displayDescription|
@@ -106,6 +134,7 @@ JcPipelineStep >> gtInstructionsFor: aView [
 	<gtView>
 	^ aView textEditor
 		title: 'Instructions';
+		priority: 50;
 		aptitude: BrGlamorousCodeEditorAptitude;
 		text: [ self gtDisplayString ]
 ]

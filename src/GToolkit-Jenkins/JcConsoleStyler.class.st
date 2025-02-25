@@ -5,15 +5,6 @@ Class {
 }
 
 { #category : #accessing }
-JcConsoleStyler >> anErrorTextError: aText [
-
-	^ ('an error' asPParser token)
-		==> [ :token | 
-			(aText from: token start to: token stop)
-				highlight: self errorBackgroundColor ]
-]
-
-{ #category : #accessing }
 JcConsoleStyler >> archiveCreatingInflatingExtractingOn: aText [
 	^ (#startOfLine asPParser
 		, ('   creating: ' asPParser / '  inflating: ' asPParser / ' extracting: ' asPParser) token
@@ -21,38 +12,6 @@ JcConsoleStyler >> archiveCreatingInflatingExtractingOn: aText [
 		, #endOfLine asPParser) ==> [ :tokens | 
 			(aText from: tokens second start to: tokens third stop)
 				foreground: (BrGlamorousColors defaultButtonTextColor alpha: 0.5) ]
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> bashError: aText [
-	^ (#startOfLine asPParser
-		, 'bash: line ' asPParser token
-		, #digit asPParser plus
-		, ': ' asPParser
-		, #endOfLine asPParser negate plus token
-		, #endOfLine asPParser)
-		==> [ :tokens | 
-			(aText from: tokens second start to: tokens fifth stop)
-				highlight: self errorBackgroundColor ]
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> brackettedErrorOn: aText [ 
-	^ ('[ERROR]' asPParser token
-		, #endOfLine asPParser negate star token , #endOfLine asPParser)
-		==> [ :tokens | 
-			(aText from: tokens first start to: tokens second stop)
-				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> classDependecesOn: aText [
-	^ (#startOfLine asPParser
-		, 'MetacelloNotification: Warning: This package depends on the following classes:' asPParser token 
-		, #endOfLine asPParser negate star token 
-		, #endOfLine asPParser) ==> [ :tokens | 
-			(aText from: tokens second start to: tokens third stop)
-				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
 { #category : #accessing }
@@ -77,40 +36,6 @@ JcConsoleStyler >> compiledMethodFrom: aString [
 	aMethodDefinition := GtSystemUtility methodDefinitionFromString: aString.
 	aMethodDefinition isDefined ifFalse: [ ^ nil ].
 	^ aMethodDefinition compiledMethod
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> consoleErrorSequenceOn: aText [
-	^ (Character escape asPParser token
-		, '[31m' asPParser token
-		, Character escape asPParser negate star token
-		, Character escape asPParser token
-		, '[0m' asPParser token
-		, Character escape asPParser negate star token
-		, Character escape asPParser token
-		, '[0m' asPParser token
-		)
-		==> [ :tokens | 
-			(aText from: tokens first start to: tokens second stop)
-				replacingAdornment: [ :aPiece :aEDitorElement | #() ].
-			(aText from: tokens third start to: tokens third stop)
-				highlight: self errorBackgroundColor.
-			(aText from: tokens fourth start to: tokens fifth stop)
-				replacingAdornment: [ :aPiece :aEDitorElement | #() ].
-			(aText from: tokens sixth start to: tokens sixth stop)
-				underlineColor: self errorBackgroundColor.
-			(aText from: tokens seventh start to: tokens eighth stop)
-				replacingAdornment: [ :aPiece :aEDitorElement | #() ] ].
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> coreDumpedOn: aText [
-	^ (#startOfLine asPParser
-		, 'Aborted (core dumped)' asPParser token
-		, #endOfLine asPParser negate star token , #endOfLine asPParser)
-		==> [ :tokens | 
-			(aText from: tokens second start to: tokens third stop)
-				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
 { #category : #colors }
@@ -148,15 +73,7 @@ JcConsoleStyler >> errorBackgroundColor [
 ]
 
 { #category : #accessing }
-JcConsoleStyler >> errorOn: aText [ 
-	^ ('[97;41;22mError:[91;49;1m' asPParser token), #endOfLine asPParser negate star token
-		==> [ :tokens | 
-			(aText from: tokens first start to: tokens last stop)
-				highlight: self errorBackgroundColor ]
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> exampleFailureError: aText [
+JcConsoleStyler >> exampleFailureOn: aText [
 	"GtApServerInDockerExamples(GtApServerExamples) >> #publishPostOneWithTwoAttachmentPictures -- success
 	GtApServerInDockerExamples(GtApServerExamples) >> #publishPostOneWithTwoAttachmentPictures -- failure"
 
@@ -167,7 +84,7 @@ JcConsoleStyler >> exampleFailureError: aText [
 ]
 
 { #category : #accessing }
-JcConsoleStyler >> exampleSuccessError: aText [
+JcConsoleStyler >> exampleSuccessOn: aText [
 	"GtApServerInDockerExamples(GtApServerExamples) >> #publishPostOneWithTwoAttachmentPictures -- success
 	GtApServerInDockerExamples(GtApServerExamples) >> #publishPostOneWithTwoAttachmentPictures -- failure"
 
@@ -178,27 +95,7 @@ JcConsoleStyler >> exampleSuccessError: aText [
 ]
 
 { #category : #accessing }
-JcConsoleStyler >> exceptionAccessViolationOn: aText [
-	^ (#startOfLine asPParser
-		, 'EXCEPTION_ACCESS_VIOLATION' asPParser token
-		, #endOfLine asPParser negate star token , #endOfLine asPParser)
-		==> [ :tokens | 
-			(aText from: tokens second start to: tokens third stop)
-				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> exceptionIllegalInstructionOn: aText [
-	^ (#startOfLine asPParser
-		, 'EXCEPTION_ILLEGAL' asPParser token
-		, #endOfLine asPParser negate star token , #endOfLine asPParser)
-		==> [ :tokens | 
-			(aText from: tokens second start to: tokens third stop)
-				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> exceptionTextError: aText [
+JcConsoleStyler >> exceptionTextOn: aText [
 
 	^ ('exception' asPParser token)
 		==> [ :token | 
@@ -222,64 +119,9 @@ JcConsoleStyler >> executeActionFailureOn: aText [
 				highlight: color ]
 ]
 
-{ #category : #accessing }
-JcConsoleStyler >> exitOneParserOn: aText [
-	^ (#startOfLine asPParser
-		, 'script returned exit code 1' asPParser token
-		, #endOfLine asPParser negate star token , #endOfLine asPParser)
-		==> [ :tokens | 
-			(aText from: tokens second start to: tokens third stop)
-				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> expectedVersionMismatchOn: aText [
-	^ ('Error: Expected version' asPParser token
-		, #endOfLine asPParser negate star token , #endOfLine asPParser)
-		==> [ :tokens | 
-			(aText from: tokens first start to: tokens second stop)
-				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> failedCommandOn: aText [ 
-	^ ('Failed command' asPParser token
-		, #endOfLine asPParser negate star token , #endOfLine asPParser)
-		==> [ :tokens | 
-			(aText from: tokens first start to: tokens second stop)
-				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
-]
-
 { #category : #colors }
 JcConsoleStyler >> failureBackgroundColor [
 	^ BrGlamorousColors failureBackgroundColor alpha: 0.5
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> hardSpaceOn: aText [
-	"ASCII value 160"
-	^ ' ' asPParser plus token
-		==> [ :token | 
-				(aText from: token start to: token stop)
-					highlight: (self failureBackgroundColor alpha: 0.75) ]
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> httpErrorOn: aText [ 
-	^ ('Error: HTTP status code:' asPParser token), #endOfLine asPParser negate star token
-		==> [ :tokens | 
-			(aText from: tokens first start to: tokens last stop)
-				highlight: self errorBackgroundColor ]
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> illegalInstructionOn: aText [
-	^ (#startOfLine asPParser
-		, 'Illegal instruction' asPParser token
-		, #endOfLine asPParser negate star token , #endOfLine asPParser)
-		==> [ :tokens | 
-			(aText from: tokens second start to: tokens third stop)
-				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]
 
 { #category : #'text attributes' }
@@ -340,42 +182,6 @@ JcConsoleStyler >> isoTimeParser [
 ]
 
 { #category : #accessing }
-JcConsoleStyler >> jenkinsError: aText [
-	^ (#startOfLine asPParser
-		, '[ERROR]' asPParser token
-		, #endOfLine asPParser negate plus token
-		, #endOfLine asPParser)
-		==> [ :tokens | 
-			(aText from: tokens second start to: tokens third stop)
-				highlight: self errorBackgroundColor ]
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> makeErrorOn: aText [
-	^ (#startOfLine asPParser
-		, 'make: ***' asPParser token
-		, ' Error ' asPParser negate star 
-		, ' Error ' asPParser
-		, #digit asPParser plus token
-		, #endOfLine asPParser)
-		==> [ :tokens | 
-			(aText from: tokens second start to: tokens fifth stop)
-				highlight: self errorBackgroundColor ]
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> makefileFailedOn: aText [
-	^ (#startOfLine asPParser
-		, 'Makefile:' asPParser token
-		, ' failed' asPParser negate plus
-		, ' failed' asPParser token
-		, #endOfLine asPParser)
-		==> [ :tokens | 
-			(aText from: tokens second start to: tokens fourth stop)
-				highlight: self errorBackgroundColor ]
-]
-
-{ #category : #accessing }
 JcConsoleStyler >> metacelloNotificationFetched: aText [
 	^ (#startOfLine asPParser
 		, 'MetacelloNotification: Fetched' asPParser token
@@ -431,64 +237,28 @@ JcConsoleStyler >> newUndeclaredOn: aText [
 ]
 
 { #category : #accessing }
-JcConsoleStyler >> noGTVersion: aText [ 
-^ 'Failed to detect the version of the gtoolkit' asPParser token
-	==> [:token | (aText from: token start to: token stop)
-				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5)]
-]
-
-{ #category : #accessing }
 JcConsoleStyler >> patternsParser: aText [
-	^ (self failedCommandOn: aText) 
-		/ (self expectedVersionMismatchOn: aText)
-		/ (self noGTVersion: aText) 
-		/ (self vmErrorOn: aText)
-		/ (self brackettedErrorOn: aText) 
-		/ (self consoleErrorSequenceOn: aText)
+	^ (JcConsoleProblemsScanner new
+		==> [ :each | 
+			| tokens |
+			each isToken
+				ifTrue: [ each start -> each stop ]
+				ifFalse: [ tokens := each select: #isToken.
+					(aText from: tokens first start to: tokens last stop)
+						highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ] ])
 		/ (self metacelloNotificationFetched: aText)
 		/ (self metacelloNotificationLoaded: aText)
-		/ (self illegalInstructionOn: aText)
-		/ (self exceptionIllegalInstructionOn: aText)
-		/ (self exceptionAccessViolationOn: aText)
-		/ (self coreDumpedOn: aText)
-		/ (self exitOneParserOn: aText) 
 		/ (self executeActionFailureOn: aText)
 		/ (self newUndeclaredOn: aText) 
 		/ (self shadowedVariableOn: aText)
-		/ (self deprecationOn: aText) 
-		/ (self squareBracketAtStartOfLineErrorOn: aText)
-		/ (self classDependecesOn: aText)
+		/ (self deprecationOn: aText)
 		/ (self archiveCreatingInflatingExtractingOn: aText)
-		/ (self makeErrorOn: aText) 
-		/ (self makefileFailedOn: aText)
-		/ (self shellError: aText) 
-		/ (self jenkinsError: aText)
-		/ (self bashError: aText) 
-		/ (self postgresError: aText)
 		/ (self postgresNeutralLog: aText) 
 		/ (self neutralOn: aText)
-		/ (self anErrorTextError: aText) 
-		/ (self serverErrorTextError: aText)
-		/ (self exampleSuccessError: aText) 
-		/ (self exceptionTextError: aText)
-		/ (self exampleFailureError: aText)
+		/ (self exampleSuccessOn: aText) 
+		/ (self exceptionTextOn: aText)
+		/ (self exampleFailureOn: aText)
 		/ (self clonerBaselineSignalFaultParserOn: aText)
-		/ (self segmentationFaultParserOn: aText) 
-		/ (self hardSpaceOn: aText)
-		/ (self httpErrorOn: aText) 
-		/ (self errorOn: aText)
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> postgresError: aText [
-
-	^ self postgresTimeStampParser , ' #Error' asPParser token
-	  , #endOfLine asPParser negate plus token , #endOfLine asPParser
-	  ==> [ :tokens | 
-		  (aText
-			   from: tokens second first start
-			   to: (tokens at: tokens size - 1) stop) highlight:
-			  self errorBackgroundColor ]
 ]
 
 { #category : #accessing }
@@ -524,25 +294,6 @@ JcConsoleStyler >> privateStyle: aText [
 ]
 
 { #category : #accessing }
-JcConsoleStyler >> segmentationFaultParserOn: aText [
-	^ ('Segmentation fault' asPParser token
-		, #endOfLine asPParser negate star token , #endOfLine asPParser)
-		==> [ :tokens | 
-			(aText from: tokens first start to: tokens second stop)
-				foreground: self defaultForegroundColor;
-				highlight: self errorBackgroundColor ]
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> serverErrorTextError: aText [
-
-	^ ('server error' asPParser token)
-		==> [ :token | 
-			(aText from: token start to: token stop)
-				highlight: self errorBackgroundColor ]
-]
-
-{ #category : #accessing }
 JcConsoleStyler >> shadowedVariableOn: aText [
 	^ ('SystemNotification: ' asPParser token 
 		, '(' asPParser negate plus token
@@ -560,40 +311,7 @@ JcConsoleStyler >> shadowedVariableOn: aText [
 			self includeMethodCoderIn: aText from: tokens second start to: tokens second stop underline: self failureBackgroundColor ]
 ]
 
-{ #category : #accessing }
-JcConsoleStyler >> shellError: aText [
-	^ (#startOfLine asPParser
-		, '/bin/sh: ' asPParser token
-		, #digit asPParser plus
-		, ': ' asPParser
-		, #endOfLine asPParser negate plus token
-		, #endOfLine asPParser)
-		==> [ :tokens | 
-			(aText from: tokens second start to: tokens fifth stop)
-				highlight: self errorBackgroundColor ]
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> squareBracketAtStartOfLineErrorOn: aText [
-	^ ("#startOfLine asPParser , "'[' asPParser token
-		, #digit asPParser plus , 'm' asPParser
-		, #endOfLine asPParser negate star token , #endOfLine asPParser)
-		==> [ :tokens | 
-			(aText from: tokens first start to: tokens fourth stop)
-				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
-]
-
 { #category : #colors }
 JcConsoleStyler >> successBackgroundColor [
 	^ BrGlamorousColors successBackgroundColor alpha: 0.5
-]
-
-{ #category : #accessing }
-JcConsoleStyler >> vmErrorOn: aText [ 
-	^ (#startOfLine asPParser
-		, 'VM Error' asPParser token
-		, #endOfLine asPParser negate star token , #endOfLine asPParser)
-		==> [ :tokens | 
-			(aText from: tokens second start to: tokens third stop)
-				highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
 ]

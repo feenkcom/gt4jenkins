@@ -6,18 +6,18 @@ Class {
 
 { #category : #accessing }
 JcPipelineStep >> consoleRangesWithProblems [
-	| tokens log |
+	| tokens log interval |
 	log := self getLogText.
-	^ ((JcConsoleProblemsScanner new sea ==> #second) star
-			optimize parse: log)
-			collect: [ :each | 
-				each isToken
+	^ ((JcConsoleProblemsScanner new sea ==> #second) star optimize parse: log)
+		collect: [ :each | 
+			interval := each isToken
 					ifTrue: [ each start -> each stop ]
 					ifFalse: [ tokens := each select: #isToken.
-						JcConsoleRange new
-							startPosition: tokens first start;
-							stopPosition: tokens last stop;
-							logString: log ] ]
+						tokens first start -> tokens last stop ].
+			JcConsoleRange new
+				startPosition: interval key;
+				stopPosition: interval value;
+				logString: log ]
 ]
 
 { #category : #accessing }

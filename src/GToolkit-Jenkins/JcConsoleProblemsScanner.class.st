@@ -106,7 +106,7 @@ JcConsoleProblemsScanner >> exceptionIllegalInstruction [
 { #category : #'as yet unclassified' }
 JcConsoleProblemsScanner >> exceptionText [
 
-	^ ('exception' asPParser token)
+	^ (' exception' asPParser token)
 ]
 
 { #category : #'as yet unclassified' }

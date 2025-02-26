@@ -223,6 +223,14 @@ JcConsoleStyler >> neutralOn: aText [
 ]
 
 { #category : #accessing }
+JcConsoleStyler >> neutralOnPendingFuturePromiseState: aText [
+	^ ('Pending future promise state: ' asPParser token)
+		==> [ :tokens | 
+			(aText from: tokens start - 1 to: tokens stop)
+				highlight: self neutralBackgroundColor ]
+]
+
+{ #category : #accessing }
 JcConsoleStyler >> newUndeclaredOn: aText [
 	^ (#startOfLine asPParser 
 		, 'NewUndeclaredWarning: ' asPParser token
@@ -259,6 +267,7 @@ JcConsoleStyler >> patternsParser: aText [
 		/ (self exceptionTextOn: aText)
 		/ (self exampleFailureOn: aText)
 		/ (self clonerBaselineSignalFaultParserOn: aText)
+		/ (self neutralOnPendingFuturePromiseState: aText)
 ]
 
 { #category : #accessing }

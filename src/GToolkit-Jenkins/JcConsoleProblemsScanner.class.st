@@ -31,7 +31,9 @@ Class {
 		'segmentationFault',
 		'hardSpace',
 		'httpError',
-		'errorToEndOfLine'
+		'errorToEndOfLine',
+		'javaLangInterruptedException',
+		'sendingInterruptSignalToProcess'
 	],
 	#category : #'GToolkit-Jenkins'
 }
@@ -166,6 +168,12 @@ JcConsoleProblemsScanner >> isoTimeParser [
 ]
 
 { #category : #'as yet unclassified' }
+JcConsoleProblemsScanner >> javaLangInterruptedException [
+	^ ('java.lang.InterruptedException' asPParser token
+		, #endOfLine asPParser token)
+]
+
+{ #category : #'as yet unclassified' }
 JcConsoleProblemsScanner >> jenkinsError [
 	^ #startOfLine asPParser token , '[ERROR]' asPParser token
 		, #endOfLine asPParser negate plus token , #endOfLine asPParser token
@@ -213,6 +221,12 @@ JcConsoleProblemsScanner >> postgresTimeStampParser [
 JcConsoleProblemsScanner >> segmentationFault [
 	^ 'Segmentation fault' asPParser token , #endOfLine asPParser negate star token
 		, #endOfLine asPParser token
+]
+
+{ #category : #'as yet unclassified' }
+JcConsoleProblemsScanner >> sendingInterruptSignalToProcess [
+	^ ('Sending interrupt signal to process' asPParser token
+		, #endOfLine asPParser token)
 ]
 
 { #category : #'as yet unclassified' }
@@ -267,6 +281,8 @@ JcConsoleProblemsScanner >> start [
 	/ hardSpace
 	/ httpError
 	/ errorToEndOfLine
+	/ javaLangInterruptedException
+	/ sendingInterruptSignalToProcess
 ]
 
 { #category : #'as yet unclassified' }

@@ -99,7 +99,7 @@ JcQueuedBlueRun >> gtStagesMapFor: aView [
 						c ignored vertical alignTop.
 						c margin: (BlInsets top: -10 right: -10) ];
 					aptitude: BrGlamorousBadgeWithLabelAptitude +
-						(BrGlamorousWithDropdownAptitude
+						(BrGlamorousWithExplicitDropdownAptitude
 							handle: [ BrBadge new
 										label: (aStage failedTests size);
 										exact: 20 @ 20;

@@ -38,7 +38,10 @@ JcPipelineRun >> allTestsURL [
 
 { #category : #accessing }
 JcPipelineRun >> duration [
-	^ ((rawData at: 'durationInMillis')  asNumber milliSeconds roundTo: 1 second) humanReadablePrintString
+	^ (self isRunning
+		ifTrue: [ DateAndTime now - (DateAndTime fromString: (rawData at: 'startTime')) ]
+		ifFalse: [ (rawData at: 'durationInMillis') asNumber milliSeconds roundTo: 1 second ])
+		humanReadablePrintString
 ]
 
 { #category : #accessing }
@@ -169,6 +172,16 @@ JcPipelineRun >> gtTestsFor: aView [
 			text: [ :eachTest | eachTest fullStageName ]
 ]
 
+{ #category : #'as yet unclassified' }
+JcPipelineRun >> isFinished [
+	^ self state = 'FINISHED'
+]
+
+{ #category : #'as yet unclassified' }
+JcPipelineRun >> isRunning [
+	^ self state = 'RUNNING'
+]
+
 { #category : #accessing }
 JcPipelineRun >> nodes [
 	nodesDictionary
@@ -198,7 +211,9 @@ JcPipelineRun >> result [
 
 { #category : #accessing }
 JcPipelineRun >> resultBackgroundColor [
-	^ JcJenkinsClient backgroundColorForStatus: self result
+	^ self isFinished
+		ifTrue: [ JcJenkinsClient backgroundColorForResult: self result ]
+		ifFalse: [ JcJenkinsClient backgroundColorForState: self state ]
 ]
 
 { #category : #accessing }
@@ -208,6 +223,11 @@ JcPipelineRun >> startTime [
 	st := st asLocal.
 	^ String streamContents: [:s | st printSeparateDateAndTimeOn: s]
 	
+]
+
+{ #category : #accessing }
+JcPipelineRun >> state [
+	^ rawData at: 'state'
 ]
 
 { #category : #accessing }

@@ -184,12 +184,17 @@ JcQueuedBlueRun >> result [
 
 { #category : #accessing }
 JcQueuedBlueRun >> resultBackgroundColor [
-	^ JcJenkinsClient backgroundColorForStatus: self result
+	^ JcJenkinsClient backgroundColorForResult: self result
 ]
 
 { #category : #accessing }
 JcQueuedBlueRun >> startTime [
 	^ (rawData at: 'state')
+]
+
+{ #category : #accessing }
+JcQueuedBlueRun >> state [
+	^ rawData at: 'state'
 ]
 
 { #category : #accessing }

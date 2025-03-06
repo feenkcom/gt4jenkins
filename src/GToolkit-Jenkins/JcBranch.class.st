@@ -55,7 +55,7 @@ JcBranch >> result [
 
 { #category : #accessing }
 JcBranch >> resultBackgroundColor [
-	^ JcJenkinsClient backgroundColorForStatus: self result
+	^ JcJenkinsClient backgroundColorForResult: self result
 ]
 
 { #category : #accessing }

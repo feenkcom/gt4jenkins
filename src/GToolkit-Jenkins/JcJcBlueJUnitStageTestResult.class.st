@@ -1,12 +1,12 @@
 Class {
 	#name : #JcJcBlueJUnitStageTestResult,
 	#superclass : #JcModelElement,
-	#category : 'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanServiceEmbeddedRestJunit'
+	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanServiceEmbeddedRestJunit'
 }
 
 { #category : #accessing }
 JcJcBlueJUnitStageTestResult >> resultBackgroundColor [
-	^ JcJenkinsClient backgroundColorForStatus: self result
+	^ JcJenkinsClient backgroundColorForResult: self result
 ]
 
 { #category : #accessing }

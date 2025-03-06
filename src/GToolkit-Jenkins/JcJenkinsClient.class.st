@@ -11,12 +11,18 @@ Class {
 }
 
 { #category : #constants }
-JcJenkinsClient class >> backgroundColorForStatus: aString [
+JcJenkinsClient class >> backgroundColorForResult: aString [
 	aString = 'SUCCESS' ifTrue: [^ BrGlamorousColors successBackgroundColor].
 	aString = 'FAILURE' ifTrue: [^ BrGlamorousColors errorBackgroundColor].
 	aString = 'FAILED' ifTrue: [^ BrGlamorousColors errorBackgroundColor].
 	aString = 'UNSTABLE' ifTrue: [^ BrGlamorousColors failureBackgroundColor ].
 	^ BrGlamorousColors lightBorderColor.
+]
+
+{ #category : #constants }
+JcJenkinsClient class >> backgroundColorForState: aString [
+	aString = 'RUNNING' ifTrue: [ ^ BrGlamorousColors primaryBorderColor ].
+	^ BrGlamorousColors lightBorderColor
 ]
 
 { #category : #constants }

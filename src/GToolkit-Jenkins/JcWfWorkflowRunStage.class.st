@@ -1,7 +1,7 @@
 Class {
 	#name : #JcWfWorkflowRunStage,
 	#superclass : #JcModelElement,
-	#category : 'GToolkit-Jenkins-Generated-IoJenkinsWfapi'
+	#category : #'GToolkit-Jenkins-Generated-IoJenkinsWfapi'
 }
 
 { #category : #accessing }
@@ -16,5 +16,5 @@ JcWfWorkflowRunStage >> result [
 
 { #category : #accessing }
 JcWfWorkflowRunStage >> resultBackgroundColor [
-	^ JcJenkinsClient backgroundColorForStatus: self result
+	^ JcJenkinsClient backgroundColorForResult: self result
 ]

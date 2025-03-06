@@ -228,6 +228,11 @@ JcPipelineNode >> id [
 	^ rawData at:'id'
 ]
 
+{ #category : #accessing }
+JcPipelineNode >> isFinished [
+	^ self state = 'FINISHED'
+]
+
 { #category : #testing }
 JcPipelineNode >> isGtTestNode [
 	^ {'Test MacOS' . 'Test Linux' . 'Test Windows'} anySatisfy: [ :aLabel |
@@ -261,7 +266,14 @@ JcPipelineNode >> result [
 
 { #category : #accessing }
 JcPipelineNode >> resultBackgroundColor [
-	^ JcJenkinsClient backgroundColorForStatus: self result
+	^ self isFinished
+		ifTrue: [ JcJenkinsClient backgroundColorForResult: self result ]
+		ifFalse: [ JcJenkinsClient backgroundColorForState: self state ]
+]
+
+{ #category : #accessing }
+JcPipelineNode >> state [
+	^ rawData at: 'state'
 ]
 
 { #category : #accessing }

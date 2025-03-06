@@ -122,7 +122,7 @@ JcWorkflowRun >> result [
 
 { #category : #accessing }
 JcWorkflowRun >> resultBackgroundColor [
-	^ JcJenkinsClient backgroundColorForStatus: self result
+	^ JcJenkinsClient backgroundColorForResult: self result
 ]
 
 { #category : #accessing }

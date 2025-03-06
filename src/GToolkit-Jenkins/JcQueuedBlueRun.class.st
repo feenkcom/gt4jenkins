@@ -99,7 +99,7 @@ JcQueuedBlueRun >> gtStagesMapFor: aView [
 						c ignored vertical alignTop.
 						c margin: (BlInsets top: -10 right: -10) ];
 					aptitude: BrGlamorousBadgeWithLabelAptitude +
-						(BrGlamorousWithDropdownAptitude
+						(BrGlamorousWithExplicitDropdownAptitude
 							handle: [ BrBadge new
 										label: (aStage failedTests size);
 										exact: 20 @ 20;
@@ -184,12 +184,17 @@ JcQueuedBlueRun >> result [
 
 { #category : #accessing }
 JcQueuedBlueRun >> resultBackgroundColor [
-	^ JcJenkinsClient backgroundColorForStatus: self result
+	^ JcJenkinsClient backgroundColorForResult: self result
 ]
 
 { #category : #accessing }
 JcQueuedBlueRun >> startTime [
 	^ (rawData at: 'state')
+]
+
+{ #category : #accessing }
+JcQueuedBlueRun >> state [
+	^ rawData at: 'state'
 ]
 
 { #category : #accessing }

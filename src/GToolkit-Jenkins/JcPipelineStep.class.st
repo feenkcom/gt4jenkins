@@ -179,5 +179,5 @@ JcPipelineStep >> result [
 
 { #category : #accessing }
 JcPipelineStep >> resultBackgroundColor [
-	^ JcJenkinsClient backgroundColorForStatus: self result
+	^ JcJenkinsClient backgroundColorForResult: self result
 ]

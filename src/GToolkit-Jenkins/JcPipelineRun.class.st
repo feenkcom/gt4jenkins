@@ -39,7 +39,7 @@ JcPipelineRun >> allTestsURL [
 { #category : #accessing }
 JcPipelineRun >> artifacts [
 	| anUrl |
-	anUrl := self atPath: #(_links artifacts href).
+	anUrl := self artifactsUrl.
 	anUrl ifNil: [ ^ #() ].
 
 	^ JcLinksClient new
@@ -47,6 +47,11 @@ JcPipelineRun >> artifacts [
 		modelBuilder: theModelBuilder;
 		url: anUrl;
 		execute
+]
+
+{ #category : #accessing }
+JcPipelineRun >> artifactsUrl [
+	^ self atPath: #(_links artifacts href)
 ]
 
 { #category : #accessing }
@@ -60,6 +65,8 @@ JcPipelineRun >> duration [
 { #category : #'gt - extensions' }
 JcPipelineRun >> gtArtifactsFor: aView [
 	<gtView>
+	self artifactsUrl ifNil: [ ^ aView empty ].
+	
 	^ aView columnedList
 		title: 'Artifacts';
 		items: [ self artifacts ];

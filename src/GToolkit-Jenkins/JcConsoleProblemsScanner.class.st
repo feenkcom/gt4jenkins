@@ -33,7 +33,8 @@ Class {
 		'httpError',
 		'errorToEndOfLine',
 		'javaLangInterruptedException',
-		'sendingInterruptSignalToProcess'
+		'sendingInterruptSignalToProcess',
+		'gemstoneCompilerErrors'
 	],
 	#category : #'GToolkit-Jenkins'
 }
@@ -127,6 +128,11 @@ JcConsoleProblemsScanner >> failedCommandToEndOfLine [
 { #category : #'as yet unclassified' }
 JcConsoleProblemsScanner >> failedToDetectGTVersion [
 	^ 'Failed to detect the version of the gtoolkit' asPParser token
+]
+
+{ #category : #'as yet unclassified' }
+JcConsoleProblemsScanner >> gemstoneCompilerErrors [
+	^ 'GemStone Smalltalk Compiler Errors' asPParser token
 ]
 
 { #category : #'as yet unclassified' }
@@ -262,6 +268,7 @@ JcConsoleProblemsScanner >> start [
 	/ exceptionIllegalInstruction 
 	/ failedCommandToEndOfLine
 	/ failedToDetectGTVersion 
+	/ gemstoneCompilerErrors
 	/ illegalInstructionToEndOfLine 
 	/ vmError
 	/ exitOneParser

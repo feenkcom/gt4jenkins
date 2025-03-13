@@ -37,11 +37,44 @@ JcPipelineRun >> allTestsURL [
 ]
 
 { #category : #accessing }
+JcPipelineRun >> artifacts [
+	| anUrl |
+	anUrl := self artifactsUrl.
+	anUrl ifNil: [ ^ #() ].
+
+	^ JcLinksClient new
+		for: #artifacts;
+		modelBuilder: theModelBuilder;
+		url: anUrl;
+		execute
+]
+
+{ #category : #accessing }
+JcPipelineRun >> artifactsUrl [
+	^ self atPath: #(_links artifacts href)
+]
+
+{ #category : #accessing }
 JcPipelineRun >> duration [
 	^ (self isRunning
 		ifTrue: [ DateAndTime now - (DateAndTime fromString: (rawData at: 'startTime')) ]
 		ifFalse: [ (rawData at: 'durationInMillis') asNumber milliSeconds roundTo: 1 second ])
 		humanReadablePrintString
+]
+
+{ #category : #'gt - extensions' }
+JcPipelineRun >> gtArtifactsFor: aView [
+	<gtView>
+	self artifactsUrl ifNil: [ ^ aView empty ].
+	
+	^ aView columnedList
+		title: 'Artifacts';
+		items: [ self artifacts ];
+		column: 'Index'
+			text: [ :each :index | index asRopedText foreground: Color gray ]
+			width: 45;
+		column: 'Path' text: [ :each | each path ];
+		column: 'Downloadable' text: #downloadable width: 100
 ]
 
 { #category : #accessing }

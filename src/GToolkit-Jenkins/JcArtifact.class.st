@@ -21,6 +21,14 @@ JcArtifact >> downloadable [
 	^ self atPath: #(downloadable)
 ]
 
+{ #category : #'gt - extensions' }
+JcArtifact >> gtViewFor: aView [
+	<gtView>
+	^ aView textEditor
+		title: 'Contents';
+		text: [ self download ifNil: [ '' ] ]
+]
+
 { #category : #accessing }
 JcArtifact >> name [
 	^ self atPath: #(name)

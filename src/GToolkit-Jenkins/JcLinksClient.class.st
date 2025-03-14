@@ -26,7 +26,7 @@ JcLinksClient >> for: aLinksKey [
 JcLinksClient >> getRawData [
 	|jc rootUrl|
 	jc := modelBuilder jenkinsClient.
-	rootUrl := jc url asUrl scheme, '://', jc url asUrl host.
+	rootUrl := jc url asUrl scheme asString, '://', jc url asUrl host.
 	^ jc znclient get: ('' join:{rootUrl . url}).
 	
 ]

@@ -54,6 +54,18 @@ JcModelElement >> fullUrlClientFor: aUrl [
 ]
 
 { #category : #'gt - extensions' }
+JcModelElement >> gtLinksFor: aView [
+	<gtView>
+	rawData ifNil: [ ^ aView empty ].
+
+	^ aView list
+		title: 'Links';
+		priority: 90;
+		items: [ self links keys sorted ];
+		send: [ :item | (self linksClientFor: item) execute ]
+]
+
+{ #category : #'gt - extensions' }
 JcModelElement >> gtRawDataFor: aView [
 	<gtView>
 	rawData ifNil: [ ^ aView empty ].

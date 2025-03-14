@@ -6,14 +6,21 @@ Class {
 
 { #category : #actions }
 JcArtifact >> download [
+	"Answer the receiver's contents"
+	| jcClient znUrl |
+
 	self downloadable ifFalse: [ ^ nil ].
 	self url ifNil: [ ^ nil ].
 
-	^ JcLinksClient new
-		for: #artifact;
-		modelBuilder: theModelBuilder;
-		url: self url;
-		getRawData
+	jcClient := theModelBuilder jenkinsClient.
+	"Using basic authentication appears to be more reliable than the bearer / cookie"
+	znUrl := (jcClient getRootOfUrl, self url) asZnUrl.
+	znUrl
+		username: jcClient username;
+		password: jcClient password.
+	^ ZnClient new
+		url: znUrl;
+		get.
 ]
 
 { #category : #accessing }

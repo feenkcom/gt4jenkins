@@ -54,7 +54,7 @@ JcJenkinsClient >> blueOceanUrl [
 
 { #category : #accessing }
 JcJenkinsClient >> getRootOfUrl [
-	^ url asUrl scheme, '://', url asUrl host.
+	^ url asUrl scheme asString, '://', url asUrl host.
 ]
 
 { #category : #accessing }

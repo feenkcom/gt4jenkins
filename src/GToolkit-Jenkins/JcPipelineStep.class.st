@@ -129,6 +129,16 @@ JcPipelineStep >> gtDisplayOn: stream [
 	displayDescription ifNotNil: [stream nextPutAll: ('', displayDescription  )]
 ]
 
+{ #category : #jcpip }
+JcPipelineStep >> gtInspectInOsFor: anAction [
+	<gtAction>
+
+	^ anAction button
+		label: 'Console log';
+		icon: BrGlamorousVectorIcons inspect;
+		action: [ self inspectConsoleLogInOs ].
+]
+
 { #category : #'gt - extensions' }
 JcPipelineStep >> gtInstructionsFor: aView [
 	<gtView>
@@ -154,6 +164,20 @@ JcPipelineStep >> gtLogFor: aView [
 JcPipelineStep >> gtVmExecutionStatisticsReports [
 	^ GtVmExecutionStatisticsReportLogLoader
 		readFromString: self getLogText readStream contents
+]
+
+{ #category : #'gt - extensions' }
+JcPipelineStep >> inspectConsoleLogInOs [
+	"Save the receiver to a temporary file and inspect in the OS.
+	No attempt to delete the file is made, 
+	this assumes that the tmp directory is eventually cleaned up by the OS."
+	| tempFile |
+
+	tempFile := FileReference newTempFilePrefix: 'String_inspectInOs-' suffix: '.txt'.
+	tempFile writeStreamDo: [ :s | s nextPutAll: self getLogText ].
+	"While WebBrowser sounds browser specific, 
+	it just opens the file using the OS default application for the mime type."
+	WebBrowser openOn: tempFile fullName.
 ]
 
 { #category : #testing }

@@ -130,7 +130,7 @@ JcPipelineNode >> gtExamplesDurationFor: aView [
 					anElement background: aLeafContext model statusBackgroundColor.
 					anElement border: (BlBorder paint: Color white width: 1).
 					anElement
-						addAptitude: (BrGlamorousWithLabelTooltipAptitude new
+						addAptitude: (BrGlamorousWithExplicitTooltipAptitude
 								text: aLeafContext model shortClassAndMethodName , ', duration='
 										, aLeafContext model duration asString).
 					anElement

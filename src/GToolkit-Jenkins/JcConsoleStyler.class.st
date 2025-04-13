@@ -250,8 +250,9 @@ JcConsoleStyler >> patternsParser: aText [
 		==> [ :each | 
 			| tokens |
 			each isToken
-				ifTrue: [ each start -> each stop ]
-				ifFalse: [ tokens := each select: #isToken.
+				ifTrue: [ (aText from: each start to: each stop)
+						highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ]
+				ifFalse: [ tokens := each select: #isToken. 
 					(aText from: tokens first start to: tokens last stop)
 						highlight: (BrGlamorousColors errorBackgroundColor alpha: 0.5) ] ])
 		/ (self metacelloNotificationFetched: aText)

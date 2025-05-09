@@ -116,7 +116,7 @@ JcPipelineRun >> gtStagesMapFor: aView [
 			allNodes := self nodes.
 			mondrian nodes
 				shape: [ :aStage | 
-					| container statusColor labelContainer duration |
+					| container statusColor labelContainer duration failedExamples |
 					statusColor := aStage resultBackgroundColor.
 					container := BrHorizontalPane new
 							hExact: 200;
@@ -140,14 +140,24 @@ JcPipelineRun >> gtStagesMapFor: aView [
 					duration < 1 second
 						ifFalse: [ labelContainer
 								addChild: (BrLabel new
-										margin: (BlInsets top: 0 left: 5 bottom: 5 right: 5);
+										margin: (BlInsets
+												top: 0
+												left: 5
+												bottom: 5
+												right: 5);
 										text: duration gtHumanReadableString asRopedText;
-										aptitude: (BrGlamorousLabelAptitude new foreground: Color gray)) ].	"examplesSize := aStage allCasesSize.
-		examplesSize > 0
-			ifTrue: [ labelContainer
-					addChild: (BrLabel new
-							text: aStage allCasesSize asString , ' tests';
-							aptitude: (BrGlamorousLabelAptitude new foreground: Color gray)) ]."
+										aptitude: (BrGlamorousLabelAptitude new foreground: Color gray)) ].
+					failedExamples := aStage failedTests size.
+					failedExamples > 0
+						ifTrue: [ labelContainer
+								addChild: (BrLabel new
+										text: failedExamples asString , ' failed';
+										margin: (BlInsets
+												top: 0
+												left: 5
+												bottom: 5
+												right: 5);
+										aptitude: (BrGlamorousLabelAptitude new foreground: Color gray)) ].
 					container
 						addChild: (BrVerticalPane new
 								vMatchParent;

@@ -91,5 +91,5 @@ JcBlueJUnitStageTestCase >> status [
 
 { #category : #accessing }
 JcBlueJUnitStageTestCase >> statusBackgroundColor [
-	^ JcJenkinsClient backgroundColorForStatus: self status
+	^ JcJenkinsClient backgroundColorForResult: self status
 ]

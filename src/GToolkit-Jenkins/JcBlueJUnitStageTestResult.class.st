@@ -60,7 +60,7 @@ JcBlueJUnitStageTestResult >> status [
 
 { #category : #accessing }
 JcBlueJUnitStageTestResult >> statusBackgroundColor [
-	^ JcJenkinsClient backgroundColorForStatus: self status
+	^ JcJenkinsClient backgroundColorForResult: self status
 ]
 
 { #category : #accessing }

@@ -91,18 +91,25 @@ JcPipelineRun >> gtNodesFor: aView [
 		items: [ self nodes sort: [ :a :b | a id asInteger < b id asInteger ] ];
 		column: 'Status' translated
 			icon: [ :each | 
-					BlElement new
-						geometry: BlCircleGeometry new;
-						background: each resultBackgroundColor;
-						size: 10 @ 10 ]
+				BlElement new
+					geometry: BlCircleGeometry new;
+					background: each resultBackgroundColor;
+					size: 10 @ 10 ]
 			width: 50;
-		column: 'Result' translated text: [ :each | each result ] width: 70;
+		column: 'Result' translated
+			text: [ :each | each result ]
+			width: 70;
 		column: 'Item' translated
 			text: [ :each | each gtDisplayText ]
 			width: 200;
 		column: 'Duration' translated
 			text: [ :each | each duration ]
-			width: 200
+			width: 200;
+		actionButtonIcon: BrGlamorousVectorIcons refresh
+			tooltip: 'Update'
+			action: [ :aButton :aTab | 
+				self refreshNodesDictionary.
+				aTab viewContentElement phlow update ]
 ]
 
 { #category : #accessing }
@@ -184,7 +191,12 @@ JcPipelineRun >> gtStagesMapFor: aView [
 				nodesAlignment: GtGradTreeNodesCenterAlignment new;
 				levelDistance: 20;
 				nodeDistance: 20.
-			mondrian ]
+			mondrian ];
+		actionButtonIcon: BrGlamorousVectorIcons refresh
+			tooltip: 'Update'
+			action: [ :aButton :aTab | 
+				self refreshNodesDictionary.
+				aTab viewContentElement phlow update ]
 ]
 
 { #category : #accessing }
@@ -227,13 +239,7 @@ JcPipelineRun >> isRunning [
 
 { #category : #accessing }
 JcPipelineRun >> nodes [
-	nodesDictionary
-		ifNil: [ nodesDictionary := Dictionary new.
-			(self linksClientFor: 'nodes') execute
-				do: [ :each | 
-					nodesDictionary 
-						at: each id 
-						put: (each parentRun: self) ] ].
+	nodesDictionary ifNil: [ self refreshNodesDictionary ].
 	^ nodesDictionary values
 ]
 
@@ -245,6 +251,13 @@ JcPipelineRun >> nodesDictionary [
 { #category : #accessing }
 JcPipelineRun >> parentBranchName: aBranchName [
 	parentBranchName := aBranchName
+]
+
+{ #category : #accessing }
+JcPipelineRun >> refreshNodesDictionary [
+	nodesDictionary := Dictionary new.
+	^ (self linksClientFor: 'nodes') execute
+		do: [ :each | nodesDictionary at: each id put: (each parentRun: self) ]
 ]
 
 { #category : #accessing }

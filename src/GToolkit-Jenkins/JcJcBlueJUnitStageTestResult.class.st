@@ -22,5 +22,5 @@ JcJcBlueJUnitStageTestResult >> status [
 
 { #category : #accessing }
 JcJcBlueJUnitStageTestResult >> statusBackgroundColor [
-	^ JcJenkinsClient backgroundColorForStatus: self status
+	^ JcJenkinsClient backgroundColorForTestStatus: self status
 ]

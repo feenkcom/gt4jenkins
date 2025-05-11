@@ -91,18 +91,25 @@ JcPipelineRun >> gtNodesFor: aView [
 		items: [ self nodes sort: [ :a :b | a id asInteger < b id asInteger ] ];
 		column: 'Status' translated
 			icon: [ :each | 
-					BlElement new
-						geometry: BlCircleGeometry new;
-						background: each resultBackgroundColor;
-						size: 10 @ 10 ]
+				BlElement new
+					geometry: BlCircleGeometry new;
+					background: each resultBackgroundColor;
+					size: 10 @ 10 ]
 			width: 50;
-		column: 'Result' translated text: [ :each | each result ] width: 70;
+		column: 'Result' translated
+			text: [ :each | each result ]
+			width: 70;
 		column: 'Item' translated
 			text: [ :each | each gtDisplayText ]
 			width: 200;
 		column: 'Duration' translated
 			text: [ :each | each duration ]
-			width: 200
+			width: 200;
+		actionButtonIcon: BrGlamorousVectorIcons refresh
+			tooltip: 'Update'
+			action: [ :aButton :aTab | 
+				self refreshNodesDictionary.
+				aTab viewContentElement phlow update ]
 ]
 
 { #category : #accessing }
@@ -116,7 +123,7 @@ JcPipelineRun >> gtStagesMapFor: aView [
 			allNodes := self nodes.
 			mondrian nodes
 				shape: [ :aStage | 
-					| container statusColor labelContainer duration |
+					| container statusColor labelContainer duration failedExamples |
 					statusColor := aStage resultBackgroundColor.
 					container := BrHorizontalPane new
 							hExact: 200;
@@ -140,14 +147,24 @@ JcPipelineRun >> gtStagesMapFor: aView [
 					duration < 1 second
 						ifFalse: [ labelContainer
 								addChild: (BrLabel new
-										margin: (BlInsets top: 0 left: 5 bottom: 5 right: 5);
+										margin: (BlInsets
+												top: 0
+												left: 5
+												bottom: 5
+												right: 5);
 										text: duration gtHumanReadableString asRopedText;
-										aptitude: (BrGlamorousLabelAptitude new foreground: Color gray)) ].	"examplesSize := aStage allCasesSize.
-		examplesSize > 0
-			ifTrue: [ labelContainer
-					addChild: (BrLabel new
-							text: aStage allCasesSize asString , ' tests';
-							aptitude: (BrGlamorousLabelAptitude new foreground: Color gray)) ]."
+										aptitude: (BrGlamorousLabelAptitude new foreground: Color gray)) ].
+					failedExamples := aStage failedTests size.
+					failedExamples > 0
+						ifTrue: [ labelContainer
+								addChild: (BrLabel new
+										text: failedExamples asString , ' failed';
+										margin: (BlInsets
+												top: 0
+												left: 5
+												bottom: 5
+												right: 5);
+										aptitude: (BrGlamorousLabelAptitude new foreground: Color gray)) ].
 					container
 						addChild: (BrVerticalPane new
 								vMatchParent;
@@ -174,7 +191,12 @@ JcPipelineRun >> gtStagesMapFor: aView [
 				nodesAlignment: GtGradTreeNodesCenterAlignment new;
 				levelDistance: 20;
 				nodeDistance: 20.
-			mondrian ]
+			mondrian ];
+		actionButtonIcon: BrGlamorousVectorIcons refresh
+			tooltip: 'Update'
+			action: [ :aButton :aTab | 
+				self refreshNodesDictionary.
+				aTab viewContentElement phlow update ]
 ]
 
 { #category : #accessing }
@@ -217,13 +239,7 @@ JcPipelineRun >> isRunning [
 
 { #category : #accessing }
 JcPipelineRun >> nodes [
-	nodesDictionary
-		ifNil: [ nodesDictionary := Dictionary new.
-			(self linksClientFor: 'nodes') execute
-				do: [ :each | 
-					nodesDictionary 
-						at: each id 
-						put: (each parentRun: self) ] ].
+	nodesDictionary ifNil: [ self refreshNodesDictionary ].
 	^ nodesDictionary values
 ]
 
@@ -235,6 +251,13 @@ JcPipelineRun >> nodesDictionary [
 { #category : #accessing }
 JcPipelineRun >> parentBranchName: aBranchName [
 	parentBranchName := aBranchName
+]
+
+{ #category : #accessing }
+JcPipelineRun >> refreshNodesDictionary [
+	nodesDictionary := Dictionary new.
+	^ (self linksClientFor: 'nodes') execute
+		do: [ :each | nodesDictionary at: each id put: (each parentRun: self) ]
 ]
 
 { #category : #accessing }

@@ -12,6 +12,18 @@ JcBranch >> duration [
 	^ (( rawData at: 'latestRun') at: 'durationInMillis') asNumber milliSeconds
 ]
 
+{ #category : #'as yet unclassified' }
+JcBranch >> gtBranchSummaryFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'Summary';
+		priority: 100;
+		items: [ self summary ];
+		column: 'Property' text: #key;
+		column: 'Value' text: #value;
+		send: #value
+]
+
 { #category : #accessing }
 JcBranch >> gtDisplayOn: stream [
 	stream nextPutAll: (rawData at: 'name')
@@ -69,4 +81,21 @@ JcBranch >> runs [
 { #category : #accessing }
 JcBranch >> startTime [
 	^ (DateAndTime fromString: (( rawData at: 'latestRun') at: 'startTime')) asLocal
+]
+
+{ #category : #'as yet unclassified' }
+JcBranch >> summary [
+	^ {'Branch Name' -> (self rawData at: 'name').
+		'Primary'
+			-> (((self rawData at: 'branch') at: 'isPrimary' ifAbsent: [ false ])
+					ifTrue: [ 'Yes' ]
+					ifFalse: [ 'No' ]).
+		'URL' -> ((self rawData at: 'branch') at: 'url' ifAbsent: [ '' ]).
+		'Full Name' -> (self rawData at: 'fullName').
+		'Organization' -> (self rawData at: 'organization').
+		'Weather Score' -> (self rawData at: 'weatherScore') asString.
+		'Latest Run ID'
+			-> ((self rawData at: 'latestRun' ifAbsent: [ nil ])
+					ifNotNil: [ :lr | lr at: 'id' ifAbsent: [ '' ] ]
+					ifNil: [ '' ])}
 ]

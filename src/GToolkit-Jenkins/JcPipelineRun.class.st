@@ -199,6 +199,18 @@ JcPipelineRun >> gtStagesMapFor: aView [
 				aTab viewContentElement phlow update ]
 ]
 
+{ #category : #'as yet unclassified' }
+JcPipelineRun >> gtSummaryViewFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'Summary';
+		priority: 50;
+		items: [ self summary ];
+		column: 'Property' text: #key;
+		column: 'Value' text: #value;
+		send: #value
+]
+
 { #category : #accessing }
 JcPipelineRun >> gtTestsFor: aView [
 	<gtView>
@@ -284,6 +296,20 @@ JcPipelineRun >> startTime [
 { #category : #accessing }
 JcPipelineRun >> state [
 	^ rawData at: 'state'
+]
+
+{ #category : #'as yet unclassified' }
+JcPipelineRun >> summary [
+	^ {'Pipeline' -> (rawData at: 'pipeline' ifAbsent: [ '' ]).
+		'Branch'
+			-> ((rawData at: 'branch' ifAbsent: [ Dictionary new ]) at: 'url' ifAbsent: [ '' ]).
+		'Run Id' -> (rawData at: 'id' ifAbsent: [ '' ]).
+		'Commit Id' -> (rawData at: 'commitId' ifAbsent: [ '' ]).
+		'Status' -> (rawData at: 'state' ifAbsent: [ '' ]).
+		'Result' -> (rawData at: 'result' ifAbsent: [ '' ]).
+		'Start Time' -> (rawData at: 'startTime' ifAbsent: [ '' ]).
+		'Estimated Duration (s)'
+			-> ((rawData at: 'estimatedDurationInMillis' ifAbsent: [ 0 ]) // 1000)}
 ]
 
 { #category : #accessing }

@@ -35,7 +35,9 @@ Class {
 		'javaLangInterruptedException',
 		'sendingInterruptSignalToProcess',
 		'gemstoneCompilerErrors',
-		'gemstoneErrorCompiling'
+		'gemstoneErrorCompiling',
+		'exitMinusOneParser',
+		'remoteCallFailed'
 	],
 	#category : #'GToolkit-Jenkins'
 }
@@ -111,6 +113,13 @@ JcConsoleProblemsScanner >> exceptionIllegalInstruction [
 JcConsoleProblemsScanner >> exceptionText [
 
 	^ (' exception' asPParser token)
+]
+
+{ #category : #'as yet unclassified' }
+JcConsoleProblemsScanner >> exitMinusOneParser [
+	^ (#startOfLine asPParser token
+		, 'script returned exit code -1' asPParser token
+		, #endOfLine asPParser negate star token , #endOfLine asPParser token)
 ]
 
 { #category : #'as yet unclassified' }
@@ -230,6 +239,13 @@ JcConsoleProblemsScanner >> postgresTimeStampParser [
 ]
 
 { #category : #'as yet unclassified' }
+JcConsoleProblemsScanner >> remoteCallFailed [
+	"self new remoteCallFailed parse: 'Remote call on m1_mac failed'"
+
+	^ 'Remote call on ' asPParser token, String space asPParser negate plus token, ' failed' asPParser token
+]
+
+{ #category : #'as yet unclassified' }
 JcConsoleProblemsScanner >> segmentationFault [
 	^ 'Segmentation fault' asPParser token , #endOfLine asPParser negate star token
 		, #endOfLine asPParser token
@@ -297,6 +313,8 @@ JcConsoleProblemsScanner >> start [
 	/ errorToEndOfLine
 	/ javaLangInterruptedException
 	/ sendingInterruptSignalToProcess
+	/ exitMinusOneParser
+	/ remoteCallFailed
 ]
 
 { #category : #'as yet unclassified' }

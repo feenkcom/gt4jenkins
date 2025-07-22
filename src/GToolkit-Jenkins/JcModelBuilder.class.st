@@ -5,7 +5,7 @@ Class {
 		'packageOrganizer',
 		'jenkinsClient'
 	],
-	#category : 'GToolkit-Jenkins'
+	#category : #'GToolkit-Jenkins'
 }
 
 { #category : #accessing }
@@ -31,7 +31,11 @@ JcModelBuilder >> ensurePackage: aFullPackageName [
 
 { #category : #accessing }
 JcModelBuilder >> initialize [ 
-	packageOrganizer := RPackageOrganizer new.
+	super initialize.
+	
+	packageOrganizer := self 
+		forPharo12: [ PackageOrganizer new ] 
+		forPharo11AndPharo10: [ RPackageOrganizer new ]
 ]
 
 { #category : #accessing }

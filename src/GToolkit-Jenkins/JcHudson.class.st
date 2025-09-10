@@ -1,7 +1,7 @@
 Class {
 	#name : #JcHudson,
 	#superclass : #JcModelElement,
-	#category : 'GToolkit-Jenkins-Generated-HudsonModel'
+	#category : #'GToolkit-Jenkins-Generated-HudsonModel'
 }
 
 { #category : #accessing }

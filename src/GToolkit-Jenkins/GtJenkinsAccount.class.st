@@ -6,7 +6,7 @@ Class {
 		'token',
 		'jenkinsUrl'
 	],
-	#category : 'GToolkit-Jenkins-Login'
+	#category : #'GToolkit-Jenkins-Login'
 }
 
 { #category : #accessing }

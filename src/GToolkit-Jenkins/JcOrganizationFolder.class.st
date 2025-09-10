@@ -1,7 +1,7 @@
 Class {
 	#name : #JcOrganizationFolder,
 	#superclass : #JcModelElement,
-	#category : 'GToolkit-Jenkins-Generated-JenkinsBranch'
+	#category : #'GToolkit-Jenkins-Generated-JenkinsBranch'
 }
 
 { #category : #accessing }

@@ -1,5 +1,5 @@
 Class {
 	#name : #JcFreeStylePipeline,
 	#superclass : #JcModelElement,
-	#category : 'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanServiceEmbeddedRest'
+	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanServiceEmbeddedRest'
 }

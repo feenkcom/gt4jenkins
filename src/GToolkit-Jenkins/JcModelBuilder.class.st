@@ -34,8 +34,8 @@ JcModelBuilder >> initialize [
 	super initialize.
 	
 	packageOrganizer := self 
-		forPharo12: [ PackageOrganizer new ] 
-		forPharo11AndPharo10: [ RPackageOrganizer new ]
+		forPharo12AndNewer: [ PackageOrganizer new ] 
+		forPharo11: [ RPackageOrganizer new ]
 ]
 
 { #category : #accessing }

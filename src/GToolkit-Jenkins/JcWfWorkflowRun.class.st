@@ -1,7 +1,7 @@
 Class {
 	#name : #JcWfWorkflowRun,
 	#superclass : #JcModelElement,
-	#category : 'GToolkit-Jenkins-Generated-IoJenkinsWfapi'
+	#category : #'GToolkit-Jenkins-Generated-IoJenkinsWfapi'
 }
 
 { #category : #accessing }

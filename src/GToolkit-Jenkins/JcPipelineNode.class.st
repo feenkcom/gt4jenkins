@@ -196,8 +196,8 @@ JcPipelineNode >> gtStepsFor: aView [
 								vExact: 400;
 								hMatchParent;
 								aptitude: BrGlamorousWithVerticalResizerAptitude;
-								addChild: ((eachItem gtLogFor: GtPhlowEmptyView new) asElement constraintsDo: [:c | c vertical matchParent. c horizontal matchParent ]) ] ]
-			weight: 1
+								addChild: ((eachItem gtLogFor: GtPhlowEmptyView new) asElement constraintsDo: [:c | c vertical matchParent. c horizontal matchParent ]) ] ] weight: 1;
+		column: 'Duration' text: [:each | each duration ] width: 100
 ]
 
 { #category : #testing }

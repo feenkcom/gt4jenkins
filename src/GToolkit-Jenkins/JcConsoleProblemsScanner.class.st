@@ -37,7 +37,8 @@ Class {
 		'gemstoneCompilerErrors',
 		'gemstoneErrorCompiling',
 		'exitMinusOneParser',
-		'remoteCallFailed'
+		'remoteCallFailed',
+		'errorColon'
 	],
 	#category : #'GToolkit-Jenkins'
 }
@@ -73,6 +74,12 @@ JcConsoleProblemsScanner >> consoleErrorSequence [
 JcConsoleProblemsScanner >> coreDumped [
 	^ #startOfLine asPParser , 'Aborted (core dumped)' asPParser token
 		, #endOfLine asPParser negate star token , #endOfLine asPParser
+]
+
+{ #category : #'as yet unclassified' }
+JcConsoleProblemsScanner >> errorColon [
+	^ ('ERROR:' asPParser / 'error:' asPParser) token , #endOfLine asPParser negate star token
+		, #endOfLine asPParser
 ]
 
 { #category : #'as yet unclassified' }
@@ -283,6 +290,7 @@ JcConsoleProblemsScanner >> squareBracketAtStartOfLineError [
 { #category : #'as yet unclassified' }
 JcConsoleProblemsScanner >> start [
 	^ brackettedError 
+	/ errorColon
 	/ consoleErrorSequence 
 	/ coreDumped
 	/ errorExpectedVersionMismatch 

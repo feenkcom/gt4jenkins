@@ -6,7 +6,7 @@ Class {
 		'url',
 		'modelBuilder'
 	],
-	#category : 'GToolkit-Jenkins'
+	#category : #'GToolkit-Jenkins'
 }
 
 { #category : #accessing }

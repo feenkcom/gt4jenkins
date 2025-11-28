@@ -26,7 +26,7 @@ JcModelBuilder >> ensureClass: aFullClassName [
 
 { #category : #accessing }
 JcModelBuilder >> ensurePackage: aFullPackageName [
-	^ packageOrganizer ensureExistAndRegisterPackageNamed: aFullPackageName
+	^ packageOrganizer ensurePackage: aFullPackageName
 ]
 
 { #category : #accessing }

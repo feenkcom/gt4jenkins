@@ -1,8 +1,16 @@
 Class {
 	#name : #JcArtifact,
 	#superclass : #JcModelElement,
+	#instVars : [
+		'data'
+	],
 	#category : #'GToolkit-Jenkins-Generated-IoJenkinsBlueoceanServiceEmbeddedRest'
 }
+
+{ #category : #actions }
+JcArtifact >> data [
+	^ data ifNil: [ data := self download ]
+]
 
 { #category : #actions }
 JcArtifact >> download [
@@ -25,7 +33,8 @@ JcArtifact >> download [
 
 { #category : #accessing }
 JcArtifact >> downloadable [
-	^ self atPath: #(downloadable)
+	<return: #Boolean>
+	^ (self atPath: #(downloadable)) ifNil: [ false ]
 ]
 
 { #category : #'gt - extensions' }
@@ -33,7 +42,24 @@ JcArtifact >> gtViewFor: aView [
 	<gtView>
 	^ aView textEditor
 		title: 'Contents';
-		text: [ self download ifNil: [ '' ] ]
+		text: [ self data ifNil: [ '' ] ]
+]
+
+{ #category : #'gt - extensions' }
+JcArtifact >> gtViewPharoDebugLogFor: aView [
+	<gtView>
+	self isPharoDebugLog ifFalse: [ ^ aView empty ].
+
+	^ aView forward
+		title: 'Entries';
+		priority: 10;
+		object: [ GtPharoDebugLogInspector new string: self data ];
+		view: #gtViewEntriesFor:
+]
+
+{ #category : #testing }
+JcArtifact >> isPharoDebugLog [
+	^ self name = 'PharoDebug.log'
 ]
 
 { #category : #accessing }

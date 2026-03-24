@@ -33,9 +33,7 @@ JcModelBuilder >> ensurePackage: aFullPackageName [
 JcModelBuilder >> initialize [ 
 	super initialize.
 	
-	packageOrganizer := self 
-		forPharo12AndNewer: [ PackageOrganizer new ] 
-		forPharo11: [ RPackageOrganizer new ]
+	packageOrganizer := PackageOrganizer new
 ]
 
 { #category : #accessing }

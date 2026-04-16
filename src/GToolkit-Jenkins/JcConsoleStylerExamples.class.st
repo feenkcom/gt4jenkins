@@ -15,7 +15,7 @@ JcConsoleStylerExamples >> postgresError [
 2021-09-18 14:16:14 118 [P3] 4529 #Close' asRopedText.
 	^ self
 		style: aText
-		attributeClass: BlTextHighlightAttribute
+		attributeClass: BlTextUnderlayAttribute
 		from: 59
 		to: 174
 ]
@@ -50,7 +50,7 @@ script returned exit code 139
 ' asRopedText.
 	^ self
 		  style: aText
-		  attributeClass: BlTextHighlightAttribute
+		  attributeClass: BlTextUnderlayAttribute
 		  from: 41
 		  to: 72
 ]

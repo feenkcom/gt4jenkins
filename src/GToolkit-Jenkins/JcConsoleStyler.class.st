@@ -130,21 +130,19 @@ JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop [
 	aSubText := aText from: aStart to: aStop.
 	aCompiledMethod := self compiledMethodFrom: aSubText asString.
 	aCompiledMethod ifNil: [ ^ self ].
-	aSubText attribute:
-		(BrGlamorousTriangleExpanderTextAttributeV2 new
-				stencil: [ | editorElement coder |
-							coder := GtPharoMethodCoder forMethod: aCompiledMethod.
-							coder subscribeToSystem.
-							editorElement := (coder asCoderViewModel expanded: true) asElement.
-							editorElement
-								border: (BlBorder paint: Color veryLightGray width: 1).
-							editorElement
-								margin:
-									(BlInsets
-										top: 3
-										right: 10
-										bottom: 10
-										left: 10) ])
+	aSubText
+		expanded: false
+		adornment: [ | editorElement coder |
+			coder := GtPharoMethodCoder forMethod: aCompiledMethod.
+			coder subscribeToSystem.
+			editorElement := (coder asCoderViewModel expanded: true) asElement.
+			editorElement border: (BlBorder paint: Color veryLightGray width: 1).
+			editorElement
+				margin: (BlInsets
+						top: 3
+						right: 10
+						bottom: 10
+						left: 10) ]
 ]
 
 { #category : #'text attributes' }

@@ -131,10 +131,8 @@ JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop [
 	aCompiledMethod := self compiledMethodFrom: aSubText asString.
 	aCompiledMethod ifNil: [ ^ self ].
 	aSubText attribute:
-		(BrGlamorousTriangleExpanderTextAttribute new
-				attributesCreatingBlock: [ BrTextAdornmentDynamicAttribute new
-						beAppend;
-						stencil: [ | editorElement coder |
+		(BrGlamorousTriangleExpanderTextAttributeV2 new
+				stencil: [ | editorElement coder |
 							coder := GtPharoMethodCoder forMethod: aCompiledMethod.
 							coder subscribeToSystem.
 							editorElement := (coder asCoderViewModel expanded: true) asElement.
@@ -146,7 +144,7 @@ JcConsoleStyler >> includeMethodCoderIn: aText from: aStart to: aStop [
 										top: 3
 										right: 10
 										bottom: 10
-										left: 10) ] ])
+										left: 10) ])
 ]
 
 { #category : #'text attributes' }

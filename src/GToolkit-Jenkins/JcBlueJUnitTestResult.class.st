@@ -8,7 +8,7 @@ Class {
 JcBlueJUnitTestResult class >> testStatusParser [
 	|method fullClass p|
 	method := #word asPParser plus flatten.
-	fullClass := (#word asPParser plus flatten separatedBy: '.' asPParser) ==> #last.
+	fullClass := (#word asPParser plus flatten separatedBy: '.' asPParser trim) ==> #last.
 	p := ((
 		((method, (Character value: 8211) asPParser trim, fullClass) ==> [:t | t third -> t first])
 		/ 

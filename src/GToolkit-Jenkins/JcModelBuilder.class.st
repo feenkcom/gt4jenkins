@@ -54,7 +54,7 @@ JcModelBuilder >> modelFrom: aDictionary [
 	theArray := OrderedCollection new.
 	aDictionary collect: [:each | theArray add: (self modelFrom: each)].
 	^ theArray].
-	aDictionary at: #'_class' ifPresent: [:fullClassName | 
+	aDictionary at: '_class' ifPresent: [:fullClassName | 
 		theClass := (self ensureClass: fullClassName).
 		theObject := theClass new.
 		theObject modelBuilder: self.

@@ -62,7 +62,8 @@ JcCoreClientExamples >> completedBuild [
 		responseProvider: [ :url | 
 			(url queryAt: 'tree') = 'name,fullName,url'
 				ifTrue: [ '{"name":"demo","fullName":"demo","url":"https://jenkins.example/ci/job/demo/"}' ]
-				ifFalse: [ (url queryAt: 'tree') = 'builds[number,url]'
+				ifFalse: [ (url queryAt: 'tree')
+						= 'builds[number,url,result,building,duration,timestamp]'
 						ifTrue: [ '{"builds":[{"number":7,"url":"https://jenkins.example/ci/job/demo/7/"}]}' ]
 						ifFalse: [ '{"number":7,"building":false,"result":"SUCCESS","timestamp":1730000000000,"duration":1200,"url":"https://jenkins.example/ci/job/demo/7/"}' ] ] ].
 	run := (client jobAtNames: #('demo')) builds first.
@@ -121,7 +122,9 @@ JcCoreClientExamples >> jenkinsJobUrl [
 				equals: #('job' 'feenkcom' 'job' 'gtoolkit' 'job' 'main' 'api' 'json').
 			(url queryAt: 'tree') = 'name,fullName,url'
 				ifTrue: [ '{"name":"main","fullName":"feenkcom/gtoolkit/main","url":"https://jenkins.feenk.com/job/feenkcom/job/gtoolkit/job/main/"}' ]
-				ifFalse: [ self assert: (url queryAt: 'tree') equals: 'builds[number,url]'.
+				ifFalse: [ self
+						assert: (url queryAt: 'tree')
+						equals: 'builds[number,url,result,building,duration,timestamp]'.
 					'{"builds":[{"number":7,"url":"https://jenkins.feenk.com/job/feenkcom/job/gtoolkit/job/main/7/"}]}' ] ].
 	job := client
 			jobAtUrl: 'https://jenkins.feenk.com/job/feenkcom/job/gtoolkit/job/main/'.

@@ -50,8 +50,19 @@ JcCoreJob >> gtBuildsFor: aView [
 		question: 'Which builds belong to this Jenkins job?';
 		priority: 20;
 		items: [ self builds ];
-		column: 'Number' text: [ :run | run number asString ];
-		column: 'URL' text: [ :run | run url ifNil: [ '' ] ] weight: 8;
+		column: 'Status'
+			icon: [ :run | run statusIcon ]
+			width: 50;
+		column: 'Result'
+			text: [ :run | run resultText ]
+			width: 70;
+		column: 'Item'
+			text: [ :run | run gtDisplayText ]
+			width: 50;
+		column: 'Duration'
+			text: [ :run | run durationText ]
+			width: 200;
+		column: 'Start time' text: [ :run | run startTimeText ];
 		actionButtonIcon: BrGlamorousVectorIcons refresh
 			id: #'jenkins--update-builds'
 			tooltip: 'Update builds list from the server'
@@ -119,7 +130,7 @@ JcCoreJob >> refreshBuilds [
 	| response freshBuilds |
 	response := client
 			getJsonAtPathSegments: (client jobPathSegmentsForNames: names)
-			tree: 'builds[number,url]'.
+			tree: 'builds[number,url,result,building,duration,timestamp]'.
 	freshBuilds := (response at: 'builds' ifAbsent: [ #() ])
 			collect: [ :build | 
 				JcCoreRun

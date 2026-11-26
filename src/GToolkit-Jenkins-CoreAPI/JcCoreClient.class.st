@@ -31,6 +31,31 @@ JcCoreClient >> baseUrl: aString [
 	jobs := nil
 ]
 
+{ #category : #accessing }
+JcCoreClient >> getJsonAtPathSegments: pathSegments [
+	| url json |
+	baseUrl ifNil: [ self error: 'Set the Jenkins controller URL first' ].
+	url := baseUrl copy.
+	pathSegments do: [ :segment | url addPathSegment: segment asString ].
+	json := responseProvider
+			ifNil: [ httpClient get: url asString ]
+			ifNotNil: [ responseProvider value: url ].
+	^ NeoJSONReader fromString: json
+]
+
+{ #category : #accessing }
+JcCoreClient >> getJsonAtPathSegments: pathSegments query: queryParameters [
+	| url json |
+	baseUrl ifNil: [ self error: 'Set the Jenkins controller URL first' ].
+	url := baseUrl copy.
+	pathSegments do: [ :segment | url addPathSegment: segment asString ].
+	queryParameters keysAndValuesDo: [ :key :value | url queryAt: key put: value ].
+	json := responseProvider
+			ifNil: [ httpClient get: url asString ]
+			ifNotNil: [ responseProvider value: url ].
+	^ NeoJSONReader fromString: json
+]
+
 { #category : #requests }
 JcCoreClient >> getJsonAtPathSegments: pathSegments tree: aTree [
 	| url json |

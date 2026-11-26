@@ -8,6 +8,206 @@ Class {
 }
 
 { #category : #examples }
+JcCoreModelExamples >> buildHistoryWithStatuses [
+	<gtExample>
+	| client job runs requests |
+	requests := 0.
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example'.
+	client
+		responseProvider: [ :url | 
+			requests := requests + 1.
+			self
+				assert: (url queryAt: 'tree')
+				equals: 'builds[number,url,result,building,duration,timestamp]'.
+			'{"builds":[{"number":7,"url":"https://jenkins.example/job/demo/7/","result":"SUCCESS","building":false,"duration":1200,"timestamp":1730000000000},{"number":8,"url":"https://jenkins.example/job/demo/8/","result":null,"building":true,"duration":0,"timestamp":1730000001000},{"number":9,"url":"https://jenkins.example/job/demo/9/","result":null,"building":false,"duration":null,"timestamp":null}]}' ].
+	job := JcCoreJob
+			client: client
+			names: #('demo')
+			rawData: (Dictionary new
+					at: 'name' put: 'demo';
+					yourself).
+	runs := job builds.
+	self assert: runs size equals: 3.
+	self assert: runs first resultText equals: 'SUCCESS'.
+	self assert: runs first durationText isEmpty not.
+	self assert: runs first startTimeText isEmpty not.
+	self assert: runs second resultText equals: 'RUNNING'.
+	self assert: runs second resultBackgroundColor notNil.
+	self assert: runs third resultText equals: 'UNKNOWN'.
+	self assert: runs third durationText equals: ''.
+	self assert: runs third startTimeText equals: ''.
+	self assert: requests equals: 1.
+	^ job
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> buildStatusIconScripter [
+	<gtExample>
+	<return: #BlScripter>
+	| scripter run |
+	run := self buildHistoryWithStatuses builds first.
+	scripter := BlScripter new.
+	scripter element: run statusIcon.
+	self assert: (scripter element isKindOf: BlElement).
+	^ scripter
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> buildWithArtifacts [
+	<gtExample>
+	| client run requests artifact |
+	requests := 0.
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example/ci/'.
+	client
+		responseProvider: [ :url | 
+			requests := requests + 1.
+			self
+				assert: url asString
+				equals: 'https://jenkins.example/ci/job/folder/job/feature%2Fx/7/api/json?tree=artifacts%5BfileName,relativePath%5D'.
+			'{"artifacts":[{"fileName":"build output.txt","relativePath":"logs/build output.txt"}]}' ].
+	run := JcCoreRun
+			client: client
+			jobNames: #('folder' 'feature/x')
+			rawData: (Dictionary new
+					at: 'number' put: 7;
+					yourself).
+	artifact := run artifacts first.
+	self assert: (artifact at: 'fileName') equals: 'build output.txt'.
+	self
+		assert: (run artifactUrlFor: artifact)
+		equals: 'https://jenkins.example/ci/job/folder/job/feature%2Fx/7/artifact/logs/build%20output.txt'.
+	self assert: run artifacts size equals: 1.
+	self assert: requests equals: 1.
+	^ run
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> buildWithProblematicTests [
+	<gtExample>
+	| client run requests |
+	requests := 0.
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example/'.
+	client
+		responseProvider: [ :url | 
+			requests := requests + 1.
+			self
+				assert: (url asString includesSubstring: '/job/main/7/testReport/api/json?tree=').
+			'{"suites":[{"cases":[{"className":"Demo","name":"passes","status":"PASSED"},{"className":"Demo","name":"fails","status":"FAILED"},{"className":"Demo","name":"skips","status":"SKIPPED"}]}]}' ].
+	run := JcCoreRun
+			client: client
+			jobNames: #('main')
+			rawData: (Dictionary new
+					at: 'number' put: 7;
+					at: 'building' put: false;
+					yourself).
+	self assert: run problematicTests size equals: 2.
+	self assert: (run problematicTests first at: 'name') equals: 'fails'.
+	self assert: requests equals: 1.
+	^ run
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> buildWithStages [
+	<gtExample>
+	| client run requests |
+	requests := 0.
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example/ci/'.
+	client
+		responseProvider: [ :url | 
+			requests := requests + 1.
+			self
+				assert: url asString
+				equals: 'https://jenkins.example/ci/job/folder/job/main/7/wfapi/describe'.
+			'{"stages":[{"id":"1","name":"Build","status":"SUCCESS","durationMillis":1200},{"id":"2","name":"Test","status":"FAILED","durationMillis":3000}]}' ].
+	run := JcCoreRun
+			client: client
+			jobNames: #('folder' 'main')
+			rawData: (Dictionary new
+					at: 'number' put: 7;
+					yourself).
+	self assert: run stages size equals: 2.
+	self assert: (run stages last at: 'status') equals: 'FAILED'.
+	self assert: requests equals: 1.
+	self assert: run refreshStages size equals: 2.
+	self assert: requests equals: 2.
+	^ run
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> buildWithoutArtifacts [
+	<gtExample>
+	| client run requests |
+	requests := 0.
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example'.
+	client
+		responseProvider: [ :url | 
+			requests := requests + 1.
+			'{}' ].
+	run := JcCoreRun
+			client: client
+			jobNames: #('demo')
+			rawData: (Dictionary new
+					at: 'number' put: 8;
+					yourself).
+	self assert: run artifacts isEmpty.
+	self assert: run artifacts isEmpty.
+	self assert: requests equals: 1.
+	^ run
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> buildWithoutStages [
+	<gtExample>
+	| client run requests |
+	requests := 0.
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example/'.
+	client
+		responseProvider: [ :url | 
+			requests := requests + 1.
+			(ZnHttpUnsuccessful response: (ZnResponse notFound: url)) signal ].
+	run := JcCoreRun
+			client: client
+			jobNames: #('freestyle')
+			rawData: (Dictionary new
+					at: 'number' put: 1;
+					yourself).
+	self assert: run stages isEmpty.
+	self assert: run stages isEmpty.
+	self assert: requests equals: 1.
+	^ run
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> buildWithoutTestReport [
+	<gtExample>
+	| client run requests |
+	requests := 0.
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example/'.
+	client
+		responseProvider: [ :url | 
+			requests := requests + 1.
+			(ZnHttpUnsuccessful response: (ZnResponse notFound: url)) signal ].
+	run := JcCoreRun
+			client: client
+			jobNames: #('main')
+			rawData: (Dictionary new
+					at: 'number' put: 7;
+					at: 'building' put: false;
+					yourself).
+	self assert: run problematicTests isEmpty.
+	self assert: run problematicTests isEmpty.
+	self assert: requests equals: 1.
+	^ run
+]
+
+{ #category : #examples }
 JcCoreModelExamples >> buildsCachedUntilRefresh [
 	<gtExample>
 	| client job requests initial refreshed |
@@ -16,7 +216,9 @@ JcCoreModelExamples >> buildsCachedUntilRefresh [
 	client baseUrl: 'https://jenkins.example'.
 	client
 		responseProvider: [ :url | 
-			self assert: (url queryAt: 'tree') equals: 'builds[number,url]'.
+			self
+				assert: (url queryAt: 'tree')
+				equals: 'builds[number,url,result,building,duration,timestamp]'.
 			requests := requests + 1.
 			requests = 1
 				ifTrue: [ '{"builds":[{"number":7,"url":"https://jenkins.example/job/demo/7/"}]}' ]
@@ -192,7 +394,7 @@ JcCoreModelExamples >> jobWithBuildsView [
 		responseProvider: [ :url | 
 			self
 				assert: url asString
-				equals: 'https://jenkins.example/ci/job/demo/api/json?tree=builds%5Bnumber,url%5D'.
+				equals: 'https://jenkins.example/ci/job/demo/api/json?tree=builds%5Bnumber,url,result,building,duration,timestamp%5D'.
 			'{"builds":[{"number":7,"url":"https://jenkins.example/ci/job/demo/7/"}]}' ].
 	job := JcCoreJob
 			client: client
@@ -295,7 +497,7 @@ JcCoreModelExamples >> runningBuildLoadsDetailsOnce [
 			requestCount = 1
 				ifTrue: [ self
 						assert: url asString
-						equals: 'https://jenkins.example/ci/job/folder/job/feature%2Fx/api/json?tree=builds%5Bnumber,url%5D'.
+						equals: 'https://jenkins.example/ci/job/folder/job/feature%2Fx/api/json?tree=builds%5Bnumber,url,result,building,duration,timestamp%5D'.
 					'{"builds":[{"number":42,"url":"https://jenkins.example/ci/job/folder/job/feature%2Fx/42/"}]}' ]
 				ifFalse: [ self
 						assert: url asString
@@ -314,5 +516,28 @@ JcCoreModelExamples >> runningBuildLoadsDetailsOnce [
 	self assert: run duration equals: nil.
 	self assert: run timestamp equals: 1730000000000.
 	self assert: requestCount equals: 2.
+	^ run
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> runningBuildWithoutTestReport [
+	<gtExample>
+	| client run requests |
+	requests := 0.
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example/'.
+	client
+		responseProvider: [ :url | 
+			requests := requests + 1.
+			self error: 'Unexpected request' ].
+	run := JcCoreRun
+			client: client
+			jobNames: #('main')
+			rawData: (Dictionary new
+					at: 'number' put: 7;
+					at: 'building' put: true;
+					yourself).
+	self assert: run problematicTests isEmpty.
+	self assert: requests equals: 0.
 	^ run
 ]

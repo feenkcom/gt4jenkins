@@ -7,7 +7,8 @@ Class {
 	#instVars : [
 		'baseUrl',
 		'httpClient',
-		'responseProvider'
+		'responseProvider',
+		'jobs'
 	],
 	#category : #'GToolkit-Jenkins-CoreAPI'
 }
@@ -26,7 +27,8 @@ JcCoreClient >> baseUrl: aString [
 				and: [ parsedUrl hasQuery not and: [ parsedUrl fragment isNil ] ] ])
 		ifFalse: [ self
 				error: 'Expected a Jenkins HTTP(S) controller URL without a query or fragment' ].
-	baseUrl := parsedUrl
+	baseUrl := parsedUrl.
+	jobs := nil
 ]
 
 { #category : #requests }
@@ -47,9 +49,14 @@ JcCoreClient >> gtJobsFor: aView [
 		question: 'Which jobs are available on this Jenkins controller?';
 		priority: 20;
 		items: [ self jobs ];
-		"children: [ :each | each jobs];"
 		column: 'Name' text: [ :job | job name ];
-		column: 'Full name' text: [ :job | job fullName ifNil: [ job name ] ]
+		column: 'Full name' text: [ :job | job fullName ifNil: [ job name ] ];
+		actionButtonIcon: BrGlamorousVectorIcons refresh
+			id: #'jenkins--update-jobs'
+			tooltip: 'Update jobs list from the server'
+			action: [ :aButton :aTab | 
+				self refreshJobs.
+				aTab phlow fireViewUpdateWish ]	"children: [ :each | each jobs ];"
 ]
 
 { #category : #initialization }
@@ -73,6 +80,42 @@ JcCoreClient >> jobAtNames: jobNames [
 		rawData: response
 ]
 
+{ #category : #jobs }
+JcCoreClient >> jobAtUrl: aJobUrl [
+	| parsedUrl controllerSegments urlSegments jobSegments names |
+	baseUrl ifNil: [ self error: 'Set the Jenkins controller URL first' ].
+	parsedUrl := ZnUrl fromString: aJobUrl.
+	(parsedUrl scheme = baseUrl scheme
+		and: [ parsedUrl host notNil
+				and: [ parsedUrl host asLowercase = baseUrl host asLowercase
+						and: [ parsedUrl portOrDefault = baseUrl portOrDefault
+								and: [ parsedUrl hasQuery not and: [ parsedUrl fragment isNil ] ] ] ] ])
+		ifFalse: [ self error: 'Job URL must belong to the configured Jenkins controller' ].
+	controllerSegments := baseUrl pathSegments asArray.
+	(controllerSegments notEmpty and: [ controllerSegments last = $/ ])
+		ifTrue: [ controllerSegments := controllerSegments allButLast ].
+	urlSegments := parsedUrl pathSegments asArray.
+	(urlSegments notEmpty and: [ urlSegments last = $/ ])
+		ifTrue: [ urlSegments := urlSegments allButLast ].
+	(urlSegments size >= controllerSegments size
+		and: [ (urlSegments first: controllerSegments size) = controllerSegments ])
+		ifFalse: [ self error: 'Job URL is outside the Jenkins controller context path' ].
+	jobSegments := urlSegments allButFirst: controllerSegments size.
+	(jobSegments isEmpty or: [ jobSegments size odd ])
+		ifTrue: [ self error: 'Expected a Jenkins job URL with job/name segments' ].
+	names := OrderedCollection new.
+	1
+		to: jobSegments size
+		by: 2
+		do: [ :index | 
+			((jobSegments at: index) = 'job'
+				and: [ (jobSegments at: index + 1) isString
+						and: [ (jobSegments at: index + 1) isEmpty not ] ])
+				ifFalse: [ self error: 'Expected a Jenkins job URL with job/name segments' ].
+			names add: (jobSegments at: index + 1) ].
+	^ self jobAtNames: names
+]
+
 { #category : #urls }
 JcCoreClient >> jobPathSegmentsForNames: jobNames [
 	| segments |
@@ -87,19 +130,27 @@ JcCoreClient >> jobPathSegmentsForNames: jobNames [
 
 { #category : #jobs }
 JcCoreClient >> jobs [
-	| response |
+	^ jobs ifNil: [ self refreshJobs ]
+]
+
+{ #category : #jobs }
+JcCoreClient >> refreshJobs [
+	| response freshJobs |
 	response := self getJsonAtPathSegments: #() tree: 'jobs[name,fullName,url]'.
-	^ (response at: 'jobs' ifAbsent: [ #() ])
-		collect: [ :job | 
-			JcCoreJob
-				client: self
-				names: {job at: 'name'}
-				rawData: job ]
+	freshJobs := (response at: 'jobs' ifAbsent: [ #() ])
+			collect: [ :job | 
+				JcCoreJob
+					client: self
+					names: {job at: 'name'}
+					rawData: job ].
+	jobs := freshJobs.
+	^ jobs
 ]
 
 { #category : #testing }
 JcCoreClient >> responseProvider: aBlock [
-	responseProvider := aBlock
+	responseProvider := aBlock.
+	jobs := nil
 ]
 
 { #category : #urls }
@@ -116,5 +167,6 @@ JcCoreClient >> urlForPathSegments: pathSegments tree: aTree [
 
 { #category : #authentication }
 JcCoreClient >> username: aUsername token: aToken [
-	httpClient username: aUsername password: aToken
+	httpClient username: aUsername password: aToken.
+	jobs := nil
 ]

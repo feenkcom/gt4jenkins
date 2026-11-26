@@ -32,6 +32,17 @@ JcCoreClient >> baseUrl: aString [
 ]
 
 { #category : #accessing }
+JcCoreClient >> getAtPathSegments: pathSegments [
+	| url |
+	baseUrl ifNil: [ self error: 'Set the Jenkins controller URL first' ].
+	url := baseUrl copy.
+	pathSegments do: [ :segment | url addPathSegment: segment asString ].
+	^ responseProvider
+		ifNil: [ httpClient get: url asString ]
+		ifNotNil: [ responseProvider value: url ]
+]
+
+{ #category : #accessing }
 JcCoreClient >> getJsonAtPathSegments: pathSegments [
 	| url json |
 	baseUrl ifNil: [ self error: 'Set the Jenkins controller URL first' ].

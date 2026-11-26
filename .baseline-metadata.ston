@@ -1,3 +1,5 @@
 {
-	"repositories" : { }
+	"repositories" : {
+		"github://svenvc/NeoJSON/repository" : "11e274dd96dc9636cab90929937b7cd09719de7c"
+	}
 }

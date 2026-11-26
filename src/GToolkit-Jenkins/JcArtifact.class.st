@@ -38,6 +38,18 @@ JcArtifact >> downloadable [
 ]
 
 { #category : #'gt - extensions' }
+JcArtifact >> gtFigureFor: aView [
+	<gtView>
+	self isImage ifFalse: [ ^ aView empty ].
+
+	^ aView forward
+		title: 'Figure';
+		priority: 10;
+		object: [ self data ];
+		view: #gtFigureFor:
+]
+
+{ #category : #'gt - extensions' }
 JcArtifact >> gtViewFor: aView [
 	<gtView>
 	^ aView textEditor
@@ -55,6 +67,12 @@ JcArtifact >> gtViewPharoDebugLogFor: aView [
 		priority: 10;
 		object: [ GtPharoDebugLogInspector new string: self data ];
 		view: #gtViewEntriesFor:
+]
+
+{ #category : #testing }
+JcArtifact >> isImage [
+	^ ImageReadWriter allTypicalFileExtensions
+		includes: ($. split: self name) last asLowercase
 ]
 
 { #category : #testing }

@@ -863,6 +863,31 @@ JcCoreModelExamples >> runningBuildWithoutTestReport [
 	^ run
 ]
 
+{ #category : #builds }
+JcCoreModelExamples >> runningColors [
+	<gtExample>
+	<return: #JcCoreRun>
+	| run running stage step |
+	run := self runningBuildDurationSinceStart.
+	running := BrGlamorousColors primaryBorderColor.
+	self assert: run resultBackgroundColor equals: running.
+	stage := JcCoreStage
+			run: run
+			parent: nil
+			rawData: (Dictionary new
+					at: 'name' put: 'Test';
+					at: 'state' put: 'running';
+					yourself).
+	self assert: stage resultBackgroundColor equals: running.
+	self
+		assert: (JcCoreStage backgroundColorForStatus: 'IN_PROGRESS')
+		equals: running.
+	self
+		assert: (JcCoreStage backgroundColorForStatus: 'SUCCESS')
+		equals: BrGlamorousColors successBackgroundColor.
+	^ run
+]
+
 { #category : #examples }
 JcCoreModelExamples >> runningStageTree [
 	<gtExample>

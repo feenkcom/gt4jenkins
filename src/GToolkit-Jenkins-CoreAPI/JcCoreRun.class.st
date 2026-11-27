@@ -457,7 +457,7 @@ JcCoreRun >> result [
 
 { #category : #accessing }
 JcCoreRun >> resultBackgroundColor [
-	self building = true ifTrue: [ ^ BrGlamorousColors neutralBackgroundColor ].
+	self building = true ifTrue: [ ^ BrGlamorousColors primaryBorderColor ].
 	self result = 'SUCCESS' ifTrue: [ ^ BrGlamorousColors successBackgroundColor ].
 	self result = 'FAILURE' ifTrue: [ ^ BrGlamorousColors errorBackgroundColor ].
 	self result = 'UNSTABLE' ifTrue: [ ^ BrGlamorousColors failureBackgroundColor ].

@@ -20,6 +20,8 @@ JcCoreStage class >> backgroundColorForStatus: aStatus [
 	(#('FAILURE' 'FAILED' 'ERROR') includes: aStatus)
 		ifTrue: [ ^ BrGlamorousColors errorBackgroundColor ].
 	aStatus = 'UNSTABLE' ifTrue: [ ^ BrGlamorousColors failureBackgroundColor ].
+	(#('RUNNING' 'IN_PROGRESS') includes: aStatus)
+		ifTrue: [ ^ BrGlamorousColors primaryBorderColor ].
 	^ BrGlamorousColors neutralBackgroundColor
 ]
 

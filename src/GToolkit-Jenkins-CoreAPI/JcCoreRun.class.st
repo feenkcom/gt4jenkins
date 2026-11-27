@@ -14,7 +14,8 @@ Class {
 		'rootStages',
 		'stageTreeAvailable',
 		'problematicTests',
-		'suiteDetails'
+		'suiteDetails',
+		'testSuites'
 	],
 	#category : #'GToolkit-Jenkins-CoreAPI'
 }
@@ -94,6 +95,7 @@ JcCoreRun >> client: aClient jobNames: names rawData: aDictionary [
 	stageTreeAvailable := nil.
 	problematicTests := nil.
 	suiteDetails := nil.
+	testSuites := nil.
 	^ self
 ]
 
@@ -307,6 +309,27 @@ JcCoreRun >> gtStagesMapFor: aView [
 				tab viewContentElement phlow update ]
 ]
 
+{ #category : #views }
+JcCoreRun >> gtTestSuitesFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'Test suites';
+		question: 'Which JUnit suites ran in this build and which were the slowest?';
+		priority: 52;
+		items: [ self testSuites
+				asSortedCollection: [ :a :b | a durationSeconds >= b durationSeconds ] ];
+		column: 'Suite' text: [ :suite | suite name ];
+		column: 'Stage' text: [ :suite | suite stageName ];
+		column: 'Duration'
+			text: [ :suite | suite durationText ]
+			width: 100;
+		actionButtonIcon: BrGlamorousVectorIcons refresh
+			tooltip: 'Refresh suites'
+			action: [ :button :tab | 
+				self refreshTestSuites.
+				tab viewContentElement phlow update ]
+]
+
 { #category : #accessing }
 JcCoreRun >> hasStageTree [
 	self rootStages.
@@ -404,6 +427,29 @@ JcCoreRun >> refreshStages [
 	^ stages
 ]
 
+{ #category : #'test report' }
+JcCoreRun >> refreshTestSuites [
+	| path response |
+	self building = true
+		ifTrue: [ testSuites := #().
+			^ testSuites ].
+	path := client jobPathSegmentsForNames: jobNames.
+	path add: self number asString.
+	path add: 'testReport'.
+	path add: 'api'.
+	path add: 'json'.
+	response := [ client
+			getJsonAtPathSegments: path
+			query: (Dictionary new
+					at: 'tree' put: 'suites[name,nodeId,enclosingBlockNames,duration]';
+					yourself) ]
+			on: ZnHttpUnsuccessful
+			do: [ :error | error response code = 404 ifTrue: [ Dictionary new ] ifFalse: [ error pass ] ].
+	testSuites := ((response at: 'suites' ifAbsent: [ #() ])
+			collect: [ :each | JcCoreTestSuite run: self rawData: each ]) asArray.
+	^ testSuites
+]
+
 { #category : #accessing }
 JcCoreRun >> result [
 	^ rawData at: 'result' ifAbsent: [ self detailAt: 'result' ]
@@ -499,6 +545,17 @@ JcCoreRun >> statusIcon [
 		geometry: BlCircleGeometry new;
 		background: self resultBackgroundColor;
 		size: 10 @ 10
+]
+
+{ #category : #'test report' }
+JcCoreRun >> testSuites [
+	^ testSuites ifNil: [ self refreshTestSuites ]
+]
+
+{ #category : #'test report' }
+JcCoreRun >> testSuitesForStage: aStage [
+	^ self testSuites
+		select: [ :each | aStage includesStageNames: each stageNames ]
 ]
 
 { #category : #accessing }

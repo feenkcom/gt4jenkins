@@ -408,6 +408,60 @@ JcCoreModelExamples >> emptyFolderJobsStayCached [
 	^ folder
 ]
 
+{ #category : #'test cases' }
+JcCoreModelExamples >> executedSuiteViews [
+	<gtExample>
+	<return: #JcCoreRun>
+	| run stage runView stageView |
+	run := self executedSuitesPerStage.
+	stage := run stages detect: [ :each | each name = 'Test Mac' ].
+	runView := run gtTestSuitesFor: GtPhlowView empty.
+	self assert: runView title equals: 'Test suites'.
+	self assert: (runView asElementDo: [ :each | each ]) notNil.
+	stageView := stage gtTestSuitesFor: GtPhlowView empty.
+	self assert: stageView title equals: 'Executed suites'.
+	self assert: (stageView asElementDo: [ :each | each ]) notNil.
+	^ run
+]
+
+{ #category : #'test cases' }
+JcCoreModelExamples >> executedSuitesPerStage [
+	<gtExample>
+	<return: #JcCoreRun>
+	| log run suites mac linux |
+	log := OrderedCollection new.
+	run := self reportRunLoggingTo: log.
+	suites := run testSuites.
+	self assert: suites size equals: 3.
+	self assert: (suites collect: #class) asSet asArray equals: {JcCoreTestSuite}.
+	self assert: suites first stageName equals: 'Test Mac'.
+	self assert: suites first durationSeconds equals: 2.5.
+	self assert: suites first nodeId equals: '9'.
+	self assert: run testSuites == suites.
+	self
+		assert: (log select: [ :each | each includesSubstring: 'duration' ]) size
+		equals: 1.
+	mac := run stages detect: [ :each | each name = 'Test Mac' ].
+	linux := run stages detect: [ :each | each name = 'Test Linux' ].
+	self assert: mac testSuites size equals: 2.
+	self assert: mac testDurationSeconds equals: 9.5.
+	self assert: linux testSuites size equals: 1.
+	self assert: linux testSuites first name equals: 'Pkg-Other'.
+	self assert: linux testSuites first durationText isString.
+	^ run
+]
+
+{ #category : #'test cases' }
+JcCoreModelExamples >> executedSuitesWithoutReport [
+	<gtExample>
+	<return: #JcCoreRun>
+	| run |
+	run := self buildWithoutTestReport.
+	self assert: run testSuites isEmpty.
+	self assert: run testSuites isEmpty.
+	^ run
+]
+
 { #category : #examples }
 JcCoreModelExamples >> folderCachesAreIndependent [
 	<gtExample>
@@ -679,7 +733,7 @@ JcCoreModelExamples >> reinitializeJobClearsBuilds [
 	^ job
 ]
 
-{ #category : #fixtures }
+{ #category : #support }
 JcCoreModelExamples >> reportRunLoggingTo: aLog [
 	| client |
 	client := JcCoreClient new.
@@ -693,11 +747,11 @@ JcCoreModelExamples >> reportRunLoggingTo: aLog [
 			(text includesSubstring: '/stages/tree')
 				ifTrue: [ '{"status":"ok","data":{"complete":true,"stages":[{"id":"2","name":"Parallel","type":"PARALLEL_BLOCK","state":"success","children":[{"id":"3","name":"Agent (arm-x)","type":"PARALLEL","state":"failed","children":[{"id":"4","name":"Test Mac","state":"failed","children":[]}]},{"id":"5","name":"Agent (lin-x)","type":"PARALLEL","state":"success","children":[{"id":"6","name":"Test Linux","state":"success","children":[]}]}]}]}}' ]
 				ifFalse: [ (text includesSubstring: '/testReport/')
-						ifTrue: [ (tree includesSubstring: 'errorDetails')
+						ifTrue: [ (tree includesSubstring: 'duration') ifTrue: [ '{"suites":[{"name":"Pkg-DemoExamples","nodeId":"9","enclosingBlockNames":["Test Mac","Agent (arm-x)"],"duration":2.5},{"name":"Pkg-Other","nodeId":"10","enclosingBlockNames":["Test Linux","Agent (lin-x)"],"duration":10.0},{"name":"Pkg-Slow","nodeId":"11","enclosingBlockNames":["Test Mac","Agent (arm-x)"],"duration":7.0}]}' ] ifFalse: [ (tree includesSubstring: 'errorDetails')
 								ifTrue: [ (tree endsWith: '{0,1}')
 										ifTrue: [ '{"suites":[{"cases":[{"className":"Pkg.Examples.DemoExamples","name":"passes","status":"PASSED","errorDetails":null,"errorStackTrace":null,"skippedMessage":null},{"className":"Pkg.Examples.DemoExamples","name":"fails","status":"FAILED","errorDetails":"boom","errorStackTrace":"DemoExamples>>fails","skippedMessage":null},{"className":"Pkg.Examples.DemoExamples","name":"skips","status":"SKIPPED","errorDetails":null,"errorStackTrace":null,"skippedMessage":"not now"}]}]}' ]
 										ifFalse: [ '{"suites":[{"cases":[{"className":"Pkg.Examples.DemoExamples","name":"fails","status":"FAILED","errorDetails":"boom on linux","errorStackTrace":"stack","skippedMessage":null}]}]}' ] ]
-								ifFalse: [ '{"suites":[{"name":"Pkg-DemoExamples","nodeId":"9","enclosingBlockNames":["Test Mac","Agent (arm-x)"],"cases":[{"className":"Pkg.Examples.DemoExamples","name":"passes","status":"PASSED"},{"className":"Pkg.Examples.DemoExamples","name":"fails","status":"FAILED"},{"className":"Pkg.Examples.DemoExamples","name":"skips","status":"SKIPPED"}]},{"name":"Pkg-DemoExamples","nodeId":"10","enclosingBlockNames":["Test Linux","Agent (lin-x)"],"cases":[{"className":"Pkg.Examples.DemoExamples","name":"fails","status":"FAILED"}]}]}' ] ]
+								ifFalse: [ '{"suites":[{"name":"Pkg-DemoExamples","nodeId":"9","enclosingBlockNames":["Test Mac","Agent (arm-x)"],"cases":[{"className":"Pkg.Examples.DemoExamples","name":"passes","status":"PASSED"},{"className":"Pkg.Examples.DemoExamples","name":"fails","status":"FAILED"},{"className":"Pkg.Examples.DemoExamples","name":"skips","status":"SKIPPED"}]},{"name":"Pkg-DemoExamples","nodeId":"10","enclosingBlockNames":["Test Linux","Agent (lin-x)"],"cases":[{"className":"Pkg.Examples.DemoExamples","name":"fails","status":"FAILED"}]}]}' ] ] ]
 						ifFalse: [ '{"artifacts":[{"fileName":"step.png","relativePath":"artifacts/arm-x/gt-examples/pharo-local/scripter/DemoExamples/fails/step.png"},{"fileName":"step-events-all.txt","relativePath":"artifacts/arm-x/gt-examples/pharo-local/scripter/DemoExamples/fails/step-events-all.txt"},{"fileName":"step.png","relativePath":"artifacts/lin-x/gt-examples/pharo-local/scripter/DemoExamples/fails/step.png"},{"fileName":"step.png","relativePath":"artifacts/arm-x/gt-examples/pharo-local/scripter/OtherExamples/other/step.png"},{"fileName":"PharoDebug.log","relativePath":"artifacts/arm-x/gt-examples/PharoDebug.log"}]}' ] ] ].
 	^ JcCoreRun
 		client: client

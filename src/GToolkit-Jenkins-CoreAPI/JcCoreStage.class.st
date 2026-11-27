@@ -4,6 +4,8 @@
 Class {
 	#name : #JcCoreStage,
 	#superclass : #Object,
+	#traits : 'TJcCoreWebResource',
+	#classTraits : 'TJcCoreWebResource classTrait',
 	#instVars : [
 		'run',
 		'parent',
@@ -381,4 +383,9 @@ JcCoreStage >> testSuites [
 { #category : #accessing }
 JcCoreStage >> type [
 	^ rawData at: 'type' ifAbsent: [ 'STAGE' ]
+]
+
+{ #category : #urls }
+JcCoreStage >> webUrl [
+	^ run webUrl , 'execution/node/' , self id asString , '/'
 ]

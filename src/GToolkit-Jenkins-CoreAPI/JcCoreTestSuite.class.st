@@ -1,6 +1,8 @@
 Class {
 	#name : #JcCoreTestSuite,
 	#superclass : #Object,
+	#traits : 'TJcCoreWebResource',
+	#classTraits : 'TJcCoreWebResource classTrait',
 	#instVars : [
 		'run',
 		'rawData'
@@ -72,4 +74,10 @@ JcCoreTestSuite >> stageName [
 { #category : #accessing }
 JcCoreTestSuite >> stageNames [
 	^ (rawData at: 'enclosingBlockNames' ifAbsent: [ nil ]) ifNil: [ #() ]
+]
+
+{ #category : #urls }
+JcCoreTestSuite >> webUrl [
+	^ self nodeId
+		ifNotNil: [ :id | run webUrl , 'execution/node/' , id asString , '/' ]
 ]

@@ -4,6 +4,8 @@
 Class {
 	#name : #JcCoreJob,
 	#superclass : #Object,
+	#traits : 'TJcCoreWebResource',
+	#classTraits : 'TJcCoreWebResource classTrait',
 	#instVars : [
 		'client',
 		'names',
@@ -21,6 +23,14 @@ JcCoreJob class >> client: aClient names: jobNames rawData: aDictionary [
 		client: aClient
 		names: jobNames
 		rawData: aDictionary
+]
+
+{ #category : #testing }
+JcCoreJob class >> isRunIdentifier: aString [
+	^ (aString isString
+		and: [ aString notEmpty and: [ aString allSatisfy: #isDigit ] ])
+		or: [ #('lastBuild' 'lastCompletedBuild' 'lastFailedBuild' 'lastStableBuild' 'lastSuccessfulBuild' 'lastUnstableBuild' 'lastUnsuccessfulBuild')
+				includes: aString ]
 ]
 
 { #category : #builds }
@@ -197,7 +207,26 @@ JcCoreJob >> refreshQueuedRuns [
 	^ queuedRuns
 ]
 
+{ #category : #builds }
+JcCoreJob >> runAt: aNumberOrAlias [
+	| path |
+	path := (client jobPathSegmentsForNames: names) asOrderedCollection.
+	path add: aNumberOrAlias asString.
+	^ JcCoreRun
+		client: client
+		jobNames: names
+		rawData: (client
+				getJsonAtPathSegments: path
+				tree: 'number,result,building,duration,timestamp,url')
+]
+
 { #category : #accessing }
 JcCoreJob >> url [
 	^ rawData at: 'url' ifAbsent: [ nil ]
+]
+
+{ #category : #urls }
+JcCoreJob >> webUrl [
+	^ (rawData at: 'url' ifAbsent: [ nil ])
+		ifNil: [ client webUrlForPathSegments: (client jobPathSegmentsForNames: names) ]
 ]

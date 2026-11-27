@@ -1,6 +1,8 @@
 Class {
 	#name : #JcCoreStep,
 	#superclass : #Object,
+	#traits : 'TJcCoreWebResource',
+	#classTraits : 'TJcCoreWebResource classTrait',
 	#instVars : [
 		'stage',
 		'rawData',
@@ -224,4 +226,9 @@ JcCoreStep >> statusIcon [
 JcCoreStep >> stopFollowingLogIn: anEditorElement [
 	(anEditorElement userData removeKey: #jenkinsLogFollower ifAbsent: [ nil ])
 		ifNotNil: [ :process | process terminate ]
+]
+
+{ #category : #urls }
+JcCoreStep >> webUrl [
+	^ stage run webUrl , 'execution/node/' , self id asString , '/log/'
 ]

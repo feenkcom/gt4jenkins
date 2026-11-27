@@ -4,6 +4,8 @@
 Class {
 	#name : #JcCoreArtifact,
 	#superclass : #Object,
+	#traits : 'TJcCoreWebResource',
+	#classTraits : 'TJcCoreWebResource classTrait',
 	#instVars : [
 		'run',
 		'rawData',
@@ -178,4 +180,9 @@ JcCoreArtifact >> scripterSelector [
 { #category : #accessing }
 JcCoreArtifact >> url [
 	^ run artifactUrlFor: rawData
+]
+
+{ #category : #urls }
+JcCoreArtifact >> webUrl [
+	^ self url
 ]

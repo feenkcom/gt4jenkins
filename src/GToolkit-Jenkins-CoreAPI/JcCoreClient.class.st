@@ -4,6 +4,8 @@
 Class {
 	#name : #JcCoreClient,
 	#superclass : #Object,
+	#traits : 'TJcCoreWebResource',
+	#classTraits : 'TJcCoreWebResource classTrait',
 	#instVars : [
 		'baseUrl',
 		'httpClient',
@@ -132,40 +134,9 @@ JcCoreClient >> jobAtNames: jobNames [
 		rawData: response
 ]
 
-{ #category : #jobs }
+{ #category : #urls }
 JcCoreClient >> jobAtUrl: aJobUrl [
-	| parsedUrl controllerSegments urlSegments jobSegments names |
-	baseUrl ifNil: [ self error: 'Set the Jenkins controller URL first' ].
-	parsedUrl := ZnUrl fromString: aJobUrl.
-	(parsedUrl scheme = baseUrl scheme
-		and: [ parsedUrl host notNil
-				and: [ parsedUrl host asLowercase = baseUrl host asLowercase
-						and: [ parsedUrl portOrDefault = baseUrl portOrDefault
-								and: [ parsedUrl hasQuery not and: [ parsedUrl fragment isNil ] ] ] ] ])
-		ifFalse: [ self error: 'Job URL must belong to the configured Jenkins controller' ].
-	controllerSegments := baseUrl pathSegments asArray.
-	(controllerSegments notEmpty and: [ controllerSegments last = $/ ])
-		ifTrue: [ controllerSegments := controllerSegments allButLast ].
-	urlSegments := parsedUrl pathSegments asArray.
-	(urlSegments notEmpty and: [ urlSegments last = $/ ])
-		ifTrue: [ urlSegments := urlSegments allButLast ].
-	(urlSegments size >= controllerSegments size
-		and: [ (urlSegments first: controllerSegments size) = controllerSegments ])
-		ifFalse: [ self error: 'Job URL is outside the Jenkins controller context path' ].
-	jobSegments := urlSegments allButFirst: controllerSegments size.
-	(jobSegments isEmpty or: [ jobSegments size odd ])
-		ifTrue: [ self error: 'Expected a Jenkins job URL with job/name segments' ].
-	names := OrderedCollection new.
-	1
-		to: jobSegments size
-		by: 2
-		do: [ :index | 
-			((jobSegments at: index) = 'job'
-				and: [ (jobSegments at: index + 1) isString
-						and: [ (jobSegments at: index + 1) isEmpty not ] ])
-				ifFalse: [ self error: 'Expected a Jenkins job URL with job/name segments' ].
-			names add: (jobSegments at: index + 1) ].
-	^ self jobAtNames: names
+	^ self jobAtNames: (self parseJenkinsUrl: aJobUrl) first
 ]
 
 { #category : #urls }
@@ -183,6 +154,50 @@ JcCoreClient >> jobPathSegmentsForNames: jobNames [
 { #category : #jobs }
 JcCoreClient >> jobs [
 	^ jobs ifNil: [ self refreshJobs ]
+]
+
+{ #category : #urls }
+JcCoreClient >> objectAtUrl: aUrl [
+	| parsed job rest |
+	parsed := self parseJenkinsUrl: aUrl.
+	job := self jobAtNames: parsed first.
+	rest := parsed second.
+	^ (rest notEmpty and: [ JcCoreJob isRunIdentifier: rest first ])
+		ifTrue: [ job runAt: rest first ]
+		ifFalse: [ job ]
+]
+
+{ #category : #urls }
+JcCoreClient >> parseJenkinsUrl: aUrlString [
+	| parsedUrl controllerSegments urlSegments remaining names |
+	baseUrl ifNil: [ self error: 'Set the Jenkins controller URL first' ].
+	parsedUrl := ZnUrl fromString: aUrlString.
+	(parsedUrl scheme = baseUrl scheme
+		and: [ parsedUrl host notNil
+				and: [ parsedUrl host asLowercase = baseUrl host asLowercase
+						and: [ parsedUrl portOrDefault = baseUrl portOrDefault ] ] ])
+		ifFalse: [ self error: 'Job URL must belong to the configured Jenkins controller' ].
+	controllerSegments := baseUrl pathSegments asArray.
+	(controllerSegments notEmpty and: [ controllerSegments last = $/ ])
+		ifTrue: [ controllerSegments := controllerSegments allButLast ].
+	urlSegments := parsedUrl pathSegments asArray.
+	(urlSegments notEmpty and: [ urlSegments last = $/ ])
+		ifTrue: [ urlSegments := urlSegments allButLast ].
+	(urlSegments size >= controllerSegments size
+		and: [ (urlSegments first: controllerSegments size) = controllerSegments ])
+		ifFalse: [ self error: 'Job URL is outside the Jenkins controller context path' ].
+	remaining := urlSegments allButFirst: controllerSegments size.
+	names := OrderedCollection new.
+	[ remaining size >= 2 and: [ #('job' 'view') includes: remaining first ] ]
+		whileTrue: [ remaining first = 'job'
+				ifTrue: [ (remaining second isString and: [ remaining second isEmpty not ])
+						ifFalse: [ self error: 'Expected a Jenkins job URL with job/name segments' ].
+					names add: remaining second ].
+			remaining := remaining allButFirst: 2 ].
+	names isEmpty
+		ifTrue: [ self error: 'Expected a Jenkins job URL with job/name segments' ].
+	^ {names asArray.
+		remaining}
 ]
 
 { #category : #jobs }
@@ -221,4 +236,18 @@ JcCoreClient >> urlForPathSegments: pathSegments tree: aTree [
 JcCoreClient >> username: aUsername token: aToken [
 	httpClient username: aUsername password: aToken.
 	jobs := nil
+]
+
+{ #category : #urls }
+JcCoreClient >> webUrl [
+	^ baseUrl ifNotNil: [ baseUrl asString ]
+]
+
+{ #category : #urls }
+JcCoreClient >> webUrlForPathSegments: pathSegments [
+	| url |
+	baseUrl ifNil: [ self error: 'Set the Jenkins controller URL first' ].
+	url := baseUrl copy.
+	pathSegments do: [ :segment | url addPathSegment: segment asString ].
+	^ url asString , '/'
 ]

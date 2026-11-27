@@ -1513,3 +1513,40 @@ JcCoreModelExamples >> testCaseWithoutReport [
 						yourself)) testCases isEmpty.
 	^ run
 ]
+
+{ #category : #urls }
+JcCoreModelExamples >> webUrlsOfModelObjects [
+	<gtExample>
+	<return: #JcCoreRun>
+	| run runUrl stage case suite artifact step |
+	run := self reportRunLoggingTo: OrderedCollection new.
+	runUrl := 'https://jenkins.example/job/main/7/'.
+	self assert: run webUrl equals: runUrl.
+	self assert: run client webUrl equals: 'https://jenkins.example/'.
+	stage := run stages detect: [ :each | each name = 'Test Mac' ].
+	self assert: stage webUrl equals: runUrl , 'execution/node/4/'.
+	case := run problematicTests first.
+	self
+		assert: case webUrl
+		equals: runUrl , 'testReport/Pkg.Examples/DemoExamples/fails/'.
+	self assert: run testSuites first webUrl equals: runUrl , 'execution/node/9/'.
+	artifact := run artifacts first.
+	self assert: artifact webUrl equals: artifact url.
+	step := JcCoreStep
+			stage: stage
+			rawData: (Dictionary new
+					at: 'id' put: '13';
+					yourself).
+	self assert: step webUrl equals: runUrl , 'execution/node/13/log/'.
+	{run.
+		stage.
+		case.
+		step.
+		artifact}
+		do: [ :each | 
+			| view |
+			view := each gtWebUrlFor: GtPhlowView empty.
+			self assert: view title equals: 'URL'.
+			self assert: (view asElementDo: [ :element | element ]) notNil ].
+	^ run
+]

@@ -4,6 +4,8 @@
 Class {
 	#name : #JcCoreRun,
 	#superclass : #Object,
+	#traits : 'TJcCoreWebResource',
+	#classTraits : 'TJcCoreWebResource classTrait',
 	#instVars : [
 		'client',
 		'jobNames',
@@ -610,4 +612,10 @@ JcCoreRun >> timestamp [
 { #category : #accessing }
 JcCoreRun >> url [
 	^ rawData at: 'url' ifAbsent: [ self detailAt: 'url' ]
+]
+
+{ #category : #urls }
+JcCoreRun >> webUrl [
+	^ client
+		webUrlForPathSegments: (client jobPathSegmentsForNames: jobNames) , {self number asString}
 ]

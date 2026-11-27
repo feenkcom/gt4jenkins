@@ -1,6 +1,8 @@
 Class {
 	#name : #JcCoreTestCase,
 	#superclass : #Object,
+	#traits : 'TJcCoreWebResource',
+	#classTraits : 'TJcCoreWebResource classTrait',
 	#instVars : [
 		'run',
 		'suiteIndex',
@@ -260,4 +262,16 @@ JcCoreTestCase >> testMethod [
 	aSelector := self name asSymbol.
 	^ (aClass instanceSide lookupSelector: aSelector)
 		ifNil: [ aClass classSide lookupSelector: aSelector ]
+]
+
+{ #category : #urls }
+JcCoreTestCase >> webUrl [
+	| fullName index packageName |
+	fullName := self className.
+	index := fullName lastIndexOf: $..
+	packageName := index = 0
+			ifTrue: [ '(root)' ]
+			ifFalse: [ fullName copyFrom: 1 to: index - 1 ].
+	^ run webUrl , 'testReport/' , packageName , '/' , self shortClassName , '/'
+		, self name , '/'
 ]

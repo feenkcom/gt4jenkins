@@ -18,6 +18,23 @@ JcCoreArtifact class >> run: aRun rawData: aDictionary [
 	^ self new run: aRun rawData: aDictionary
 ]
 
+{ #category : #views }
+JcCoreArtifact class >> screenshotsElementFor: aCollectionOfImageArtifacts [
+	| container |
+	container := BrVerticalPane new
+			hMatchParent;
+			vFitContent;
+			padding: (BlInsets all: 10).
+	aCollectionOfImageArtifacts
+		do: [ :artifact | 
+			container
+				addChild: (BrLabel new
+						text: artifact name asRopedText;
+						aptitude: BrGlamorousLabelAptitude);
+				addChild: (artifact figureElement margin: (BlInsets bottom: 10)) ].
+	^ container asScrollableElement
+]
+
 { #category : #accessing }
 JcCoreArtifact >> data [
 	dataLoaded = true ifTrue: [ ^ data ].
@@ -35,6 +52,11 @@ JcCoreArtifact >> download [
 { #category : #testing }
 JcCoreArtifact >> downloadable [
 	^ self path isEmpty not
+]
+
+{ #category : #views }
+JcCoreArtifact >> figureElement [
+	^ (self gtFigureFor: GtPhlowView empty) asElementDo: [ :element | element ]
 ]
 
 { #category : #printing }
@@ -88,6 +110,11 @@ JcCoreArtifact >> isPharoDebugLog [
 	^ self name = 'PharoDebug.log'
 ]
 
+{ #category : #testing }
+JcCoreArtifact >> isScripterArtifact [
+	^ self scripterSegments notNil
+]
+
 { #category : #accessing }
 JcCoreArtifact >> name [
 	^ rawData at: 'fileName' ifAbsent: [ '' ]
@@ -96,6 +123,20 @@ JcCoreArtifact >> name [
 { #category : #accessing }
 JcCoreArtifact >> path [
 	^ rawData at: 'relativePath' ifAbsent: [ '' ]
+]
+
+{ #category : #accessing }
+JcCoreArtifact >> pathSegments [
+	^ self path findTokens: '/'
+]
+
+{ #category : #accessing }
+JcCoreArtifact >> platformName [
+	| segments |
+	segments := self pathSegments.
+	^ (segments size > 2 and: [ segments first = 'artifacts' ])
+		ifTrue: [ segments second ]
+		ifFalse: [ '' ]
 ]
 
 { #category : #accessing }
@@ -110,6 +151,28 @@ JcCoreArtifact >> run: aRun rawData: aDictionary [
 	data := nil.
 	dataLoaded := false.
 	^ self
+]
+
+{ #category : #accessing }
+JcCoreArtifact >> scripterClassName [
+	^ self scripterSegments ifNotNil: [ :segments | segments first ]
+]
+
+{ #category : #accessing }
+JcCoreArtifact >> scripterSegments [
+	| segments index |
+	segments := self pathSegments asArray.
+	index := segments size.
+	[ index > 0 and: [ (segments at: index) ~= 'scripter' ] ]
+		whileTrue: [ index := index - 1 ].
+	^ (index > 0 and: [ segments size - index >= 3 ])
+		ifTrue: [ segments copyFrom: index + 1 to: segments size ]
+		ifFalse: [ nil ]
+]
+
+{ #category : #accessing }
+JcCoreArtifact >> scripterSelector [
+	^ self scripterSegments ifNotNil: [ :segments | segments second ]
 ]
 
 { #category : #accessing }

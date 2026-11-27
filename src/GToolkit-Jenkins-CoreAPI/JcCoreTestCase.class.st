@@ -70,6 +70,18 @@ JcCoreTestCase >> gtArtifactsFor: aView [
 		column: 'Path' text: [ :artifact | artifact path ]
 ]
 
+{ #category : #views }
+JcCoreTestCase >> gtConsoleLogFor: aView [
+	<gtView>
+	self step ifNil: [ ^ aView empty ].
+	^ aView forward
+		title: 'Console log';
+		question: 'What did the step that ran this test print?';
+		priority: 6;
+		object: [ self step ];
+		view: #gtLogFor:
+]
+
 { #category : #printing }
 JcCoreTestCase >> gtDisplayOn: aStream [
 	aStream
@@ -198,6 +210,11 @@ JcCoreTestCase >> skippedMessage [
 	^ (self details at: 'skippedMessage' ifAbsent: [ nil ]) ifNil: [ '' ]
 ]
 
+{ #category : #associations }
+JcCoreTestCase >> stage [
+	^ run stageForTestCase: self
+]
+
 { #category : #accessing }
 JcCoreTestCase >> stageNames [
 	^ (suiteData at: 'enclosingBlockNames' ifAbsent: [ nil ]) ifNil: [ #() ]
@@ -219,6 +236,16 @@ JcCoreTestCase >> statusIcon [
 		geometry: BlCircleGeometry new;
 		background: self resultBackgroundColor;
 		size: 10 @ 10
+]
+
+{ #category : #associations }
+JcCoreTestCase >> step [
+	| nodeId |
+	nodeId := self stageNodeId.
+	nodeId ifNil: [ ^ nil ].
+	^ self stage
+		ifNil: [ nil ]
+		ifNotNil: [ :aStage | aStage steps detect: [ :each | each id = nodeId ] ifNone: [ nil ] ]
 ]
 
 { #category : #accessing }

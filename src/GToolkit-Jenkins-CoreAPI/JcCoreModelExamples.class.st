@@ -1173,6 +1173,39 @@ JcCoreModelExamples >> testCaseStatusIconScripter [
 	^ scripter
 ]
 
+{ #category : #'test cases' }
+JcCoreModelExamples >> testCaseStep [
+	<gtExample>
+	<return: #JcCoreRun>
+	| run client previous case step other |
+	run := self reportRunLoggingTo: OrderedCollection new.
+	client := run instVarNamed: 'client'.
+	previous := client instVarNamed: 'responseProvider'.
+	client
+		responseProvider: [ :url | 
+			| text |
+			text := url asString.
+			(text includesSubstring: '/execution/node/4/wfapi/describe')
+				ifTrue: [ '{"id":"4","name":"Test Mac","stageFlowNodes":[{"id":"8","name":"Checkout","status":"SUCCESS"},{"id":"9","name":"Shell Script","status":"FAILED","parameterDescription":"run tests"}]}' ]
+				ifFalse: [ (text includesSubstring: '/execution/node/9/wfapi/log')
+						ifTrue: [ '{"text":"<span>boom log</span>","hasMore":false}' ]
+						ifFalse: [ previous value: url ] ] ].
+	case := run problematicTests first.
+	step := case step.
+	self assert: step class equals: JcCoreStep.
+	self assert: step id equals: '9'.
+	self assert: case stage name equals: 'Test Mac'.
+	self assert: step logText equals: 'boom log'.
+	other := run problematicTests third.
+	self assert: other step isNil.
+	self
+		assert: (case gtConsoleLogFor: GtPhlowView empty) title
+		equals: 'Console log'.
+	self
+		assert: ((case gtConsoleLogFor: GtPhlowView empty) asElementDo: [ :each | each ]) notNil.
+	^ run
+]
+
 { #category : #examples }
 JcCoreModelExamples >> testCaseViews [
 	<gtExample>

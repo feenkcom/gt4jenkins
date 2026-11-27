@@ -93,6 +93,11 @@ JcCoreRun >> caseDetailsAtSuite: aSuiteIndex case: aCaseIndex [
 	^ cases at: aCaseIndex ifAbsent: [ Dictionary new ]
 ]
 
+{ #category : #accessing }
+JcCoreRun >> client [
+	^ client
+]
+
 { #category : #initialization }
 JcCoreRun >> client: aClient jobNames: names rawData: aDictionary [
 	client := aClient.
@@ -361,6 +366,11 @@ JcCoreRun >> initializeQueued [
 { #category : #accessing }
 JcCoreRun >> isQueued [
 	^ (rawData at: 'queued' ifAbsent: [ false ]) == true
+]
+
+{ #category : #accessing }
+JcCoreRun >> jobNames [
+	^ jobNames
 ]
 
 { #category : #accessing }

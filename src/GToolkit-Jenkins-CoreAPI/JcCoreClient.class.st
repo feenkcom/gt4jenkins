@@ -77,6 +77,22 @@ JcCoreClient >> getJsonAtPathSegments: pathSegments tree: aTree [
 	^ NeoJSONReader fromString: json
 ]
 
+{ #category : #requests }
+JcCoreClient >> getProgressiveTextAtPathSegments: pathSegments start: anOffset [
+	| url text next |
+	baseUrl ifNil: [ self error: 'Set the Jenkins controller URL first' ].
+	url := baseUrl copy.
+	pathSegments do: [ :segment | url addPathSegment: segment asString ].
+	url queryAt: 'start' put: anOffset.
+	responseProvider
+		ifNil: [ text := httpClient get: url asString.
+			next := httpClient response headers at: 'X-Text-Size' ifAbsent: [ nil ].
+			next := next ifNotNil: [ next asInteger ] ]
+		ifNotNil: [ text := responseProvider value: url ].
+	text := text ifNil: [ '' ].
+	^ text -> (next ifNil: [ anOffset + text utf8Encoded size ])
+]
+
 { #category : #'gt - views' }
 JcCoreClient >> gtJobsFor: aView [
 	<gtView>

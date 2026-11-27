@@ -304,8 +304,9 @@ JcCoreStage >> refreshSteps [
 	response := [ run getJsonAtNodeId: self id suffix: #('wfapi' 'describe') ]
 			on: ZnHttpUnsuccessful
 			do: [ :error | error response code = 404 ifTrue: [ Dictionary new ] ifFalse: [ error pass ] ].
-	newSteps := (response at: 'stageFlowNodes' ifAbsent: [ #() ])
-			collect: [ :each | JcCoreStep stage: self rawData: each ].
+	newSteps := ((response ifNil: [ Dictionary new ])
+			at: 'stageFlowNodes'
+			ifAbsent: [ #() ]) collect: [ :each | JcCoreStep stage: self rawData: each ].
 	steps := newSteps.
 	^ steps
 ]

@@ -123,10 +123,10 @@ JcCoreRun >> duration [
 
 { #category : #accessing }
 JcCoreRun >> durationText [
-	| elapsed milliseconds |
+	| start milliseconds |
 	self building = true
-		ifTrue: [ elapsed := self startTime ifNil: [ ^ 'RUNNING' ].
-			^ (DateAndTime now - elapsed) humanReadablePrintString ].
+		ifTrue: [ start := self startTime ifNil: [ ^ 'RUNNING' ].
+			^ (DateAndTime now - start) asSeconds seconds humanReadablePrintString ].
 	milliseconds := self duration.
 	^ milliseconds
 		ifNil: [ '' ]
@@ -526,7 +526,7 @@ JcCoreRun >> stages [
 JcCoreRun >> startTime [
 	| milliseconds |
 	milliseconds := self timestamp.
-	^ milliseconds ifNotNil: [ DateAndTime fromSeconds: milliseconds / 1000 ]
+	^ milliseconds ifNotNil: [ DateAndTime fromUnixTime: milliseconds // 1000 ]
 ]
 
 { #category : #accessing }

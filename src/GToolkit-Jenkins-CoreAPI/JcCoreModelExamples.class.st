@@ -762,6 +762,26 @@ JcCoreModelExamples >> reportRunLoggingTo: aLog [
 				yourself)
 ]
 
+{ #category : #builds }
+JcCoreModelExamples >> runningBuildDurationSinceStart [
+	<gtExample>
+	<return: #JcCoreRun>
+	| run started |
+	started := DateAndTime now asUnixTime - 125.
+	run := JcCoreRun
+			client: JcCoreClient new
+			jobNames: #('main')
+			rawData: (Dictionary new
+					at: 'number' put: 7;
+					at: 'building' put: true;
+					at: 'timestamp' put: started * 1000;
+					yourself).
+	self assert: run startTime asUnixTime equals: started.
+	self assert: (DateAndTime now - run startTime) asSeconds < 200.
+	self assert: (run durationText beginsWith: '2 minutes').
+	^ run
+]
+
 { #category : #examples }
 JcCoreModelExamples >> runningBuildForViews [
 	<gtExample>

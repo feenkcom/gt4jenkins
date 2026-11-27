@@ -13,7 +13,8 @@ Class {
 		'stages',
 		'rootStages',
 		'stageTreeAvailable',
-		'problematicTests'
+		'problematicTests',
+		'suiteDetails'
 	],
 	#category : #'GToolkit-Jenkins-CoreAPI'
 }
@@ -71,6 +72,16 @@ JcCoreRun >> building [
 	^ rawData at: 'building' ifAbsent: [ self detailAt: 'building' ]
 ]
 
+{ #category : #accessing }
+JcCoreRun >> caseDetailsAtSuite: aSuiteIndex case: aCaseIndex [
+	| cases |
+	suiteDetails ifNil: [ suiteDetails := Dictionary new ].
+	cases := suiteDetails
+			at: aSuiteIndex
+			ifAbsentPut: [ self fetchSuiteCasesAt: aSuiteIndex ].
+	^ cases at: aCaseIndex ifAbsent: [ Dictionary new ]
+]
+
 { #category : #initialization }
 JcCoreRun >> client: aClient jobNames: names rawData: aDictionary [
 	client := aClient.
@@ -82,6 +93,7 @@ JcCoreRun >> client: aClient jobNames: names rawData: aDictionary [
 	rootStages := nil.
 	stageTreeAvailable := nil.
 	problematicTests := nil.
+	suiteDetails := nil.
 	^ self
 ]
 
@@ -117,6 +129,41 @@ JcCoreRun >> durationText [
 	^ milliseconds
 		ifNil: [ '' ]
 		ifNotNil: [ milliseconds milliSeconds humanReadablePrintString ]
+]
+
+{ #category : #accessing }
+JcCoreRun >> fetchSuiteCasesAt: aSuiteIndex [
+	| path response suites |
+	path := client jobPathSegmentsForNames: jobNames.
+	path add: self number asString.
+	path add: 'testReport'.
+	path add: 'api'.
+	path add: 'json'.
+	response := [ client
+			getJsonAtPathSegments: path
+			query: (Dictionary new
+					at: 'tree'
+						put: 'suites[cases[className,name,status,errorDetails,errorStackTrace,skippedMessage]]{'
+								, (aSuiteIndex - 1) asString , ',' , aSuiteIndex asString , '}';
+					yourself) ]
+			on: ZnHttpUnsuccessful
+			do: [ :error | error response code = 404 ifTrue: [ Dictionary new ] ifFalse: [ error pass ] ].
+	suites := response at: 'suites' ifAbsent: [ #() ].
+	^ suites isEmpty
+		ifTrue: [ #() ]
+		ifFalse: [ suites first at: 'cases' ifAbsent: [ #() ] ]
+]
+
+{ #category : #accessing }
+JcCoreRun >> getJsonAtNodeId: aNodeId suffix: aCollection [
+	| path |
+	path := client jobPathSegmentsForNames: jobNames.
+	path add: self number asString.
+	path add: 'execution'.
+	path add: 'node'.
+	path add: aNodeId asString.
+	path addAll: aCollection.
+	^ client getJsonAtPathSegments: path
 ]
 
 { #category : #'gt - views' }
@@ -158,9 +205,13 @@ JcCoreRun >> gtProblematicTestsFor: aView [
 		question: 'Which JUnit tests failed or were skipped in this build?';
 		priority: 50;
 		items: [ self problematicTests ];
-		column: 'Status' text: [ :case | case at: 'status' ifAbsent: [ '' ] ];
-		column: 'Class' text: [ :case | case at: 'className' ifAbsent: [ '' ] ];
-		column: 'Test' text: [ :case | case at: 'name' ifAbsent: [ '' ] ];
+		column: 'Status'
+			icon: [ :case | case statusIcon ]
+			width: 50;
+		column: 'Class' text: [ :case | case shortClassName ];
+		column: 'Test' text: [ :case | case name ];
+		column: 'Stage'
+			text: [ :case | case stageNames ifEmpty: [ '' ] ifNotEmpty: [ :names | names first ] ];
 		actionButtonIcon: BrGlamorousVectorIcons refresh
 			tooltip: 'Refresh tests'
 			action: [ :button :tab | 
@@ -180,6 +231,22 @@ JcCoreRun >> gtRawDataFor: aView [
 ]
 
 { #category : #views }
+JcCoreRun >> gtScripterArtifactsFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'Scripter artifacts';
+		question: 'Which scripter screenshots and event logs did this build archive?';
+		priority: 45;
+		items: [ self scripterArtifacts ];
+		column: 'Platform'
+			text: [ :artifact | artifact platformName ]
+			width: 250;
+		column: 'Example'
+			text: [ :artifact | artifact scripterClassName , '>>#' , artifact scripterSelector ];
+		column: 'File' text: [ :artifact | artifact name ]
+]
+
+{ #category : #views }
 JcCoreRun >> gtStagesFor: aView [
 	<gtView>
 	^ aView columnedList
@@ -187,7 +254,9 @@ JcCoreRun >> gtStagesFor: aView [
 		question: 'Which stages did this Jenkins Pipeline build run?';
 		priority: 30;
 		items: [ self stages ];
-		column: 'Status' text: [ :stage | stage status ];
+		column: 'Status'
+			icon: [ :stage | stage statusIcon ]
+			width: 50;
 		column: 'Stage' text: [ :stage | stage name ];
 		column: 'Parent'
 			text: [ :stage | stage parent ifNil: [ '' ] ifNotNil: [ stage parent name ] ];
@@ -261,7 +330,8 @@ JcCoreRun >> rawData [
 
 { #category : #accessing }
 JcCoreRun >> refreshProblematicTests [
-	| path response cases newTests |
+	| path response suites newTests |
+	suiteDetails := Dictionary new.
 	self building = true
 		ifTrue: [ problematicTests := #().
 			^ problematicTests ].
@@ -273,17 +343,27 @@ JcCoreRun >> refreshProblematicTests [
 	response := [ client
 			getJsonAtPathSegments: path
 			query: (Dictionary new
-					at: 'tree' put: 'suites[cases[className,name,status]]';
+					at: 'tree'
+						put: 'suites[name,nodeId,enclosingBlockNames,cases[className,name,status]]';
 					yourself) ]
 			on: ZnHttpUnsuccessful
 			do: [ :error | error response code = 404 ifTrue: [ Dictionary new ] ifFalse: [ error pass ] ].
-	cases := (response at: 'suites' ifAbsent: [ #() ])
-			flatCollect: [ :suite | suite at: 'cases' ifAbsent: [ #() ] ].
-	newTests := cases
-			select: [ :each | 
-				#('FAILED' 'REGRESSION' 'SKIPPED')
-					includes: (each at: 'status' ifAbsent: [ '' ]) ].
-	problematicTests := newTests.
+	suites := response at: 'suites' ifAbsent: [ #() ].
+	newTests := OrderedCollection new.
+	suites
+		doWithIndex: [ :suite :suiteIndex | 
+			(suite at: 'cases' ifAbsent: [ #() ])
+				doWithIndex: [ :each :caseIndex | 
+					(JcCoreTestCase problematicStatuses
+						includes: (each at: 'status' ifAbsent: [ '' ]))
+						ifTrue: [ newTests
+								add: (JcCoreTestCase
+										run: self
+										suiteIndex: suiteIndex
+										caseIndex: caseIndex
+										suiteData: suite
+										rawData: each) ] ] ].
+	problematicTests := newTests asArray.
 	^ problematicTests
 ]
 
@@ -351,6 +431,23 @@ JcCoreRun >> rootStages [
 ]
 
 { #category : #accessing }
+JcCoreRun >> scripterArtifacts [
+	^ self artifacts select: [ :each | each isScripterArtifact ]
+]
+
+{ #category : #accessing }
+JcCoreRun >> scripterArtifactsForTestCase: aTestCase [
+	| target |
+	target := (self stageForTestCase: aTestCase)
+			ifNotNil: [ :stage | stage agentTarget ].
+	^ self scripterArtifacts
+		select: [ :each | 
+			each scripterClassName = aTestCase shortClassName
+				and: [ each scripterSelector = aTestCase name
+						and: [ target isNil or: [ each pathSegments includes: target ] ] ] ]
+]
+
+{ #category : #accessing }
 JcCoreRun >> stageEdges [
 	| edges previousExits |
 	self hasStageTree ifFalse: [ ^ #() ].
@@ -362,6 +459,16 @@ JcCoreRun >> stageEdges [
 			previousExits do: [ :exit | edges add: exit -> stage ].
 			previousExits := stage exitStages ].
 	^ edges asArray
+]
+
+{ #category : #accessing }
+JcCoreRun >> stageForTestCase: aTestCase [
+	| names |
+	names := aTestCase stageNames.
+	names isEmpty ifTrue: [ ^ nil ].
+	^ self stages
+		detect: [ :each | each name = names first and: [ each includesTestCase: aTestCase ] ]
+		ifNone: [ nil ]
 ]
 
 { #category : #accessing }

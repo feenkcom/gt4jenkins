@@ -190,7 +190,8 @@ JcCoreModelExamples >> buildWithProblematicTests [
 					at: 'building' put: false;
 					yourself).
 	self assert: run problematicTests size equals: 2.
-	self assert: (run problematicTests first at: 'name') equals: 'fails'.
+	self assert: run problematicTests first name equals: 'fails'.
+	self assert: run problematicTests first stageNames isEmpty.
 	self assert: requests equals: 1.
 	^ run
 ]
@@ -222,6 +223,29 @@ JcCoreModelExamples >> buildWithStages [
 	self assert: requests equals: 1.
 	self assert: run refreshStages size equals: 2.
 	self assert: requests equals: 2.
+	^ run
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> buildWithTestCases [
+	<gtExample>
+	<return: #JcCoreRun>
+	| log run cases failed |
+	log := OrderedCollection new.
+	run := self reportRunLoggingTo: log.
+	cases := run problematicTests.
+	self assert: cases size equals: 3.
+	self assert: (cases collect: #class) asSet asArray equals: {JcCoreTestCase}.
+	self
+		assert: (cases collect: #status) asArray
+		equals: #('FAILED' 'SKIPPED' 'FAILED').
+	failed := cases first.
+	self assert: failed gtDisplayString equals: 'DemoExamples>>#fails'.
+	self assert: failed isFailed.
+	self assert: cases second isSkipped.
+	self assert: failed stageNames asArray equals: #('Test Mac' 'Agent (arm-x)').
+	self assert: log size equals: 1.
+	self assert: run problematicTests == cases.
 	^ run
 ]
 
@@ -655,6 +679,35 @@ JcCoreModelExamples >> reinitializeJobClearsBuilds [
 	^ job
 ]
 
+{ #category : #fixtures }
+JcCoreModelExamples >> reportRunLoggingTo: aLog [
+	| client |
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example/'.
+	client
+		responseProvider: [ :url | 
+			| text tree |
+			text := url asString.
+			aLog add: text.
+			tree := url queryAt: 'tree' ifAbsent: [ '' ].
+			(text includesSubstring: '/stages/tree')
+				ifTrue: [ '{"status":"ok","data":{"complete":true,"stages":[{"id":"2","name":"Parallel","type":"PARALLEL_BLOCK","state":"success","children":[{"id":"3","name":"Agent (arm-x)","type":"PARALLEL","state":"failed","children":[{"id":"4","name":"Test Mac","state":"failed","children":[]}]},{"id":"5","name":"Agent (lin-x)","type":"PARALLEL","state":"success","children":[{"id":"6","name":"Test Linux","state":"success","children":[]}]}]}]}}' ]
+				ifFalse: [ (text includesSubstring: '/testReport/')
+						ifTrue: [ (tree includesSubstring: 'errorDetails')
+								ifTrue: [ (tree endsWith: '{0,1}')
+										ifTrue: [ '{"suites":[{"cases":[{"className":"Pkg.Examples.DemoExamples","name":"passes","status":"PASSED","errorDetails":null,"errorStackTrace":null,"skippedMessage":null},{"className":"Pkg.Examples.DemoExamples","name":"fails","status":"FAILED","errorDetails":"boom","errorStackTrace":"DemoExamples>>fails","skippedMessage":null},{"className":"Pkg.Examples.DemoExamples","name":"skips","status":"SKIPPED","errorDetails":null,"errorStackTrace":null,"skippedMessage":"not now"}]}]}' ]
+										ifFalse: [ '{"suites":[{"cases":[{"className":"Pkg.Examples.DemoExamples","name":"fails","status":"FAILED","errorDetails":"boom on linux","errorStackTrace":"stack","skippedMessage":null}]}]}' ] ]
+								ifFalse: [ '{"suites":[{"name":"Pkg-DemoExamples","nodeId":"9","enclosingBlockNames":["Test Mac","Agent (arm-x)"],"cases":[{"className":"Pkg.Examples.DemoExamples","name":"passes","status":"PASSED"},{"className":"Pkg.Examples.DemoExamples","name":"fails","status":"FAILED"},{"className":"Pkg.Examples.DemoExamples","name":"skips","status":"SKIPPED"}]},{"name":"Pkg-DemoExamples","nodeId":"10","enclosingBlockNames":["Test Linux","Agent (lin-x)"],"cases":[{"className":"Pkg.Examples.DemoExamples","name":"fails","status":"FAILED"}]}]}' ] ]
+						ifFalse: [ '{"artifacts":[{"fileName":"step.png","relativePath":"artifacts/arm-x/gt-examples/pharo-local/scripter/DemoExamples/fails/step.png"},{"fileName":"step-events-all.txt","relativePath":"artifacts/arm-x/gt-examples/pharo-local/scripter/DemoExamples/fails/step-events-all.txt"},{"fileName":"step.png","relativePath":"artifacts/lin-x/gt-examples/pharo-local/scripter/DemoExamples/fails/step.png"},{"fileName":"step.png","relativePath":"artifacts/arm-x/gt-examples/pharo-local/scripter/OtherExamples/other/step.png"},{"fileName":"PharoDebug.log","relativePath":"artifacts/arm-x/gt-examples/PharoDebug.log"}]}' ] ] ].
+	^ JcCoreRun
+		client: client
+		jobNames: #('main')
+		rawData: (Dictionary new
+				at: 'number' put: 7;
+				at: 'building' put: false;
+				yourself)
+]
+
 { #category : #examples }
 JcCoreModelExamples >> runningBuildForViews [
 	<gtExample>
@@ -789,6 +842,140 @@ JcCoreModelExamples >> stageCardScripter [
 ]
 
 { #category : #examples }
+JcCoreModelExamples >> stageStatusIconScripter [
+	<gtExample>
+	<return: #BlScripter>
+	| scripter stage |
+	stage := self buildWithStages stages last.
+	scripter := BlScripter new.
+	scripter element: stage statusIcon.
+	self
+		assert: scripter element background paint color
+		equals: stage resultBackgroundColor.
+	self assert: scripter element geometry class equals: BlCircleGeometry.
+	^ scripter
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> stageTestCasesAndArtifacts [
+	<gtExample>
+	<return: #JcCoreRun>
+	| run mac linux agent |
+	run := self reportRunLoggingTo: OrderedCollection new.
+	mac := run stages detect: [ :each | each name = 'Test Mac' ].
+	linux := run stages detect: [ :each | each name = 'Test Linux' ].
+	agent := run stages detect: [ :each | each name = 'Agent (arm-x)' ].
+	self assert: mac testCases size equals: 2.
+	self assert: linux testCases size equals: 1.
+	self assert: agent testCases size equals: 2.
+	self
+		assert: (run stages detect: [ :each | each name = 'Parallel' ]) testCases isEmpty.
+	self assert: mac agentTarget equals: 'arm-x'.
+	self
+		assert: (mac artifacts collect: #name) asArray
+		equals: #('step.png' 'step-events-all.txt' 'step.png' 'PharoDebug.log').
+	self assert: (run stageForTestCase: run problematicTests third) == linux.
+	self
+		assert: (run stages detect: [ :each | each name = 'Parallel' ]) artifacts isEmpty.
+	^ run
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> stageViews [
+	<gtExample>
+	<return: #JcCoreStage>
+	| stage stepsView childrenView logView |
+	stage := self stageWithSteps.
+	stepsView := stage gtStepsFor: GtPhlowView empty.
+	self assert: stepsView title equals: 'Steps'.
+	self assert: (stepsView asElementDo: [ :each | each ]) notNil.
+	childrenView := self buildWithParallelStages rootStages second
+			gtChildrenFor: GtPhlowView empty.
+	self assert: (childrenView asElementDo: [ :each | each ]) notNil.
+	logView := self stepWithLog gtLogFor: GtPhlowView empty.
+	self assert: (logView asElementDo: [ :each | each ]) notNil.
+	self
+		assert: (self stepWithoutLog gtLogFor: GtPhlowView empty) title
+		equals: 'Log'.
+	^ stage
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> stageWithSteps [
+	<gtExample>
+	<return: #JcCoreStage>
+	| client run stage requests steps |
+	requests := 0.
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example/ci/'.
+	client
+		responseProvider: [ :url | 
+			requests := requests + 1.
+			self
+				assert: url asString
+				equals: 'https://jenkins.example/ci/job/folder/job/main/7/execution/node/12/wfapi/describe'.
+			'{"id":"12","name":"Test","stageFlowNodes":[{"id":"13","name":"Shell Script","status":"SUCCESS","parameterDescription":"echo ok","durationMillis":1500},{"id":"14","name":"Shell Script","status":"FAILED","parameterDescription":null,"durationMillis":-1}]}' ].
+	run := JcCoreRun
+			client: client
+			jobNames: #('folder' 'main')
+			rawData: (Dictionary new
+					at: 'number' put: 7;
+					yourself).
+	stage := JcCoreStage
+			run: run
+			parent: nil
+			rawData: (Dictionary new
+					at: 'id' put: '12';
+					at: 'name' put: 'Test';
+					yourself).
+	steps := stage steps.
+	self assert: steps size equals: 2.
+	self assert: steps first class equals: JcCoreStep.
+	self assert: steps first gtDisplayString equals: 'Shell Script - echo ok'.
+	self assert: steps first status equals: 'SUCCESS'.
+	self assert: steps first durationText isEmpty not.
+	self assert: steps second gtDisplayString equals: 'Shell Script'.
+	self assert: steps second parameterDescription equals: ''.
+	self
+		assert: steps second resultBackgroundColor
+		equals: BrGlamorousColors errorBackgroundColor.
+	self assert: stage steps == steps.
+	self assert: requests equals: 1.
+	^ stage
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> stageWithoutStepData [
+	<gtExample>
+	<return: #JcCoreStage>
+	| client run stage requests |
+	requests := 0.
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example/'.
+	client
+		responseProvider: [ :url | 
+			requests := requests + 1.
+			(ZnHttpUnsuccessful response: (ZnResponse notFound: url)) signal ].
+	run := JcCoreRun
+			client: client
+			jobNames: #('main')
+			rawData: (Dictionary new
+					at: 'number' put: 7;
+					yourself).
+	stage := JcCoreStage
+			run: run
+			parent: nil
+			rawData: (Dictionary new
+					at: 'id' put: '3';
+					at: 'name' put: 'Parallel';
+					yourself).
+	self assert: stage steps isEmpty.
+	self assert: stage steps isEmpty.
+	self assert: requests equals: 1.
+	^ stage
+]
+
+{ #category : #examples }
 JcCoreModelExamples >> stagesMapView [
 	<gtExample>
 	<return: #JcCoreRun>
@@ -800,5 +987,171 @@ JcCoreModelExamples >> stagesMapView [
 	cards := element withAllChildrenBreadthFirst
 			select: [ :each | each isKindOf: BrHorizontalPane ].
 	self assert: cards size equals: run stages size.
+	^ run
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> stepWithLog [
+	<gtExample>
+	<return: #JcCoreStep>
+	| client run stage step requests |
+	requests := 0.
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example/'.
+	client
+		responseProvider: [ :url | 
+			requests := requests + 1.
+			self
+				assert: url asString
+				equals: 'https://jenkins.example/job/main/7/execution/node/13/wfapi/log'.
+			'{"nodeId":"13","length":30,"hasMore":false,"text":"<span class=\"pipeline-new-node\">[Pipeline] sh</span>\n+ echo &lt;ok&gt; &amp; done\n"}' ].
+	run := JcCoreRun
+			client: client
+			jobNames: #('main')
+			rawData: (Dictionary new
+					at: 'number' put: 7;
+					yourself).
+	stage := JcCoreStage
+			run: run
+			parent: nil
+			rawData: Dictionary new.
+	step := JcCoreStep
+			stage: stage
+			rawData: (Dictionary new
+					at: 'id' put: '13';
+					at: 'name' put: 'Shell Script';
+					yourself).
+	self
+		assert: step logText
+		equals: '[Pipeline] sh' , String lf , '+ echo <ok> & done' , String lf.
+	self assert: step logText == step logText.
+	self assert: requests equals: 1.
+	^ step
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> stepWithoutLog [
+	<gtExample>
+	<return: #JcCoreStep>
+	| client run stage step requests |
+	requests := 0.
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example/'.
+	client
+		responseProvider: [ :url | 
+			requests := requests + 1.
+			(ZnHttpUnsuccessful response: (ZnResponse notFound: url)) signal ].
+	run := JcCoreRun
+			client: client
+			jobNames: #('main')
+			rawData: (Dictionary new
+					at: 'number' put: 7;
+					yourself).
+	stage := JcCoreStage
+			run: run
+			parent: nil
+			rawData: Dictionary new.
+	step := JcCoreStep
+			stage: stage
+			rawData: (Dictionary new
+					at: 'id' put: '13';
+					yourself).
+	self assert: step logText equals: ''.
+	self assert: step logText equals: ''.
+	self assert: requests equals: 1.
+	^ step
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> testCaseDetailsLoadedLazily [
+	<gtExample>
+	<return: #JcCoreRun>
+	| log run cases |
+	log := OrderedCollection new.
+	run := self reportRunLoggingTo: log.
+	cases := run problematicTests.
+	self assert: log size equals: 1.
+	self assert: cases first errorDetails equals: 'boom'.
+	self assert: cases first errorStackTrace equals: 'DemoExamples>>fails'.
+	self assert: cases second skippedMessage equals: 'not now'.
+	self assert: cases second errorDetails equals: ''.
+	self assert: log size equals: 2.
+	self assert: cases third errorDetails equals: 'boom on linux'.
+	self assert: cases third errorDetails equals: 'boom on linux'.
+	self assert: log size equals: 3.
+	^ run
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> testCaseScripterArtifacts [
+	<gtExample>
+	<return: #JcCoreRun>
+	| run cases |
+	run := self reportRunLoggingTo: OrderedCollection new.
+	cases := run problematicTests.
+	self
+		assert: (cases first scripterArtifacts collect: #name) asArray
+		equals: #('step.png' 'step-events-all.txt').
+	self
+		assert: (cases first scripterArtifacts
+				allSatisfy: [ :each | each platformName = 'arm-x' ]).
+	self assert: cases second scripterArtifacts isEmpty.
+	self assert: cases third scripterArtifacts size equals: 1.
+	self assert: cases third scripterArtifacts first platformName equals: 'lin-x'.
+	self assert: run scripterArtifacts size equals: 4.
+	^ run
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> testCaseStatusIconScripter [
+	<gtExample>
+	<return: #BlScripter>
+	| scripter case |
+	case := self buildWithTestCases problematicTests second.
+	scripter := BlScripter new.
+	scripter element: case statusIcon.
+	self
+		assert: scripter element background paint color
+		equals: BrGlamorousColors failureBackgroundColor.
+	self
+		assert: case resultBackgroundColor
+		equals: BrGlamorousColors failureBackgroundColor.
+	^ scripter
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> testCaseViews [
+	<gtExample>
+	<return: #JcCoreRun>
+	| run case stage |
+	run := self reportRunLoggingTo: OrderedCollection new.
+	case := run problematicTests first.
+	stage := run stages detect: [ :each | each name = 'Test Mac' ].
+	{run gtProblematicTestsFor: GtPhlowView empty.
+		run gtScripterArtifactsFor: GtPhlowView empty.
+		stage gtProblematicTestsFor: GtPhlowView empty.
+		stage gtArtifactsFor: GtPhlowView empty.
+		case gtErrorDetailsFor: GtPhlowView empty.
+		case gtTestFor: GtPhlowView empty.
+		case gtArtifactsFor: GtPhlowView empty.
+		case gtScreenshotsFor: GtPhlowView empty}
+		do: [ :view | self assert: (view asElementDo: [ :each | each ]) notNil ].
+	^ run
+]
+
+{ #category : #examples }
+JcCoreModelExamples >> testCaseWithoutReport [
+	<gtExample>
+	<return: #JcCoreRun>
+	| run |
+	run := self buildWithoutTestReport.
+	self assert: run problematicTests isEmpty.
+	self
+		assert: (JcCoreStage
+				run: run
+				parent: nil
+				rawData: (Dictionary new
+						at: 'name' put: 'Test';
+						yourself)) testCases isEmpty.
 	^ run
 ]

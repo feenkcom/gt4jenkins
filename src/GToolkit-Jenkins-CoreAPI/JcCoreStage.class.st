@@ -8,10 +8,20 @@ Class {
 		'run',
 		'parent',
 		'rawData',
-		'children'
+		'children',
+		'steps'
 	],
 	#category : #'GToolkit-Jenkins-CoreAPI'
 }
+
+{ #category : #accessing }
+JcCoreStage class >> backgroundColorForStatus: aStatus [
+	aStatus = 'SUCCESS' ifTrue: [ ^ BrGlamorousColors successBackgroundColor ].
+	(#('FAILURE' 'FAILED' 'ERROR') includes: aStatus)
+		ifTrue: [ ^ BrGlamorousColors errorBackgroundColor ].
+	aStatus = 'UNSTABLE' ifTrue: [ ^ BrGlamorousColors failureBackgroundColor ].
+	^ BrGlamorousColors neutralBackgroundColor
+]
 
 { #category : #'instance creation' }
 JcCoreStage class >> run: aRun parent: aParent rawData: aDictionary [
@@ -38,12 +48,36 @@ JcCoreStage >> addEdgesTo: aCollection [
 			sources := each exitStages ]
 ]
 
+{ #category : #association }
+JcCoreStage >> agentStage [
+	| current |
+	current := self.
+	[ current notNil ]
+		whileTrue: [ (current name beginsWith: 'Agent (') ifTrue: [ ^ current ].
+			current := current parent ].
+	^ nil
+]
+
+{ #category : #association }
+JcCoreStage >> agentTarget [
+	| agentName |
+	agentName := self agentStage ifNil: [ ^ nil ] ifNotNil: [ :agent | agent name ].
+	^ agentName copyFrom: 8 to: agentName size - 1
+]
+
 { #category : #accessing }
 JcCoreStage >> allStages [
 	| all |
 	all := OrderedCollection with: self.
 	children do: [ :child | all addAll: child allStages ].
 	^ all asArray
+]
+
+{ #category : #association }
+JcCoreStage >> artifacts [
+	| target |
+	target := self agentTarget ifNil: [ ^ #() ].
+	^ run artifacts select: [ :each | each pathSegments includes: target ]
 ]
 
 { #category : #views }
@@ -117,6 +151,20 @@ JcCoreStage >> exitStages [
 ]
 
 { #category : #views }
+JcCoreStage >> gtArtifactsFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'Artifacts';
+		question: 'Which archived files belong to the agent that ran this stage?';
+		priority: 14;
+		items: [ self artifacts ];
+		column: 'File'
+			text: [ :artifact | artifact name ]
+			width: 250;
+		column: 'Path' text: [ :artifact | artifact path ]
+]
+
+{ #category : #views }
 JcCoreStage >> gtChildrenFor: aView [
 	<gtView>
 	^ aView columnedList
@@ -124,7 +172,9 @@ JcCoreStage >> gtChildrenFor: aView [
 		question: 'Which stages belong to this stage or parallel branch?';
 		priority: 20;
 		items: [ self children ];
-		column: 'Status' text: [ :stage | stage status ];
+		column: 'Status'
+			icon: [ :stage | stage statusIcon ]
+			width: 50;
 		column: 'Stage' text: [ :stage | stage name ];
 		column: 'Duration' text: [ :stage | stage durationText ]
 ]
@@ -132,6 +182,21 @@ JcCoreStage >> gtChildrenFor: aView [
 { #category : #printing }
 JcCoreStage >> gtDisplayOn: aStream [
 	aStream nextPutAll: self name
+]
+
+{ #category : #views }
+JcCoreStage >> gtProblematicTestsFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'Failed examples';
+		question: 'Which tests failed or were skipped in this stage?';
+		priority: 12;
+		items: [ self testCases ];
+		column: 'Status'
+			icon: [ :case | case statusIcon ]
+			width: 50;
+		column: 'Class' text: [ :case | case shortClassName ];
+		column: 'Test' text: [ :case | case name ]
 ]
 
 { #category : #views }
@@ -145,9 +210,41 @@ JcCoreStage >> gtRawDataFor: aView [
 		view: #gtTreeFor:context:
 ]
 
+{ #category : #views }
+JcCoreStage >> gtStepsFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'Steps';
+		question: 'Which steps did this stage run?';
+		priority: 10;
+		items: [ self steps ];
+		column: 'Status'
+			icon: [ :step | step statusIcon ]
+			width: 50;
+		column: 'Step' text: [ :step | step name ];
+		column: 'Arguments' text: [ :step | step parameterDescription ];
+		column: 'Duration'
+			text: [ :step | step durationText ]
+			width: 100;
+		actionButtonIcon: BrGlamorousVectorIcons refresh
+			tooltip: 'Refresh steps'
+			action: [ :button :tab | 
+				self refreshSteps.
+				tab viewContentElement phlow update ]
+]
+
 { #category : #accessing }
 JcCoreStage >> id [
 	^ rawData at: 'id' ifAbsent: [ '' ]
+]
+
+{ #category : #association }
+JcCoreStage >> includesTestCase: aTestCase [
+	| names agent |
+	names := aTestCase stageNames.
+	(names includes: self name) ifFalse: [ ^ false ].
+	agent := self agentStage.
+	^ agent isNil or: [ names includes: agent name ]
 ]
 
 { #category : #testing }
@@ -181,14 +278,20 @@ JcCoreStage >> rawData [
 ]
 
 { #category : #accessing }
+JcCoreStage >> refreshSteps [
+	| response newSteps |
+	response := [ run getJsonAtNodeId: self id suffix: #('wfapi' 'describe') ]
+			on: ZnHttpUnsuccessful
+			do: [ :error | error response code = 404 ifTrue: [ Dictionary new ] ifFalse: [ error pass ] ].
+	newSteps := (response at: 'stageFlowNodes' ifAbsent: [ #() ])
+			collect: [ :each | JcCoreStep stage: self rawData: each ].
+	steps := newSteps.
+	^ steps
+]
+
+{ #category : #views }
 JcCoreStage >> resultBackgroundColor [
-	| state |
-	state := self status.
-	state = 'SUCCESS' ifTrue: [ ^ BrGlamorousColors successBackgroundColor ].
-	(#('FAILURE' 'FAILED' 'ERROR') includes: state)
-		ifTrue: [ ^ BrGlamorousColors errorBackgroundColor ].
-	state = 'UNSTABLE' ifTrue: [ ^ BrGlamorousColors failureBackgroundColor ].
-	^ BrGlamorousColors neutralBackgroundColor
+	^ self class backgroundColorForStatus: self status
 ]
 
 { #category : #accessing }
@@ -223,6 +326,24 @@ JcCoreStage >> state [
 { #category : #accessing }
 JcCoreStage >> status [
 	^ self state asUppercase
+]
+
+{ #category : #views }
+JcCoreStage >> statusIcon [
+	^ BlElement new
+		geometry: BlCircleGeometry new;
+		background: self resultBackgroundColor;
+		size: 10 @ 10
+]
+
+{ #category : #accessing }
+JcCoreStage >> steps [
+	^ steps ifNil: [ self refreshSteps ]
+]
+
+{ #category : #association }
+JcCoreStage >> testCases [
+	^ run problematicTests select: [ :each | self includesTestCase: each ]
 ]
 
 { #category : #accessing }

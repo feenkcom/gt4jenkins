@@ -701,6 +701,71 @@ JcCoreModelExamples >> pharoDebugLogArtifact [
 	^ artifact
 ]
 
+{ #category : #builds }
+JcCoreModelExamples >> queueUnavailable [
+	<gtExample>
+	<return: #JcCoreJob>
+	| client job |
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example'.
+	client
+		responseProvider: [ :url | 
+			(url asString includesSubstring: '/queue/api/json')
+				ifTrue: [ (ZnHttpUnsuccessful response: (ZnResponse notFound: url)) signal ]
+				ifFalse: [ '{"builds":[]}' ] ].
+	job := JcCoreJob
+			client: client
+			names: #('demo')
+			rawData: (Dictionary new
+					at: 'name' put: 'demo';
+					at: 'url' put: 'https://jenkins.example/job/demo/';
+					yourself).
+	self assert: job queuedRuns isEmpty.
+	^ job
+]
+
+{ #category : #builds }
+JcCoreModelExamples >> queuedRunInBuildsView [
+	<gtExample>
+	<return: #JcCoreJob>
+	| client job queued view |
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example'.
+	client
+		responseProvider: [ :url | 
+			(url asString includesSubstring: '/queue/api/json')
+				ifTrue: [ '{"items":[{"id":1,"inQueueSince":1730000000000,"why":"Build #8 is already in progress","task":{"url":"https://jenkins.example/job/demo/"}},{"id":2,"inQueueSince":1730000000000,"why":"other","task":{"url":"https://jenkins.example/job/other/"}}]}' ]
+				ifFalse: [ '{"builds":[{"number":8,"url":"https://jenkins.example/job/demo/8/","building":true}]}' ] ].
+	job := JcCoreJob
+			client: client
+			names: #('demo')
+			rawData: (Dictionary new
+					at: 'name' put: 'demo';
+					at: 'url' put: 'https://jenkins.example/job/demo/';
+					yourself).
+	self assert: job builds size equals: 1.
+	queued := job queuedRuns.
+	self assert: queued size equals: 1.
+	self assert: queued first isQueued.
+	self assert: queued first number equals: 9.
+	self assert: queued first resultText equals: 'QUEUED'.
+	self
+		assert: queued first queuedReason
+		equals: 'Build #8 is already in progress'.
+	self assert: queued first durationText isEmpty not.
+	self assert: queued first startTimeText isEmpty not.
+	self
+		assert: queued first resultBackgroundColor
+		equals: BrGlamorousColors lightBorderColor.
+	self assert: queued first stages isEmpty.
+	self assert: queued first artifacts isEmpty.
+	self assert: queued first problematicTests isEmpty.
+	self assert: job queuedRuns == queued.
+	view := job gtBuildsFor: GtPhlowView empty.
+	self assert: (view asElementDo: [ :each | each ]) notNil.
+	^ job
+]
+
 { #category : #examples }
 JcCoreModelExamples >> reinitializeJobClearsBuilds [
 	<gtExample>

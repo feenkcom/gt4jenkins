@@ -9,7 +9,8 @@ Class {
 		'names',
 		'rawData',
 		'jobs',
-		'builds'
+		'builds',
+		'queuedRuns'
 	],
 	#category : #'GToolkit-Jenkins-CoreAPI'
 }
@@ -34,6 +35,7 @@ JcCoreJob >> client: aClient names: jobNames rawData: aDictionary [
 	rawData := aDictionary.
 	jobs := nil.
 	builds := nil.
+	queuedRuns := nil.
 	^ self
 ]
 
@@ -49,7 +51,7 @@ JcCoreJob >> gtBuildsFor: aView [
 		title: 'Builds';
 		question: 'Which builds belong to this Jenkins job?';
 		priority: 20;
-		items: [ self builds ];
+		items: [ self queuedRuns , self builds ];
 		column: 'Status'
 			icon: [ :run | run statusIcon ]
 			width: 50;
@@ -68,6 +70,7 @@ JcCoreJob >> gtBuildsFor: aView [
 			tooltip: 'Update builds list from the server'
 			action: [ :aButton :aTab | 
 				self refreshBuilds.
+				self refreshQueuedRuns.
 				aTab phlow fireViewUpdateWish ]
 ]
 
@@ -120,6 +123,11 @@ JcCoreJob >> names [
 	^ names
 ]
 
+{ #category : #queue }
+JcCoreJob >> queuedRuns [
+	^ queuedRuns ifNil: [ self refreshQueuedRuns ]
+]
+
 { #category : #accessing }
 JcCoreJob >> rawData [
 	^ rawData
@@ -155,6 +163,38 @@ JcCoreJob >> refreshJobs [
 					rawData: job ].
 	jobs := freshJobs.
 	^ jobs
+]
+
+{ #category : #queue }
+JcCoreJob >> refreshQueuedRuns [
+	| response items number |
+	response := [ client
+			getJsonAtPathSegments: #('queue' 'api' 'json')
+			tree: 'items[id,inQueueSince,why,task[url]]' ]
+			on: ZnHttpUnsuccessful
+			do: [ :error | Dictionary new ].
+	items := ((response at: 'items' ifAbsent: [ #() ])
+			select: [ :each | 
+				((each at: 'task' ifAbsent: [ Dictionary new ]) at: 'url' ifAbsent: [ nil ])
+					= self url ])
+			sorted: [ :a :b | (a at: 'inQueueSince' ifAbsent: [ 0 ]) <= (b at: 'inQueueSince' ifAbsent: [ 0 ]) ].
+	number := self builds isEmpty
+			ifTrue: [ 0 ]
+			ifFalse: [ self builds first number ].
+	queuedRuns := (items
+			collect: [ :each | 
+				number := number + 1.
+				JcCoreRun
+					queuedClient: client
+					jobNames: names
+					rawData: (Dictionary new
+							at: 'number' put: number;
+							at: 'queued' put: true;
+							at: 'building' put: false;
+							at: 'timestamp' put: (each at: 'inQueueSince' ifAbsent: [ nil ]);
+							at: 'why' put: (each at: 'why' ifAbsent: [ nil ]);
+							yourself) ]) reversed asArray.
+	^ queuedRuns
 ]
 
 { #category : #accessing }

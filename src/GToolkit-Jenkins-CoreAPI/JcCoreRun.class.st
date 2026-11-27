@@ -28,6 +28,16 @@ JcCoreRun class >> client: aClient jobNames: names rawData: aDictionary [
 		rawData: aDictionary
 ]
 
+{ #category : #'instance creation' }
+JcCoreRun class >> queuedClient: aClient jobNames: names rawData: aDictionary [
+	^ (self
+		client: aClient
+		jobNames: names
+		rawData: aDictionary)
+		initializeQueued;
+		yourself
+]
+
 { #category : #accessing }
 JcCoreRun >> artifactContentsFor: anArtifact [
 	| relativePath path |
@@ -124,8 +134,9 @@ JcCoreRun >> duration [
 { #category : #accessing }
 JcCoreRun >> durationText [
 	| start milliseconds |
-	self building = true
-		ifTrue: [ start := self startTime ifNil: [ ^ 'RUNNING' ].
+	(self isQueued or: [ self building = true ])
+		ifTrue: [ start := self startTime
+					ifNil: [ ^ self isQueued ifTrue: [ 'QUEUED' ] ifFalse: [ 'RUNNING' ] ].
 			^ (DateAndTime now - start) asSeconds seconds humanReadablePrintString ].
 	milliseconds := self duration.
 	^ milliseconds
@@ -336,6 +347,22 @@ JcCoreRun >> hasStageTree [
 	^ stageTreeAvailable == true
 ]
 
+{ #category : #initialization }
+JcCoreRun >> initializeQueued [
+	details := Dictionary new.
+	artifacts := #().
+	stages := #().
+	rootStages := #().
+	stageTreeAvailable := false.
+	problematicTests := #().
+	testSuites := #()
+]
+
+{ #category : #accessing }
+JcCoreRun >> isQueued [
+	^ (rawData at: 'queued' ifAbsent: [ false ]) == true
+]
+
 { #category : #accessing }
 JcCoreRun >> number [
 	^ rawData at: 'number'
@@ -344,6 +371,11 @@ JcCoreRun >> number [
 { #category : #accessing }
 JcCoreRun >> problematicTests [
 	^ problematicTests ifNil: [ self refreshProblematicTests ]
+]
+
+{ #category : #accessing }
+JcCoreRun >> queuedReason [
+	^ rawData at: 'why' ifAbsent: [ nil ]
 ]
 
 { #category : #accessing }
@@ -457,6 +489,7 @@ JcCoreRun >> result [
 
 { #category : #accessing }
 JcCoreRun >> resultBackgroundColor [
+	self isQueued ifTrue: [ ^ BrGlamorousColors lightBorderColor ].
 	self building = true ifTrue: [ ^ BrGlamorousColors primaryBorderColor ].
 	self result = 'SUCCESS' ifTrue: [ ^ BrGlamorousColors successBackgroundColor ].
 	self result = 'FAILURE' ifTrue: [ ^ BrGlamorousColors errorBackgroundColor ].
@@ -466,6 +499,7 @@ JcCoreRun >> resultBackgroundColor [
 
 { #category : #accessing }
 JcCoreRun >> resultText [
+	self isQueued ifTrue: [ ^ 'QUEUED' ].
 	self building = true ifTrue: [ ^ 'RUNNING' ].
 	^ self result ifNil: [ 'UNKNOWN' ]
 ]

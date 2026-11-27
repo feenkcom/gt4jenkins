@@ -408,6 +408,60 @@ JcCoreModelExamples >> emptyFolderJobsStayCached [
 	^ folder
 ]
 
+{ #category : #'test cases' }
+JcCoreModelExamples >> executedSuiteViews [
+	<gtExample>
+	<return: #JcCoreRun>
+	| run stage runView stageView |
+	run := self executedSuitesPerStage.
+	stage := run stages detect: [ :each | each name = 'Test Mac' ].
+	runView := run gtTestSuitesFor: GtPhlowView empty.
+	self assert: runView title equals: 'Test suites'.
+	self assert: (runView asElementDo: [ :each | each ]) notNil.
+	stageView := stage gtTestSuitesFor: GtPhlowView empty.
+	self assert: stageView title equals: 'Executed suites'.
+	self assert: (stageView asElementDo: [ :each | each ]) notNil.
+	^ run
+]
+
+{ #category : #'test cases' }
+JcCoreModelExamples >> executedSuitesPerStage [
+	<gtExample>
+	<return: #JcCoreRun>
+	| log run suites mac linux |
+	log := OrderedCollection new.
+	run := self reportRunLoggingTo: log.
+	suites := run testSuites.
+	self assert: suites size equals: 3.
+	self assert: (suites collect: #class) asSet asArray equals: {JcCoreTestSuite}.
+	self assert: suites first stageName equals: 'Test Mac'.
+	self assert: suites first durationSeconds equals: 2.5.
+	self assert: suites first nodeId equals: '9'.
+	self assert: run testSuites == suites.
+	self
+		assert: (log select: [ :each | each includesSubstring: 'duration' ]) size
+		equals: 1.
+	mac := run stages detect: [ :each | each name = 'Test Mac' ].
+	linux := run stages detect: [ :each | each name = 'Test Linux' ].
+	self assert: mac testSuites size equals: 2.
+	self assert: mac testDurationSeconds equals: 9.5.
+	self assert: linux testSuites size equals: 1.
+	self assert: linux testSuites first name equals: 'Pkg-Other'.
+	self assert: linux testSuites first durationText isString.
+	^ run
+]
+
+{ #category : #'test cases' }
+JcCoreModelExamples >> executedSuitesWithoutReport [
+	<gtExample>
+	<return: #JcCoreRun>
+	| run |
+	run := self buildWithoutTestReport.
+	self assert: run testSuites isEmpty.
+	self assert: run testSuites isEmpty.
+	^ run
+]
+
 { #category : #examples }
 JcCoreModelExamples >> folderCachesAreIndependent [
 	<gtExample>
@@ -647,6 +701,71 @@ JcCoreModelExamples >> pharoDebugLogArtifact [
 	^ artifact
 ]
 
+{ #category : #builds }
+JcCoreModelExamples >> queueUnavailable [
+	<gtExample>
+	<return: #JcCoreJob>
+	| client job |
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example'.
+	client
+		responseProvider: [ :url | 
+			(url asString includesSubstring: '/queue/api/json')
+				ifTrue: [ (ZnHttpUnsuccessful response: (ZnResponse notFound: url)) signal ]
+				ifFalse: [ '{"builds":[]}' ] ].
+	job := JcCoreJob
+			client: client
+			names: #('demo')
+			rawData: (Dictionary new
+					at: 'name' put: 'demo';
+					at: 'url' put: 'https://jenkins.example/job/demo/';
+					yourself).
+	self assert: job queuedRuns isEmpty.
+	^ job
+]
+
+{ #category : #builds }
+JcCoreModelExamples >> queuedRunInBuildsView [
+	<gtExample>
+	<return: #JcCoreJob>
+	| client job queued view |
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example'.
+	client
+		responseProvider: [ :url | 
+			(url asString includesSubstring: '/queue/api/json')
+				ifTrue: [ '{"items":[{"id":1,"inQueueSince":1730000000000,"why":"Build #8 is already in progress","task":{"url":"https://jenkins.example/job/demo/"}},{"id":2,"inQueueSince":1730000000000,"why":"other","task":{"url":"https://jenkins.example/job/other/"}}]}' ]
+				ifFalse: [ '{"builds":[{"number":8,"url":"https://jenkins.example/job/demo/8/","building":true}]}' ] ].
+	job := JcCoreJob
+			client: client
+			names: #('demo')
+			rawData: (Dictionary new
+					at: 'name' put: 'demo';
+					at: 'url' put: 'https://jenkins.example/job/demo/';
+					yourself).
+	self assert: job builds size equals: 1.
+	queued := job queuedRuns.
+	self assert: queued size equals: 1.
+	self assert: queued first isQueued.
+	self assert: queued first number equals: 9.
+	self assert: queued first resultText equals: 'QUEUED'.
+	self
+		assert: queued first queuedReason
+		equals: 'Build #8 is already in progress'.
+	self assert: queued first durationText isEmpty not.
+	self assert: queued first startTimeText isEmpty not.
+	self
+		assert: queued first resultBackgroundColor
+		equals: BrGlamorousColors lightBorderColor.
+	self assert: queued first stages isEmpty.
+	self assert: queued first artifacts isEmpty.
+	self assert: queued first problematicTests isEmpty.
+	self assert: job queuedRuns == queued.
+	view := job gtBuildsFor: GtPhlowView empty.
+	self assert: (view asElementDo: [ :each | each ]) notNil.
+	^ job
+]
+
 { #category : #examples }
 JcCoreModelExamples >> reinitializeJobClearsBuilds [
 	<gtExample>
@@ -679,7 +798,7 @@ JcCoreModelExamples >> reinitializeJobClearsBuilds [
 	^ job
 ]
 
-{ #category : #fixtures }
+{ #category : #support }
 JcCoreModelExamples >> reportRunLoggingTo: aLog [
 	| client |
 	client := JcCoreClient new.
@@ -693,11 +812,11 @@ JcCoreModelExamples >> reportRunLoggingTo: aLog [
 			(text includesSubstring: '/stages/tree')
 				ifTrue: [ '{"status":"ok","data":{"complete":true,"stages":[{"id":"2","name":"Parallel","type":"PARALLEL_BLOCK","state":"success","children":[{"id":"3","name":"Agent (arm-x)","type":"PARALLEL","state":"failed","children":[{"id":"4","name":"Test Mac","state":"failed","children":[]}]},{"id":"5","name":"Agent (lin-x)","type":"PARALLEL","state":"success","children":[{"id":"6","name":"Test Linux","state":"success","children":[]}]}]}]}}' ]
 				ifFalse: [ (text includesSubstring: '/testReport/')
-						ifTrue: [ (tree includesSubstring: 'errorDetails')
+						ifTrue: [ (tree includesSubstring: 'duration') ifTrue: [ '{"suites":[{"name":"Pkg-DemoExamples","nodeId":"9","enclosingBlockNames":["Test Mac","Agent (arm-x)"],"duration":2.5},{"name":"Pkg-Other","nodeId":"10","enclosingBlockNames":["Test Linux","Agent (lin-x)"],"duration":10.0},{"name":"Pkg-Slow","nodeId":"11","enclosingBlockNames":["Test Mac","Agent (arm-x)"],"duration":7.0}]}' ] ifFalse: [ (tree includesSubstring: 'errorDetails')
 								ifTrue: [ (tree endsWith: '{0,1}')
 										ifTrue: [ '{"suites":[{"cases":[{"className":"Pkg.Examples.DemoExamples","name":"passes","status":"PASSED","errorDetails":null,"errorStackTrace":null,"skippedMessage":null},{"className":"Pkg.Examples.DemoExamples","name":"fails","status":"FAILED","errorDetails":"boom","errorStackTrace":"DemoExamples>>fails","skippedMessage":null},{"className":"Pkg.Examples.DemoExamples","name":"skips","status":"SKIPPED","errorDetails":null,"errorStackTrace":null,"skippedMessage":"not now"}]}]}' ]
 										ifFalse: [ '{"suites":[{"cases":[{"className":"Pkg.Examples.DemoExamples","name":"fails","status":"FAILED","errorDetails":"boom on linux","errorStackTrace":"stack","skippedMessage":null}]}]}' ] ]
-								ifFalse: [ '{"suites":[{"name":"Pkg-DemoExamples","nodeId":"9","enclosingBlockNames":["Test Mac","Agent (arm-x)"],"cases":[{"className":"Pkg.Examples.DemoExamples","name":"passes","status":"PASSED"},{"className":"Pkg.Examples.DemoExamples","name":"fails","status":"FAILED"},{"className":"Pkg.Examples.DemoExamples","name":"skips","status":"SKIPPED"}]},{"name":"Pkg-DemoExamples","nodeId":"10","enclosingBlockNames":["Test Linux","Agent (lin-x)"],"cases":[{"className":"Pkg.Examples.DemoExamples","name":"fails","status":"FAILED"}]}]}' ] ]
+								ifFalse: [ '{"suites":[{"name":"Pkg-DemoExamples","nodeId":"9","enclosingBlockNames":["Test Mac","Agent (arm-x)"],"cases":[{"className":"Pkg.Examples.DemoExamples","name":"passes","status":"PASSED"},{"className":"Pkg.Examples.DemoExamples","name":"fails","status":"FAILED"},{"className":"Pkg.Examples.DemoExamples","name":"skips","status":"SKIPPED"}]},{"name":"Pkg-DemoExamples","nodeId":"10","enclosingBlockNames":["Test Linux","Agent (lin-x)"],"cases":[{"className":"Pkg.Examples.DemoExamples","name":"fails","status":"FAILED"}]}]}' ] ] ]
 						ifFalse: [ '{"artifacts":[{"fileName":"step.png","relativePath":"artifacts/arm-x/gt-examples/pharo-local/scripter/DemoExamples/fails/step.png"},{"fileName":"step-events-all.txt","relativePath":"artifacts/arm-x/gt-examples/pharo-local/scripter/DemoExamples/fails/step-events-all.txt"},{"fileName":"step.png","relativePath":"artifacts/lin-x/gt-examples/pharo-local/scripter/DemoExamples/fails/step.png"},{"fileName":"step.png","relativePath":"artifacts/arm-x/gt-examples/pharo-local/scripter/OtherExamples/other/step.png"},{"fileName":"PharoDebug.log","relativePath":"artifacts/arm-x/gt-examples/PharoDebug.log"}]}' ] ] ].
 	^ JcCoreRun
 		client: client
@@ -706,6 +825,26 @@ JcCoreModelExamples >> reportRunLoggingTo: aLog [
 				at: 'number' put: 7;
 				at: 'building' put: false;
 				yourself)
+]
+
+{ #category : #builds }
+JcCoreModelExamples >> runningBuildDurationSinceStart [
+	<gtExample>
+	<return: #JcCoreRun>
+	| run started |
+	started := DateAndTime now asUnixTime - 125.
+	run := JcCoreRun
+			client: JcCoreClient new
+			jobNames: #('main')
+			rawData: (Dictionary new
+					at: 'number' put: 7;
+					at: 'building' put: true;
+					at: 'timestamp' put: started * 1000;
+					yourself).
+	self assert: run startTime asUnixTime equals: started.
+	self assert: (DateAndTime now - run startTime) asSeconds < 200.
+	self assert: (run durationText beginsWith: '2 minutes').
+	^ run
 ]
 
 { #category : #examples }
@@ -786,6 +925,31 @@ JcCoreModelExamples >> runningBuildWithoutTestReport [
 					yourself).
 	self assert: run problematicTests isEmpty.
 	self assert: requests equals: 0.
+	^ run
+]
+
+{ #category : #builds }
+JcCoreModelExamples >> runningColors [
+	<gtExample>
+	<return: #JcCoreRun>
+	| run running stage step |
+	run := self runningBuildDurationSinceStart.
+	running := BrGlamorousColors primaryBorderColor.
+	self assert: run resultBackgroundColor equals: running.
+	stage := JcCoreStage
+			run: run
+			parent: nil
+			rawData: (Dictionary new
+					at: 'name' put: 'Test';
+					at: 'state' put: 'running';
+					yourself).
+	self assert: stage resultBackgroundColor equals: running.
+	self
+		assert: (JcCoreStage backgroundColorForStatus: 'IN_PROGRESS')
+		equals: running.
+	self
+		assert: (JcCoreStage backgroundColorForStatus: 'SUCCESS')
+		equals: BrGlamorousColors successBackgroundColor.
 	^ run
 ]
 
@@ -1117,6 +1281,39 @@ JcCoreModelExamples >> testCaseStatusIconScripter [
 		assert: case resultBackgroundColor
 		equals: BrGlamorousColors failureBackgroundColor.
 	^ scripter
+]
+
+{ #category : #'test cases' }
+JcCoreModelExamples >> testCaseStep [
+	<gtExample>
+	<return: #JcCoreRun>
+	| run client previous case step other |
+	run := self reportRunLoggingTo: OrderedCollection new.
+	client := run instVarNamed: 'client'.
+	previous := client instVarNamed: 'responseProvider'.
+	client
+		responseProvider: [ :url | 
+			| text |
+			text := url asString.
+			(text includesSubstring: '/execution/node/4/wfapi/describe')
+				ifTrue: [ '{"id":"4","name":"Test Mac","stageFlowNodes":[{"id":"8","name":"Checkout","status":"SUCCESS"},{"id":"9","name":"Shell Script","status":"FAILED","parameterDescription":"run tests"}]}' ]
+				ifFalse: [ (text includesSubstring: '/execution/node/9/wfapi/log')
+						ifTrue: [ '{"text":"<span>boom log</span>","hasMore":false}' ]
+						ifFalse: [ previous value: url ] ] ].
+	case := run problematicTests first.
+	step := case step.
+	self assert: step class equals: JcCoreStep.
+	self assert: step id equals: '9'.
+	self assert: case stage name equals: 'Test Mac'.
+	self assert: step logText equals: 'boom log'.
+	other := run problematicTests third.
+	self assert: other step isNil.
+	self
+		assert: (case gtConsoleLogFor: GtPhlowView empty) title
+		equals: 'Console log'.
+	self
+		assert: ((case gtConsoleLogFor: GtPhlowView empty) asElementDo: [ :each | each ]) notNil.
+	^ run
 ]
 
 { #category : #examples }

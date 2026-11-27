@@ -20,6 +20,8 @@ JcCoreStage class >> backgroundColorForStatus: aStatus [
 	(#('FAILURE' 'FAILED' 'ERROR') includes: aStatus)
 		ifTrue: [ ^ BrGlamorousColors errorBackgroundColor ].
 	aStatus = 'UNSTABLE' ifTrue: [ ^ BrGlamorousColors failureBackgroundColor ].
+	(#('RUNNING' 'IN_PROGRESS') includes: aStatus)
+		ifTrue: [ ^ BrGlamorousColors primaryBorderColor ].
 	^ BrGlamorousColors neutralBackgroundColor
 ]
 
@@ -233,18 +235,37 @@ JcCoreStage >> gtStepsFor: aView [
 				tab viewContentElement phlow update ]
 ]
 
+{ #category : #views }
+JcCoreStage >> gtTestSuitesFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'Executed suites';
+		question: 'Which JUnit suites ran in this stage and how long did they take?';
+		priority: 11;
+		items: [ self testSuites
+				asSortedCollection: [ :a :b | a durationSeconds >= b durationSeconds ] ];
+		column: 'Suite' text: [ :suite | suite name ];
+		column: 'Duration'
+			text: [ :suite | suite durationText ]
+			width: 100
+]
+
 { #category : #accessing }
 JcCoreStage >> id [
 	^ rawData at: 'id' ifAbsent: [ '' ]
 ]
 
-{ #category : #association }
-JcCoreStage >> includesTestCase: aTestCase [
-	| names agent |
-	names := aTestCase stageNames.
+{ #category : #tests }
+JcCoreStage >> includesStageNames: names [
+	| agent |
 	(names includes: self name) ifFalse: [ ^ false ].
 	agent := self agentStage.
 	^ agent isNil or: [ names includes: agent name ]
+]
+
+{ #category : #tests }
+JcCoreStage >> includesTestCase: aTestCase [
+	^ self includesStageNames: aTestCase stageNames
 ]
 
 { #category : #testing }
@@ -344,6 +365,16 @@ JcCoreStage >> steps [
 { #category : #association }
 JcCoreStage >> testCases [
 	^ run problematicTests select: [ :each | self includesTestCase: each ]
+]
+
+{ #category : #tests }
+JcCoreStage >> testDurationSeconds [
+	^ self testSuites inject: 0 into: [ :sum :each | sum + each durationSeconds ]
+]
+
+{ #category : #tests }
+JcCoreStage >> testSuites [
+	^ run testSuitesForStage: self
 ]
 
 { #category : #accessing }

@@ -14,7 +14,8 @@ Class {
 		'rootStages',
 		'stageTreeAvailable',
 		'problematicTests',
-		'suiteDetails'
+		'suiteDetails',
+		'testSuites'
 	],
 	#category : #'GToolkit-Jenkins-CoreAPI'
 }
@@ -25,6 +26,16 @@ JcCoreRun class >> client: aClient jobNames: names rawData: aDictionary [
 		client: aClient
 		jobNames: names
 		rawData: aDictionary
+]
+
+{ #category : #'instance creation' }
+JcCoreRun class >> queuedClient: aClient jobNames: names rawData: aDictionary [
+	^ (self
+		client: aClient
+		jobNames: names
+		rawData: aDictionary)
+		initializeQueued;
+		yourself
 ]
 
 { #category : #accessing }
@@ -94,6 +105,7 @@ JcCoreRun >> client: aClient jobNames: names rawData: aDictionary [
 	stageTreeAvailable := nil.
 	problematicTests := nil.
 	suiteDetails := nil.
+	testSuites := nil.
 	^ self
 ]
 
@@ -121,10 +133,11 @@ JcCoreRun >> duration [
 
 { #category : #accessing }
 JcCoreRun >> durationText [
-	| elapsed milliseconds |
-	self building = true
-		ifTrue: [ elapsed := self startTime ifNil: [ ^ 'RUNNING' ].
-			^ (DateAndTime now - elapsed) humanReadablePrintString ].
+	| start milliseconds |
+	(self isQueued or: [ self building = true ])
+		ifTrue: [ start := self startTime
+					ifNil: [ ^ self isQueued ifTrue: [ 'QUEUED' ] ifFalse: [ 'RUNNING' ] ].
+			^ (DateAndTime now - start) asSeconds seconds humanReadablePrintString ].
 	milliseconds := self duration.
 	^ milliseconds
 		ifNil: [ '' ]
@@ -307,10 +320,47 @@ JcCoreRun >> gtStagesMapFor: aView [
 				tab viewContentElement phlow update ]
 ]
 
+{ #category : #views }
+JcCoreRun >> gtTestSuitesFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'Test suites';
+		question: 'Which JUnit suites ran in this build and which were the slowest?';
+		priority: 52;
+		items: [ self testSuites
+				asSortedCollection: [ :a :b | a durationSeconds >= b durationSeconds ] ];
+		column: 'Suite' text: [ :suite | suite name ];
+		column: 'Stage' text: [ :suite | suite stageName ];
+		column: 'Duration'
+			text: [ :suite | suite durationText ]
+			width: 100;
+		actionButtonIcon: BrGlamorousVectorIcons refresh
+			tooltip: 'Refresh suites'
+			action: [ :button :tab | 
+				self refreshTestSuites.
+				tab viewContentElement phlow update ]
+]
+
 { #category : #accessing }
 JcCoreRun >> hasStageTree [
 	self rootStages.
 	^ stageTreeAvailable == true
+]
+
+{ #category : #initialization }
+JcCoreRun >> initializeQueued [
+	details := Dictionary new.
+	artifacts := #().
+	stages := #().
+	rootStages := #().
+	stageTreeAvailable := false.
+	problematicTests := #().
+	testSuites := #()
+]
+
+{ #category : #accessing }
+JcCoreRun >> isQueued [
+	^ (rawData at: 'queued' ifAbsent: [ false ]) == true
 ]
 
 { #category : #accessing }
@@ -321,6 +371,11 @@ JcCoreRun >> number [
 { #category : #accessing }
 JcCoreRun >> problematicTests [
 	^ problematicTests ifNil: [ self refreshProblematicTests ]
+]
+
+{ #category : #accessing }
+JcCoreRun >> queuedReason [
+	^ rawData at: 'why' ifAbsent: [ nil ]
 ]
 
 { #category : #accessing }
@@ -404,6 +459,29 @@ JcCoreRun >> refreshStages [
 	^ stages
 ]
 
+{ #category : #'test report' }
+JcCoreRun >> refreshTestSuites [
+	| path response |
+	self building = true
+		ifTrue: [ testSuites := #().
+			^ testSuites ].
+	path := client jobPathSegmentsForNames: jobNames.
+	path add: self number asString.
+	path add: 'testReport'.
+	path add: 'api'.
+	path add: 'json'.
+	response := [ client
+			getJsonAtPathSegments: path
+			query: (Dictionary new
+					at: 'tree' put: 'suites[name,nodeId,enclosingBlockNames,duration]';
+					yourself) ]
+			on: ZnHttpUnsuccessful
+			do: [ :error | error response code = 404 ifTrue: [ Dictionary new ] ifFalse: [ error pass ] ].
+	testSuites := ((response at: 'suites' ifAbsent: [ #() ])
+			collect: [ :each | JcCoreTestSuite run: self rawData: each ]) asArray.
+	^ testSuites
+]
+
 { #category : #accessing }
 JcCoreRun >> result [
 	^ rawData at: 'result' ifAbsent: [ self detailAt: 'result' ]
@@ -411,7 +489,8 @@ JcCoreRun >> result [
 
 { #category : #accessing }
 JcCoreRun >> resultBackgroundColor [
-	self building = true ifTrue: [ ^ BrGlamorousColors neutralBackgroundColor ].
+	self isQueued ifTrue: [ ^ BrGlamorousColors lightBorderColor ].
+	self building = true ifTrue: [ ^ BrGlamorousColors primaryBorderColor ].
 	self result = 'SUCCESS' ifTrue: [ ^ BrGlamorousColors successBackgroundColor ].
 	self result = 'FAILURE' ifTrue: [ ^ BrGlamorousColors errorBackgroundColor ].
 	self result = 'UNSTABLE' ifTrue: [ ^ BrGlamorousColors failureBackgroundColor ].
@@ -420,6 +499,7 @@ JcCoreRun >> resultBackgroundColor [
 
 { #category : #accessing }
 JcCoreRun >> resultText [
+	self isQueued ifTrue: [ ^ 'QUEUED' ].
 	self building = true ifTrue: [ ^ 'RUNNING' ].
 	^ self result ifNil: [ 'UNKNOWN' ]
 ]
@@ -480,7 +560,7 @@ JcCoreRun >> stages [
 JcCoreRun >> startTime [
 	| milliseconds |
 	milliseconds := self timestamp.
-	^ milliseconds ifNotNil: [ DateAndTime fromSeconds: milliseconds / 1000 ]
+	^ milliseconds ifNotNil: [ DateAndTime fromUnixTime: milliseconds // 1000 ]
 ]
 
 { #category : #accessing }
@@ -499,6 +579,17 @@ JcCoreRun >> statusIcon [
 		geometry: BlCircleGeometry new;
 		background: self resultBackgroundColor;
 		size: 10 @ 10
+]
+
+{ #category : #'test report' }
+JcCoreRun >> testSuites [
+	^ testSuites ifNil: [ self refreshTestSuites ]
+]
+
+{ #category : #'test report' }
+JcCoreRun >> testSuitesForStage: aStage [
+	^ self testSuites
+		select: [ :each | aStage includesStageNames: each stageNames ]
 ]
 
 { #category : #accessing }

@@ -4,6 +4,8 @@
 Class {
 	#name : #JcCoreStage,
 	#superclass : #Object,
+	#traits : 'TJcCoreWebResource',
+	#classTraits : 'TJcCoreWebResource classTrait',
 	#instVars : [
 		'run',
 		'parent',
@@ -304,8 +306,9 @@ JcCoreStage >> refreshSteps [
 	response := [ run getJsonAtNodeId: self id suffix: #('wfapi' 'describe') ]
 			on: ZnHttpUnsuccessful
 			do: [ :error | error response code = 404 ifTrue: [ Dictionary new ] ifFalse: [ error pass ] ].
-	newSteps := (response at: 'stageFlowNodes' ifAbsent: [ #() ])
-			collect: [ :each | JcCoreStep stage: self rawData: each ].
+	newSteps := ((response ifNil: [ Dictionary new ])
+			at: 'stageFlowNodes'
+			ifAbsent: [ #() ]) collect: [ :each | JcCoreStep stage: self rawData: each ].
 	steps := newSteps.
 	^ steps
 ]
@@ -380,4 +383,9 @@ JcCoreStage >> testSuites [
 { #category : #accessing }
 JcCoreStage >> type [
 	^ rawData at: 'type' ifAbsent: [ 'STAGE' ]
+]
+
+{ #category : #urls }
+JcCoreStage >> webUrl [
+	^ run webUrl , 'execution/node/' , self id asString , '/'
 ]

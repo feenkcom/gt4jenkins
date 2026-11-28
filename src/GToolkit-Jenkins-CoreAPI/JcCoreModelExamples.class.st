@@ -551,6 +551,124 @@ JcCoreModelExamples >> folderWithJobsView [
 	^ folder
 ]
 
+{ #category : #steps }
+JcCoreModelExamples >> followingLongStepLogScripter [
+	<gtExample>
+	<return: #BlScripter>
+	| client run stage step scripter editor requests lines |
+	requests := 0.
+	lines := [ :from :to | 
+		String
+			streamContents: [ :stream | 
+				from
+					to: to
+					do: [ :each | 
+						stream
+							nextPutAll: 'line ' , each printString;
+							lf ] ] ].
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example/'.
+	client
+		responseProvider: [ :url | 
+			(url asString includesSubstring: 'wfapi/describe')
+				ifTrue: [ '{"status":"IN_PROGRESS"}' ]
+				ifFalse: [ requests := requests + 1.
+					requests = 1
+						ifTrue: [ lines value: 1 value: 200 ]
+						ifFalse: [ requests < 6
+								ifTrue: [ lines value: requests * 100 value: requests * 100 + 9 ]
+								ifFalse: [ '' ] ] ] ].
+	run := JcCoreRun
+			client: client
+			jobNames: #('main')
+			rawData: (Dictionary new
+					at: 'number' put: 7;
+					yourself).
+	stage := JcCoreStage
+			run: run
+			parent: nil
+			rawData: Dictionary new.
+	step := JcCoreStep
+			stage: stage
+			rawData: (Dictionary new
+					at: 'id' put: '13';
+					at: 'status' put: 'IN_PROGRESS';
+					yourself).
+	scripter := BlScripter new.
+	scripter
+		element: ((step gtLogFor: GtPhlowView empty) asElementDo: [ :each | each ]).
+	scripter element size: 500 @ 300.
+	scripter pulse.
+	editor := scripter element withAllChildrenBreadthFirst
+			detect: [ :each | each isKindOf: BrEditor ].
+	self assert: editor computeVerticalScrollOffset equals: 0.
+	step followLogIn: editor everyMilliseconds: 50.
+	(Delay forMilliseconds: 700) wait.
+	scripter pulse.
+	scripter pulse.
+	self assert: editor lineCount equals: 240.
+	self assert: editor computeVerticalScrollOffset > 150.
+	self assert: editor computeVerticalScrollOffset + 2 >= (editor lineCount - 16).
+	step stopFollowingLogIn: editor.
+	^ scripter
+]
+
+{ #category : #steps }
+JcCoreModelExamples >> followingStepLog [
+	<gtExample>
+	<return: #BlScripter>
+	| client run stage step scripter editor requests text process |
+	requests := 0.
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example/'.
+	client
+		responseProvider: [ :url | 
+			(url asString includesSubstring: 'wfapi/describe')
+				ifTrue: [ '{"status":"SUCCESS"}' ]
+				ifFalse: [ requests := requests + 1.
+					requests = 1
+						ifTrue: [ 'one' , String lf ]
+						ifFalse: [ requests = 2 ifTrue: [ 'two' , String lf ] ifFalse: [ '' ] ] ] ].
+	run := JcCoreRun
+			client: client
+			jobNames: #('main')
+			rawData: (Dictionary new
+					at: 'number' put: 7;
+					yourself).
+	stage := JcCoreStage
+			run: run
+			parent: nil
+			rawData: Dictionary new.
+	step := JcCoreStep
+			stage: stage
+			rawData: (Dictionary new
+					at: 'id' put: '13';
+					at: 'status' put: 'IN_PROGRESS';
+					yourself).
+	editor := BrEditor new
+			aptitude: BrGlamorousCodeEditorAptitude;
+			text: step logText asRopedText;
+			constraintsDo: [ :c | 
+				c horizontal matchParent.
+				c vertical matchParent ].
+	scripter := BlScripter new.
+	scripter element: editor.
+	text := editor text.
+	step followLogIn: editor everyMilliseconds: 50.
+	process := editor userData at: #jenkinsLogFollower.
+	step followLogIn: editor everyMilliseconds: 50.
+	self assert: (editor userData at: #jenkinsLogFollower) == process.
+	self assert: (step isFollowingLogIn: editor).
+	(Delay forMilliseconds: 600) wait.
+	scripter pulse.
+	self assert: step logText equals: 'one' , String lf , 'two' , String lf.
+	self assert: editor text == text.
+	self assert: editor text asString equals: 'one' , String lf , 'two' , String lf.
+	step stopFollowingLogIn: editor.
+	self assert: (step isFollowingLogIn: editor) not.
+	^ scripter
+]
+
 { #category : #examples }
 JcCoreModelExamples >> imageArtifact [
 	<gtExample>
@@ -1154,21 +1272,54 @@ JcCoreModelExamples >> stagesMapView [
 	^ run
 ]
 
-{ #category : #examples }
-JcCoreModelExamples >> stepWithLog [
+{ #category : #steps }
+JcCoreModelExamples >> stepStatusRefreshed [
 	<gtExample>
 	<return: #JcCoreStep>
-	| client run stage step requests |
-	requests := 0.
+	| client run stage step |
 	client := JcCoreClient new.
 	client baseUrl: 'https://jenkins.example/'.
 	client
 		responseProvider: [ :url | 
-			requests := requests + 1.
-			self
-				assert: url asString
-				equals: 'https://jenkins.example/job/main/7/execution/node/13/wfapi/log'.
-			'{"nodeId":"13","length":30,"hasMore":false,"text":"<span class=\"pipeline-new-node\">[Pipeline] sh</span>\n+ echo &lt;ok&gt; &amp; done\n"}' ].
+			self assert: (url asString endsWith: '/execution/node/13/wfapi/describe').
+			'{"id":"13","status":"SUCCESS"}' ].
+	run := JcCoreRun
+			client: client
+			jobNames: #('main')
+			rawData: (Dictionary new
+					at: 'number' put: 7;
+					yourself).
+	stage := JcCoreStage
+			run: run
+			parent: nil
+			rawData: Dictionary new.
+	step := JcCoreStep
+			stage: stage
+			rawData: (Dictionary new
+					at: 'id' put: '13';
+					at: 'status' put: 'IN_PROGRESS';
+					yourself).
+	self assert: step isInProgress.
+	self assert: step refreshStatus equals: 'SUCCESS'.
+	self assert: step isInProgress not.
+	self assert: (step gtLogFor: GtPhlowView empty) title equals: 'Log'.
+	^ step
+]
+
+{ #category : #steps }
+JcCoreModelExamples >> stepWithLog [
+	<gtExample>
+	<return: #JcCoreStep>
+	| client run stage step urls |
+	urls := OrderedCollection new.
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.example/'.
+	client
+		responseProvider: [ :url | 
+			urls add: url asString.
+			(url queryAt: 'start') = '0'
+				ifTrue: [ '[Pipeline] sh' , String lf , '+ echo <ok> & done' , String lf ]
+				ifFalse: [ (url queryAt: 'start') = '33' ifTrue: [ 'ok' , String lf ] ifFalse: [ '' ] ] ].
 	run := JcCoreRun
 			client: client
 			jobNames: #('main')
@@ -1189,7 +1340,17 @@ JcCoreModelExamples >> stepWithLog [
 		assert: step logText
 		equals: '[Pipeline] sh' , String lf , '+ echo <ok> & done' , String lf.
 	self assert: step logText == step logText.
-	self assert: requests equals: 1.
+	self assert: urls size equals: 1.
+	self
+		assert: urls first
+		equals: 'https://jenkins.example/job/main/7/execution/node/13/log/logText/progressiveText?start=0'.
+	self assert: step appendLog.
+	self
+		assert: step logText
+		equals: '[Pipeline] sh' , String lf , '+ echo <ok> & done' , String lf , 'ok'
+				, String lf.
+	self assert: step appendLog not.
+	self assert: (urls last endsWith: 'start=36').
 	^ step
 ]
 
@@ -1289,7 +1450,7 @@ JcCoreModelExamples >> testCaseStep [
 	<return: #JcCoreRun>
 	| run client previous case step other |
 	run := self reportRunLoggingTo: OrderedCollection new.
-	client := run instVarNamed: 'client'.
+	client := run client.
 	previous := client instVarNamed: 'responseProvider'.
 	client
 		responseProvider: [ :url | 
@@ -1297,8 +1458,8 @@ JcCoreModelExamples >> testCaseStep [
 			text := url asString.
 			(text includesSubstring: '/execution/node/4/wfapi/describe')
 				ifTrue: [ '{"id":"4","name":"Test Mac","stageFlowNodes":[{"id":"8","name":"Checkout","status":"SUCCESS"},{"id":"9","name":"Shell Script","status":"FAILED","parameterDescription":"run tests"}]}' ]
-				ifFalse: [ (text includesSubstring: '/execution/node/9/wfapi/log')
-						ifTrue: [ '{"text":"<span>boom log</span>","hasMore":false}' ]
+				ifFalse: [ (text includesSubstring: '/execution/node/9/log/logText/progressiveText')
+						ifTrue: [ 'boom log' ]
 						ifFalse: [ previous value: url ] ] ].
 	case := run problematicTests first.
 	step := case step.
@@ -1350,5 +1511,42 @@ JcCoreModelExamples >> testCaseWithoutReport [
 				rawData: (Dictionary new
 						at: 'name' put: 'Test';
 						yourself)) testCases isEmpty.
+	^ run
+]
+
+{ #category : #urls }
+JcCoreModelExamples >> webUrlsOfModelObjects [
+	<gtExample>
+	<return: #JcCoreRun>
+	| run runUrl stage case suite artifact step |
+	run := self reportRunLoggingTo: OrderedCollection new.
+	runUrl := 'https://jenkins.example/job/main/7/'.
+	self assert: run webUrl equals: runUrl.
+	self assert: run client webUrl equals: 'https://jenkins.example/'.
+	stage := run stages detect: [ :each | each name = 'Test Mac' ].
+	self assert: stage webUrl equals: runUrl , 'execution/node/4/'.
+	case := run problematicTests first.
+	self
+		assert: case webUrl
+		equals: runUrl , 'testReport/Pkg.Examples/DemoExamples/fails/'.
+	self assert: run testSuites first webUrl equals: runUrl , 'execution/node/9/'.
+	artifact := run artifacts first.
+	self assert: artifact webUrl equals: artifact url.
+	step := JcCoreStep
+			stage: stage
+			rawData: (Dictionary new
+					at: 'id' put: '13';
+					yourself).
+	self assert: step webUrl equals: runUrl , 'execution/node/13/log/'.
+	{run.
+		stage.
+		case.
+		step.
+		artifact}
+		do: [ :each | 
+			| view |
+			view := each gtWebUrlFor: GtPhlowView empty.
+			self assert: view title equals: 'URL'.
+			self assert: (view asElementDo: [ :element | element ]) notNil ].
 	^ run
 ]

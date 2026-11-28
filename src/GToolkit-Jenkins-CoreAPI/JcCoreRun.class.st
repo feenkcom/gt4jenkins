@@ -4,6 +4,8 @@
 Class {
 	#name : #JcCoreRun,
 	#superclass : #Object,
+	#traits : 'TJcCoreWebResource',
+	#classTraits : 'TJcCoreWebResource classTrait',
 	#instVars : [
 		'client',
 		'jobNames',
@@ -91,6 +93,11 @@ JcCoreRun >> caseDetailsAtSuite: aSuiteIndex case: aCaseIndex [
 			at: aSuiteIndex
 			ifAbsentPut: [ self fetchSuiteCasesAt: aSuiteIndex ].
 	^ cases at: aCaseIndex ifAbsent: [ Dictionary new ]
+]
+
+{ #category : #accessing }
+JcCoreRun >> client [
+	^ client
 ]
 
 { #category : #initialization }
@@ -364,6 +371,11 @@ JcCoreRun >> isQueued [
 ]
 
 { #category : #accessing }
+JcCoreRun >> jobNames [
+	^ jobNames
+]
+
+{ #category : #accessing }
 JcCoreRun >> number [
 	^ rawData at: 'number'
 ]
@@ -600,4 +612,10 @@ JcCoreRun >> timestamp [
 { #category : #accessing }
 JcCoreRun >> url [
 	^ rawData at: 'url' ifAbsent: [ self detailAt: 'url' ]
+]
+
+{ #category : #urls }
+JcCoreRun >> webUrl [
+	^ client
+		webUrlForPathSegments: (client jobPathSegmentsForNames: jobNames) , {self number asString}
 ]

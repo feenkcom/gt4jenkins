@@ -152,6 +152,31 @@ JcCoreClientExamples >> jobUrlWithContextAndEncodedBranch [
 	^ job
 ]
 
+{ #category : #urls }
+JcCoreClientExamples >> jobUrlWithoutRunResolvesJob [
+	<gtExample>
+	<return: #JcCoreJob>
+	| client job |
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.feenk.com'.
+	client
+		responseProvider: [ :url | '{"name":"main","fullName":"feenkcom/gtoolkit/main","url":"https://jenkins.feenk.com/job/feenkcom/job/gtoolkit/job/main/"}' ].
+	job := client
+			objectAtUrl: 'https://jenkins.feenk.com/view/GToolkit/job/feenkcom/job/gtoolkit/job/main/'.
+	self assert: job class equals: JcCoreJob.
+	self
+		assert: (client
+				objectAtUrl: 'https://jenkins.feenk.com/job/feenkcom/job/gtoolkit/job/main/configure')
+				class
+		equals: JcCoreJob.
+	self
+		assert: (client
+				objectAtUrl: 'https://jenkins.feenk.com/job/feenkcom/job/gtoolkit/job/main/lastBuild/')
+				class
+		equals: JcCoreRun.
+	^ job
+]
+
 { #category : #examples }
 JcCoreClientExamples >> jobsCachedUntilRefresh [
 	<gtExample>
@@ -229,4 +254,35 @@ JcCoreClientExamples >> rejectUnrelatedJobUrl [
 			rejected := true ].
 	self assert: rejected.
 	^ client
+]
+
+{ #category : #urls }
+JcCoreClientExamples >> viewUrlWithRunNumber [
+	<gtExample>
+	<return: #JcCoreRun>
+	| client run job urls |
+	urls := OrderedCollection new.
+	client := JcCoreClient new.
+	client baseUrl: 'https://jenkins.feenk.com'.
+	client
+		responseProvider: [ :url | 
+			urls add: url asString.
+			(url queryAt: 'tree') = 'name,fullName,url'
+				ifTrue: [ '{"name":"main","fullName":"feenkcom/gtoolkit/main","url":"https://jenkins.feenk.com/job/feenkcom/job/gtoolkit/job/main/"}' ]
+				ifFalse: [ '{"number":13519,"building":false,"result":"SUCCESS","timestamp":1730000000000,"duration":1200}' ] ].
+	run := client
+			objectAtUrl: 'https://jenkins.feenk.com/view/GToolkit/job/feenkcom/job/gtoolkit/job/main/13519/'.
+	self assert: run class equals: JcCoreRun.
+	self assert: run number equals: 13519.
+	self assert: run jobNames equals: #('feenkcom' 'gtoolkit' 'main').
+	self
+		assert: run webUrl
+		equals: 'https://jenkins.feenk.com/job/feenkcom/job/gtoolkit/job/main/13519/'.
+	self
+		assert: urls last
+		equals: 'https://jenkins.feenk.com/job/feenkcom/job/gtoolkit/job/main/13519/api/json?tree=number,result,building,duration,timestamp,url'.
+	job := client
+			jobAtUrl: 'https://jenkins.feenk.com/view/GToolkit/job/feenkcom/job/gtoolkit/job/main/13519/console?x=1#top'.
+	self assert: job names equals: #('feenkcom' 'gtoolkit' 'main').
+	^ run
 ]
